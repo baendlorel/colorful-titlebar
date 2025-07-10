@@ -95,22 +95,22 @@ interface ColorSet {
 
 const defaultColorSet: ColorSet = {
   light: [
+    'rgb(167, 139, 250)',
     'rgb(147, 197, 253)',
     'rgb(128, 203, 196)',
     'rgb(172, 243, 157)',
     'rgb(250, 204, 21)',
     'rgb(253, 151, 31)',
     'rgb(251, 113, 133)',
-    'rgb(167, 139, 250)',
   ],
   dark: [
-    'rgb(10, 78, 135)',
-    'rgb(0, 100, 100)',
-    'rgb(12, 118, 51)',
-    'rgb(135, 107, 0)',
-    'rgb(135, 87, 36)',
-    'rgb(135, 0, 0)',
-    'rgb(75, 0, 130)',
+    'rgb(68, 0, 116)',
+    'rgb(0, 47, 85)',
+    'rgb(0, 66, 66)',
+    'rgb(0, 75, 28)',
+    // 'rgb(99, 80, 0)',
+    'rgb(124, 65, 1)',
+    'rgb(130, 0, 0)',
   ],
 };
 
@@ -131,14 +131,9 @@ export function getColorByK(k: number, isDarkTheme: boolean, colorSet?: ColorSet
   colorSet = colorSet ?? defaultColorSet;
   const table = (isDarkTheme ? colorSet.dark : colorSet.light).slice();
 
-  // * 最后一个颜色需要再渐变回第一个颜色
-  if (table[0] !== table[table.length - 1]) {
-    table.push(table[0]);
-  }
-
   const n = table.length;
   const a = Math.floor(k * n);
-  const b = a + 1;
+  const b = (a + 1) % n; // 如果不取余数，会在a=length-1时，b=length而提取到undefined，最终解析出黑色
   const factor = (k - a / n) * n;
   const c1 = new RGBColor(table[a]);
   const c2 = new RGBColor(table[b]);

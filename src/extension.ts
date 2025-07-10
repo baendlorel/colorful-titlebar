@@ -15,7 +15,7 @@ function isDarkTheme(): boolean {
   }
 }
 
-export function activate(_context: vscode.ExtensionContext) {
+export async function activate(_context: vscode.ExtensionContext) {
   const cwd = vscode.workspace.workspaceFolders?.[0];
   const projectName = cwd ? basename(cwd.uri.fsPath) : 'kasukabe-tsumugi';
   const color = getColor(projectName, isDarkTheme());
@@ -28,14 +28,11 @@ export function activate(_context: vscode.ExtensionContext) {
     'titleBar.inactiveBackground': color.toGreyDarkenString(),
   };
 
-  config.update(section, value, vscode.ConfigurationTarget.Workspace).then(() => {
-    vscode.window.showInformationMessage(`设置完成`);
-  });
-
-  purgeSettingsFile(section, value);
+  await config.update(section, value, vscode.ConfigurationTarget.Workspace);
+  // await purgeSettingsFile(section, value);
 }
 
-// todo 试试看删除文件后是否还能正常显示颜色
+// & 删除settings文件后，样式将直接变回去
 async function purgeSettingsFile(section: string, value: unknown) {
   const cwd = vscode.workspace.workspaceFolders?.[0];
   if (!cwd) {
@@ -58,8 +55,7 @@ async function purgeSettingsFile(section: string, value: unknown) {
 
     if (compactContent === compactBgColorSetting) {
       vscode.window.showInformationMessage(`只包含彩色标题栏！: ${compactContent}`);
-    } else {
-      vscode.window.showInformationMessage(`文件内容是: ${compactContent}`);
+      await fs.unlink(configFilePath);
     }
   } catch (error) {
     vscode.window.showErrorMessage(`读取失败: ${(error as Error).message}`);

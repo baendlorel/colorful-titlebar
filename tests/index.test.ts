@@ -101,7 +101,6 @@ const names = [
   'Solene-Darrow',
   'Kairo-Ashen',
   'Noelle-Griffin',
-  'Riven-Locke',
 ];
 const lines1: string[] = [];
 const lines2: string[] = [];
@@ -115,9 +114,12 @@ console.log(lines1.join(''));
 console.log(lines2.join(''));
 
 const lines3: string[] = [];
+const lines4: string[] = [];
 for (let i = 0; i < 100; i++) {
   const c3 = getColorByK(i / 100, false).plain();
   lines3.push(`\x1b[48;2;${c3.r};${c3.g};${c3.b}m \x1b[0m`);
+  const c4 = getColorByK(i / 100, true).plain();
+  lines4.push(`\x1b[48;2;${c4.r};${c4.g};${c4.b}m \x1b[0m`);
 }
-// fixme 颜色存在最后一个渐变节点发黑的情况
 console.log(lines3.join(''));
+console.log(lines4.join(''));
