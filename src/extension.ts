@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { basename, join } from 'node:path';
-import { readFile } from 'node:fs';
+import fs from 'node:fs/promises';
 
 import { getColor } from './colors';
 
@@ -16,9 +16,10 @@ export function activate(_context: vscode.ExtensionContext) {
     'titleBar.activeBackground': color.toString(),
     'titleBar.inactiveBackground': color.toGreyDarkenString(),
   };
-  config.update(section, value, vscode.ConfigurationTarget.Workspace);
 
-  // 删除配置文件
+  config.update(section, value, vscode.ConfigurationTarget.Workspace).then((v) => {
+    vscode.window.showInformationMessage(`设置完成 ${typeof v}`);
+  });
   purgeSettingsFile(section, value);
 }
 
@@ -33,23 +34,29 @@ function isDarkTheme(): boolean {
   }
 }
 
-function purgeSettingsFile(section: string, value: any) {
+// todo 试试看删除文件后是否还能正常显示颜色
+async function purgeSettingsFile(section: string, value: unknown) {
   const cwd = vscode.workspace.workspaceFolders?.[0];
-  vscode.window.showInformationMessage(`cwd? ${typeof cwd}`);
   if (!cwd) {
     vscode.window.showInformationMessage(`没有找到工作目录`);
     return;
   }
-  const workspacePath = cwd.uri.fsPath;
-  const configFilePath = join(workspacePath, '.vscode', 'settings.json');
-  vscode.window.showInformationMessage(`configFilePath: ${configFilePath}`);
-  readFile(configFilePath, 'utf8', (err, data) => {
-    if (err) {
-      vscode.window.showErrorMessage(`读取失败: ${err.message}`);
-    } else {
-      vscode.window.showInformationMessage(`文件内容是: ${data}`);
+
+  const vscodeSettingsPath = join(cwd.uri.fsPath, '.vscode');
+  const configFilePath = join(vscodeSettingsPath, 'settings.json');
+
+  try {
+    const files = await fs.readdir(vscodeSettingsPath);
+    if (files.length === 1 && files[0] === 'settings.json') {
+      vscode.window.showInformationMessage(`删除? ${configFilePath}`);
     }
-  });
+    const content = fs.readFile(configFilePath, 'utf8');
+    vscode.window.showInformationMessage(`文件内容是: ${content}`);
+  } catch (error) {
+    vscode.window.showErrorMessage(`读取失败: ${(error as Error).message}`);
+  }
 }
 
-export function deactivate() {}
+export function deactivate() {
+  return true;
+}

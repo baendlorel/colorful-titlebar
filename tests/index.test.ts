@@ -1,5 +1,4 @@
-import { isUniform } from '@/utils';
+import fs from 'node:fs';
 
-isUniform([40, 20, 20]);
-isUniform([125, 250, 130]);
-isUniform([80, 60, 60]);
+let o = fs.writeFileSync;
+fs.writeFileSync = () => {};
