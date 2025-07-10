@@ -7,8 +7,6 @@ import alias from '@rollup/plugin-alias';
 import terser from '@rollup/plugin-terser';
 import babel from '@rollup/plugin-babel';
 
-import { createConstFoldTransformers } from './plugins/const-fold.js';
-
 const tsconfigFile = './tsconfig.build.json';
 
 /**
@@ -17,10 +15,10 @@ const tsconfigFile = './tsconfig.build.json';
 export default [
   // 主打包配置 - 混淆版
   {
-    input: 'src/index.ts',
+    input: 'src/extension.ts',
     output: [
       {
-        file: 'dist/index.js',
+        file: 'out/extension.js',
         format: 'cjs', // 指定为CommonJS格式
         sourcemap: true,
         name: 'NBaseInteger', // 全局名称
@@ -34,7 +32,6 @@ export default [
       commonjs(),
       typescript({
         tsconfig: tsconfigFile,
-        // transformers: createConstFoldTransformers(),
       }),
       babel({
         babelHelpers: 'bundled',
@@ -68,18 +65,5 @@ export default [
       }),
     ].filter(Boolean), // 过滤掉未使用的插件
     external: [], // 如果要包含所有依赖，这里保持空数组
-  },
-  // 类型声明打包
-  {
-    input: 'src/index.ts',
-    output: [{ file: 'dist/index.d.ts', format: 'es' }],
-    plugins: [
-      alias({
-        entries: [{ find: /^@/, replacement: path.resolve(import.meta.dirname, 'src') }],
-      }),
-      dts({
-        tsconfig: tsconfigFile,
-      }),
-    ],
   },
 ];
