@@ -4,6 +4,17 @@ import fs from 'node:fs/promises';
 
 import { getColor } from './colors';
 
+function isDarkTheme(): boolean {
+  switch (vscode.window.activeColorTheme.kind) {
+    case vscode.ColorThemeKind.Dark:
+    case vscode.ColorThemeKind.HighContrast:
+      return true;
+    case vscode.ColorThemeKind.Light:
+    case vscode.ColorThemeKind.HighContrastLight:
+      return false;
+  }
+}
+
 export function activate(_context: vscode.ExtensionContext) {
   const cwd = vscode.workspace.workspaceFolders?.[0];
   const projectName = cwd ? basename(cwd.uri.fsPath) : 'kasukabe-tsumugi';
@@ -17,21 +28,11 @@ export function activate(_context: vscode.ExtensionContext) {
     'titleBar.inactiveBackground': color.toGreyDarkenString(),
   };
 
-  config.update(section, value, vscode.ConfigurationTarget.Workspace).then((v) => {
-    vscode.window.showInformationMessage(`设置完成 ${typeof v}`);
+  config.update(section, value, vscode.ConfigurationTarget.Workspace).then(() => {
+    vscode.window.showInformationMessage(`设置完成`);
   });
-  purgeSettingsFile(section, value);
-}
 
-function isDarkTheme(): boolean {
-  switch (vscode.window.activeColorTheme.kind) {
-    case vscode.ColorThemeKind.Dark:
-    case vscode.ColorThemeKind.HighContrast:
-      return true;
-    case vscode.ColorThemeKind.Light:
-    case vscode.ColorThemeKind.HighContrastLight:
-      return false;
-  }
+  purgeSettingsFile(section, value);
 }
 
 // todo 试试看删除文件后是否还能正常显示颜色
@@ -50,8 +51,16 @@ async function purgeSettingsFile(section: string, value: unknown) {
     if (files.length === 1 && files[0] === 'settings.json') {
       vscode.window.showInformationMessage(`删除? ${configFilePath}`);
     }
-    const content = fs.readFile(configFilePath, 'utf8');
-    vscode.window.showInformationMessage(`文件内容是: ${content}`);
+
+    const content = await fs.readFile(configFilePath, 'utf8');
+    const compactContent = content.replace(/\s/g, '');
+    const compactBgColorSetting = JSON.stringify({ [section]: value });
+
+    if (compactContent === compactBgColorSetting) {
+      vscode.window.showInformationMessage(`只包含彩色标题栏！: ${compactContent}`);
+    } else {
+      vscode.window.showInformationMessage(`文件内容是: ${compactContent}`);
+    }
   } catch (error) {
     vscode.window.showErrorMessage(`读取失败: ${(error as Error).message}`);
   }

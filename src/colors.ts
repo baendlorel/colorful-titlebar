@@ -27,6 +27,15 @@ class RGBColor {
     this.b = parseInt(matched[2], 10);
   }
 
+  plain() {
+    return {
+      r: this.r,
+      g: this.g,
+      b: this.b,
+      a: this.a,
+    };
+  }
+
   /**
    * 混合两个颜色，系数代表原本颜色占比
    * - 系数为0代表自己，1代表other，0.5代表各一半
