@@ -67,7 +67,6 @@
       }
     }
   },
-  "type": "module",
   "scripts": {
     "build": "rimraf out && rollup -c",
     "watch": "tsc -watch -p ./",
