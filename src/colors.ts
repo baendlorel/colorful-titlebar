@@ -1,8 +1,10 @@
-export class RGBColor {
-  r: number = 0;
-  g: number = 0;
-  b: number = 0;
-  a: number = 1;
+import { createHash } from 'node:crypto';
+
+class RGBColor {
+  private r: number = 0;
+  private g: number = 0;
+  private b: number = 0;
+  private a: number = 1;
 
   constructor(s?: string) {
     if (!s) {
@@ -22,6 +24,22 @@ export class RGBColor {
     this.r = parseInt(matched[0], 10);
     this.g = parseInt(matched[1], 10);
     this.b = parseInt(matched[2], 10);
+  }
+
+  /**
+   * 混合两个颜色，系数代表原本颜色占比
+   * - 系数为0代表自己，1代表other，0.5代表各一半
+   * @param other 另一个颜色
+   * @param factor 系数
+   * @returns 新的颜色
+   */
+  mix(other: RGBColor, factor: number) {
+    const c = new RGBColor();
+    c.r = Math.floor(this.r + (other.r - this.r) * factor);
+    c.g = Math.floor(this.g + (other.g - this.g) * factor);
+    c.b = Math.floor(this.b + (other.b - this.b) * factor);
+    c.a = Math.floor(this.a + (other.a - this.a) * factor);
+    return c;
   }
 
   toString() {
@@ -62,7 +80,6 @@ const defaultColorSet: ColorSet = {
     'rgb(253, 151, 31)',
     'rgb(251, 113, 133)',
     'rgb(167, 139, 250)',
-    'rgb(147, 197, 253)', // Same as the first color
   ],
   dark: [
     'rgb(10, 78, 135)',
@@ -72,36 +89,34 @@ const defaultColorSet: ColorSet = {
     'rgb(135, 87, 36)',
     'rgb(135, 0, 0)',
     'rgb(75, 0, 130)',
-    'rgb(10, 78, 135)', // Same as the first color
   ],
 };
 
 /**
- * 获取颜色套组
- * @param k 0~1之间的比例值
- * @param isDark 是否为暗色主题
- * @param colorSet 颜色套组可能从config中获取，没有则使用默认套组
+ * 根据项目名称获取颜色套组
+ * @param name 项目名称，用哈希计算出0~1之间的数字`k`
+ * @param isDarkTheme 是否为暗色主题
+ * @param colorSet 颜色套组可能从`config`中获取，没有则使用默认套组
  * @returns
  */
-export const getColorSet = (k: number, isDark: boolean, colorSet?: ColorSet): RGBColor => {
+export function getColor(name: string, isDarkTheme: boolean, colorSet?: ColorSet): RGBColor {
   colorSet = colorSet ?? defaultColorSet;
-  const table = isDark ? colorSet.dark : colorSet.light;
+
+  const hash = Array.from(createHash('md5').update(name).digest());
+  // 将0-255映射到指定的亮度范围
+  const k = (hash[0] + hash[1] * 0xff) / 0xffff;
+  const table = (isDarkTheme ? colorSet.dark : colorSet.light).slice();
+
+  // * 最后一个颜色需要再渐变回第一个颜色
+  if (table[0] !== table[table.length - 1]) {
+    table.push(table[0]);
+  }
+
   const n = table.length;
-  const nto1 = 1 / n;
   const a = Math.floor(k * n);
   const b = a + 1;
-  const factor = (k - a * nto1) / nto1;
-
+  const factor = (k - a / n) * n;
   const c1 = new RGBColor(table[a]);
   const c2 = new RGBColor(table[b]);
-  return interpolate(c1, c2, factor);
-};
-
-function interpolate(c1: RGBColor, c2: RGBColor, factor: number): RGBColor {
-  const c = new RGBColor();
-  c.r = Math.floor(c1.r + (c2.r - c1.r) * factor);
-  c.g = Math.floor(c1.g + (c2.g - c1.g) * factor);
-  c.b = Math.floor(c1.b + (c2.b - c1.b) * factor);
-
-  return c;
+  return c1.mix(c2, factor);
 }

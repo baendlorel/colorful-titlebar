@@ -2,36 +2,24 @@ import * as vscode from 'vscode';
 import { basename, join } from 'node:path';
 import { readFile } from 'node:fs';
 
-import { generateColor } from './utils';
-import { RGBColor } from './colors';
+import { getColor } from './colors';
 
 export function activate(_context: vscode.ExtensionContext) {
-  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-
-  let color = new RGBColor('#007ACC');
-  if (workspaceFolder) {
-    const folderPath = workspaceFolder.uri.fsPath;
-    const projectName = basename(folderPath);
-    vscode.window.showInformationMessage(`projectName:${projectName}`);
-    color = generateColor(projectName, isDarkTheme());
-  }
-
-  vscode.window.showInformationMessage(`process.execPath: ${process.execPath}`);
+  const dir = vscode.workspace.workspaceFolders?.[0];
+  const projectName = dir ? basename(dir.uri.fsPath) : 'kasukabe-tsumugi';
+  const color = getColor(projectName, isDarkTheme());
 
   // 将状态栏项添加到订阅中，确保在扩展停用时清理
   vscode.window.showInformationMessage(`插件已激活！颜色: ${color.toString()}`);
 
   const config = vscode.workspace.getConfiguration();
-  config.update(
-    'workbench.colorCustomizations',
-    {
-      'titleBar.activeBackground': color.toString(),
-      'titleBar.inactiveBackground': color.toGreyDarkenString(),
-    },
-    null
-    // vscode.ConfigurationTarget.Global
-  );
-  purgeSettingsFile();
+  const section = 'workbench.colorCustomizations';
+  const value = {
+    'titleBar.activeBackground': color.toString(),
+    'titleBar.inactiveBackground': color.toGreyDarkenString(),
+  };
+  config.update(section, value, vscode.ConfigurationTarget.Workspace);
+  purgeSettingsFile(section, value);
 }
 
 function isDarkTheme(): boolean {
@@ -45,8 +33,11 @@ function isDarkTheme(): boolean {
   }
 }
 
-function purgeSettingsFile() {
+function purgeSettingsFile(section: string, value: any) {
   const folders = vscode.workspace.workspaceFolders;
+  vscode.window.showInformationMessage(
+    `has folders? ${Array.isArray(folders)}, folders?.length: ${folders?.length}`
+  );
   if (folders && folders.length > 0) {
     vscode.window.showInformationMessage(folders.map((f) => f.name).join(', '));
     const workspacePath = folders[0].uri.fsPath;
@@ -58,10 +49,6 @@ function purgeSettingsFile() {
         vscode.window.showInformationMessage(`文件内容是: ${data}`);
       }
     });
-  } else {
-    vscode.window.showInformationMessage(
-      `has folders? ${Array.isArray(folders)}, folders?.length: ${folders?.length}`
-    );
   }
 }
 
