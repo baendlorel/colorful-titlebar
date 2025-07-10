@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 
+const toHex = (n: number) => Math.round(n).toString(16).padStart(2, '0');
 class RGBColor {
   private r: number = 0;
   private g: number = 0;
@@ -42,14 +43,25 @@ class RGBColor {
     return c;
   }
 
+  /**
+   * 将本颜色输出为hex字符串
+   */
   toString() {
-    const r = Math.round(this.r).toString(16).padStart(2, '0');
-    const g = Math.round(this.g).toString(16).padStart(2, '0');
-    const b = Math.round(this.b).toString(16).padStart(2, '0');
-    return `#${r}${g}${b}`;
+    const r = toHex(this.r);
+    const g = toHex(this.g);
+    const b = toHex(this.b);
+    const a = toHex(this.a * 255);
+    return `#${r}${g}${b}${a}`;
   }
 
-  toGreyDarkenString(intensity = 0.2) {
+  /**
+   * 将本颜色变灰变暗后输出为hex字符串
+   * @param intensity 烈度，数值越大越灰越暗
+   */
+  toGreyDarkenString(intensity?: number) {
+    // 这个默认值是测试的结果，灰度比较满意
+    intensity = intensity ?? 0.56;
+
     // intensity 越大，越灰且越暗，建议 0.1 ~ 0.5
     const gray = (this.r + this.g + this.b) / 3;
 
@@ -59,10 +71,11 @@ class RGBColor {
       return Math.round(darker + grayer);
     };
 
-    const r = Math.round(mix(this.r)).toString(16).padStart(2, '0');
-    const g = Math.round(mix(this.g)).toString(16).padStart(2, '0');
-    const b = Math.round(mix(this.b)).toString(16).padStart(2, '0');
-    return `#${r}${g}${b}`;
+    const r = toHex(mix(this.r));
+    const g = toHex(mix(this.g));
+    const b = toHex(mix(this.b));
+    const a = toHex(this.a * 255);
+    return `#${r}${g}${b}${a}`;
   }
 }
 
