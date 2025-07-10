@@ -122,11 +122,13 @@ const defaultColorSet: ColorSet = {
  * @returns
  */
 export function getColor(name: string, isDarkTheme: boolean, colorSet?: ColorSet): RGBColor {
-  colorSet = colorSet ?? defaultColorSet;
-
   const hash = Array.from(createHash('md5').update(name).digest());
-  // 将0-255映射到指定的亮度范围
   const k = (hash[0] + hash[1] * 0xff) / 0xffff;
+  return getColorByK(k, isDarkTheme, colorSet);
+}
+
+export function getColorByK(k: number, isDarkTheme: boolean, colorSet?: ColorSet) {
+  colorSet = colorSet ?? defaultColorSet;
   const table = (isDarkTheme ? colorSet.dark : colorSet.light).slice();
 
   // * 最后一个颜色需要再渐变回第一个颜色

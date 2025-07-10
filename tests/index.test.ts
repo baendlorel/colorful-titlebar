@@ -1,4 +1,4 @@
-import { getColor } from '@/colors';
+import { getColor, getColorByK } from '@/colors';
 
 const names = [
   'Ava-Kingsley',
@@ -103,7 +103,21 @@ const names = [
   'Noelle-Griffin',
   'Riven-Locke',
 ];
+const lines1: string[] = [];
+const lines2: string[] = [];
 for (const name of names) {
-  const c = getColor(name, true).plain();
-  console.log(`\x1b[38;2;${c.r};${c.g};${c.b}m${name}\x1b[0m`);
+  const c1 = getColor(name, false).plain();
+  lines1.push(`\x1b[48;2;${c1.r};${c1.g};${c1.b}m \x1b[0m`);
+  const c2 = getColor(name, true).plain();
+  lines2.push(`\x1b[48;2;${c2.r};${c2.g};${c2.b}m \x1b[0m`);
 }
+console.log(lines1.join(''));
+console.log(lines2.join(''));
+
+const lines3: string[] = [];
+for (let i = 0; i < 100; i++) {
+  const c3 = getColorByK(i / 100, false).plain();
+  lines3.push(`\x1b[48;2;${c3.r};${c3.g};${c3.b}m \x1b[0m`);
+}
+// fixme 颜色存在最后一个渐变节点发黑的情况
+console.log(lines3.join(''));
