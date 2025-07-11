@@ -17,32 +17,32 @@
     "commands": [
       {
         "command": "colorful-titlebar.clear",
-        "title": "Clear Titlebar Color of current workspace",
-        "category": "Colorful Titlebar"
+        "title": "%command.clear.title%",
+        "category": "%extension.category%"
       },
       {
         "command": "colorful-titlebar.enable",
-        "title": "Enable Colorful Titlebar",
-        "category": "Colorful Titlebar"
+        "title": "%command.enable.title%",
+        "category": "%extension.category%"
       },
       {
         "command": "colorful-titlebar.disable",
-        "title": "Disable Colorful Titlebar",
-        "category": "Colorful Titlebar"
+        "title": "%command.disable.title%",
+        "category": "%extension.category%"
       }
     ],
     "configuration": {
-      "title": "Colorful Titlebar",
+      "title": "%configuration.title%",
       "properties": {
         "colorful-titlebar.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable or disable the colorful titlebar effect"
+          "description": "%configuration.enabled.description%"
         },
         "colorful-titlebar.showInfoPop": {
           "type": "boolean",
           "default": true,
-          "description": "Whether to show information messages."
+          "description": "%configuration.showInfoPop.description%"
         },
         "colorful-titlebar.hashSource": {
           "type": "string",
@@ -52,11 +52,11 @@
             "projectNameDate"
           ],
           "default": "projectName",
-          "description": "Source for generating hash-based colors. Use 'projectName' for project folder name only, or 'fullPath' for complete project path.",
+          "description": "%configuration.hashSource.description%",
           "enumDescriptions": [
-            "Generate color hash from project folder name only",
-            "Generate color hash from complete project path, so same project in different locations will have different colors",
-            "Generate color hash from project name and date, making it unique everyday"
+            "%configuration.hashSource.projectName.description%",
+            "%configuration.hashSource.fullPath.description%",
+            "%configuration.hashSource.projectNameDate.description%"
           ]
         },
         "colorful-titlebar.lightThemeColors": {
@@ -70,7 +70,7 @@
             "rgb(253, 151, 31)",
             "rgb(251, 113, 133)"
           ],
-          "description": "Colors to generate gradient for project-based titlebar color selection in light themes.  Supports `#RRGGBB`, `#RRGGBBAA`, `rgb(R,G,B)`, `rgba(R,G,B,A)`, `hsl(H,S,L)`, `hsla(H,S,L,A)`.",
+          "description": "%configuration.lightThemeColors.description%",
           "items": {
             "type": "string"
           }
@@ -85,7 +85,7 @@
             "rgb(124, 65, 1)",
             "#721a1a"
           ],
-          "description": "Colors to generate gradient for project-based titlebar color selection in dark themes. Supports `#RRGGBB`, `#RRGGBBAA`, `rgb(R,G,B)`, `rgba(R,G,B,A)`, `hsl(H,S,L)`, `hsla(H,S,L,A)`.",
+          "description": "%configuration.darkThemeColors.description%",
           "items": {
             "type": "string"
           }
@@ -120,7 +120,7 @@
             "Deno.json",
             "deno.jsonc"
           ],
-          "description": "File or directory names(will not trim) that indicate a project directory.",
+          "description": "%configuration.projectIndicators.description%",
           "items": {
             "type": "string"
           }

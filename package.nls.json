@@ -1,0 +1,16 @@
+{
+  "extension.category": "Colorful Titlebar",
+  "command.clear.title": "Clear Titlebar Color",
+  "command.enable.title": "Enable Colorful Titlebar",
+  "command.disable.title": "Disable Colorful Titlebar",
+  "configuration.title": "Colorful Titlebar",
+  "configuration.enabled.description": "Enable or disable the colorful titlebar effect",
+  "configuration.showInfoPop.description": "Whether to show information messages",
+  "configuration.hashSource.description": "Source for generating hash-based colors",
+  "configuration.hashSource.projectName.description": "Generate color hash from project folder name only",
+  "configuration.hashSource.fullPath.description": "Generate color hash from complete project path, so same project in different locations will have different colors",
+  "configuration.hashSource.projectNameDate.description": "Generate color hash from project name and date, making it unique everyday",
+  "configuration.lightThemeColors.description": "Colors to generate gradient for project-based titlebar color selection in light themes. Supports `#RRGGBB`, `#RRGGBBAA`, `rgb(R,G,B)`, `rgba(R,G,B,A)`, `hsl(H,S,L)`, `hsla(H,S,L,A)`",
+  "configuration.darkThemeColors.description": "Colors to generate gradient for project-based titlebar color selection in dark themes. Supports `#RRGGBB`, `#RRGGBBAA`, `rgb(R,G,B)`, `rgba(R,G,B,A)`, `hsl(H,S,L)`, `hsla(H,S,L,A)`",
+  "configuration.projectIndicators.description": "File or directory names (will not trim) that indicate a project directory"
+}
