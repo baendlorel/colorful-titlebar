@@ -2,32 +2,39 @@ import vscode from 'vscode';
 import { basename } from 'node:path';
 import { readdir } from 'node:fs/promises';
 
+import { Msg } from './core/i18n';
 import { defaultColorSet, getColor } from './colors';
-import { Msg } from './i18n';
+import { isTitleBarStyleCustom } from './core/ensure-custom';
 
 const enum ConfigKey {
   Enabled = 'enabled',
-  showInformationMessages = 'showInformationMessages',
+  ShowInformationMessages = 'showInformationMessages',
   LightThemeColors = 'lightThemeColors',
   DarkThemeColors = 'darkThemeColors',
   ProjectIndicators = 'projectIndicators',
 }
 
+const enum TitleBarStyleConfig {
+  Section = 'workbench.colorCustomizations',
+  ActiveBackground = 'titleBar.activeBackground',
+  InactiveBackground = 'titleBar.inactiveBackground',
+}
+
+interface PartialTitleBarStyleConfig {
+  [TitleBarStyleConfig.ActiveBackground]: string;
+  [TitleBarStyleConfig.InactiveBackground]: string;
+}
+
 export const activate = async (_context: vscode.ExtensionContext) => {
-  const titleBarStyleCheckResult = await ensureTitleBarStyleIsCustom();
-  switch (titleBarStyleCheckResult) {
-    case TitleBarStyleCheckResult.Custom:
-      break;
-    case TitleBarStyleCheckResult.NotCustom:
-      return;
-    case TitleBarStyleCheckResult.JustSet:
-      return;
+  const isCustom = await isTitleBarStyleCustom();
+  if (!isCustom) {
+    return;
   }
 
   const config = vscode.workspace.getConfiguration('colorful-titlebar');
   const enabled = config.get<boolean>(ConfigKey.Enabled, true);
   if (!enabled) {
-    return false;
+    return;
   }
 
   const cwd = vscode.workspace.workspaceFolders?.[0];
@@ -45,22 +52,34 @@ export const activate = async (_context: vscode.ExtensionContext) => {
   const projectName = basename(cwd.uri.fsPath);
   const colorSet = getColorSet(config);
   const color = getColor(projectName, colorSet);
+  const configValue = {
+    [TitleBarStyleConfig.ActiveBackground]: color.toString(),
+    [TitleBarStyleConfig.InactiveBackground]: color.toGreyDarkenString(),
+  };
 
   // 将状态栏项添加到订阅中，确保在扩展停用时清理
   const workspaceConfig = vscode.workspace.getConfiguration();
-  const section = 'workbench.colorCustomizations';
-  const value = {
-    'titleBar.activeBackground': color.toString(),
-    'titleBar.inactiveBackground': color.toGreyDarkenString(),
-  };
+  const curStyle = workspaceConfig.get<PartialTitleBarStyleConfig>(TitleBarStyleConfig.Section);
+  if (curStyle && isSameStyle(curStyle, configValue)) {
+    // 如果当前标题栏颜色已经是预期的颜色，则不需要更新
+    return;
+  }
 
-  await workspaceConfig.update(section, value, vscode.ConfigurationTarget.Workspace);
+  await workspaceConfig.update(
+    TitleBarStyleConfig.Section,
+    configValue,
+    vscode.ConfigurationTarget.Workspace
+  );
   // await purgeSettingsFile(section, value);
 };
 
+const isSameStyle = (a: PartialTitleBarStyleConfig, b: PartialTitleBarStyleConfig) =>
+  a[TitleBarStyleConfig.ActiveBackground] === b[TitleBarStyleConfig.ActiveBackground] &&
+  a[TitleBarStyleConfig.InactiveBackground] === b[TitleBarStyleConfig.InactiveBackground];
+
 let showInfo: (message: string) => void = async (m: string) => {
   const config = vscode.workspace.getConfiguration('colorful-titlebar');
-  const show = config.get<boolean>(ConfigKey.showInformationMessages, true);
+  const show = config.get<boolean>(ConfigKey.ShowInformationMessages, true);
   if (show) {
     showInfo = async (m: string) => {
       const result = await vscode.window.showInformationMessage(m, Msg.NoMoreInfoPop);
@@ -72,48 +91,6 @@ let showInfo: (message: string) => void = async (m: string) => {
     await showInfo(m);
   } else {
     showInfo = async (m: string) => {};
-  }
-};
-
-const enum TitleBarStyleCheckResult {
-  Custom,
-  NotCustom,
-  JustSet,
-}
-
-const ensureTitleBarStyleIsCustom = async (): Promise<TitleBarStyleCheckResult> => {
-  // 检测当前标题栏样式设置
-  const titleBarStyle = vscode.workspace.getConfiguration('window').get<string>('titleBarStyle');
-
-  const titleBarStyleInspect = vscode.workspace
-    .getConfiguration('window')
-    .inspect<string>('titleBarStyle');
-
-  let configurationTarget = vscode.ConfigurationTarget.Global;
-  if (titleBarStyleInspect?.workspaceFolderValue === titleBarStyle) {
-    configurationTarget = vscode.ConfigurationTarget.WorkspaceFolder;
-  } else if (titleBarStyleInspect?.workspaceValue === titleBarStyle) {
-    configurationTarget = vscode.ConfigurationTarget.Workspace;
-  }
-
-  if (titleBarStyle === 'custom') {
-    return TitleBarStyleCheckResult.Custom;
-  }
-
-  const result = await vscode.window.showWarningMessage(
-    Msg.NotCustomTitleBarStyleHint(Msg.ConfigLevel[configurationTarget]),
-    Msg.SetTitleBarStyleToCustom,
-    Msg.Cancel
-  );
-
-  if (result === Msg.SetTitleBarStyleToCustom) {
-    await vscode.workspace
-      .getConfiguration('window')
-      .update('titleBarStyle', 'custom', configurationTarget);
-    vscode.window.showInformationMessage(Msg.SetTitleBarStyleToCustomSuccess);
-    return TitleBarStyleCheckResult.JustSet;
-  } else {
-    return TitleBarStyleCheckResult.NotCustom;
   }
 };
 
