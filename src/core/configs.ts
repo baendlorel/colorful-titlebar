@@ -4,7 +4,7 @@ import { defaultColorSet } from '@/core/colors';
 
 const enum Prop {
   Enabled = 'enabled',
-  ShowInformationMessages = 'showInformationMessages',
+  ShowInfoPop = 'showInfoPop',
   LightThemeColors = 'lightThemeColors',
   DarkThemeColors = 'darkThemeColors',
   ProjectIndicators = 'projectIndicators',
@@ -52,8 +52,8 @@ class Config {
     return thisConfig.get<boolean>(Prop.Enabled, true);
   }
 
-  get [Prop.ShowInformationMessages]() {
-    return thisConfig.get<boolean>(Prop.ShowInformationMessages, true);
+  get [Prop.ShowInfoPop]() {
+    return thisConfig.get<boolean>(Prop.ShowInfoPop, true);
   }
 
   get colorSet() {
@@ -103,9 +103,9 @@ class Config {
     async [Prop.Enabled](value: boolean) {
       return thisConfig.update(Prop.Enabled, value, vscode.ConfigurationTarget.Global);
     },
-    async [Prop.ShowInformationMessages](value: boolean) {
-      const inspection = configs.inspect(thisConfig, Prop.ShowInformationMessages);
-      return thisConfig.update(Prop.ShowInformationMessages, value, inspection.target);
+    async [Prop.ShowInfoPop](value: boolean) {
+      const inspection = configs.inspect(thisConfig, Prop.ShowInfoPop);
+      return thisConfig.update(Prop.ShowInfoPop, value, inspection.target);
     },
   };
 }

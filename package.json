@@ -32,6 +32,19 @@
           "default": true,
           "description": "Enable or disable the colorful titlebar effect"
         },
+        "colorful-titlebar.hashSource": {
+          "type": "string",
+          "enum": [
+            "projectName",
+            "fullPath"
+          ],
+          "default": "projectName",
+          "description": "Source for generating hash-based colors. Use 'projectName' for project folder name only, or 'fullPath' for complete project path.",
+          "enumDescriptions": [
+            "Generate color hash from project folder name only",
+            "Generate color hash from complete project path"
+          ]
+        },
         "colorful-titlebar.showInformationMessages": {
           "type": "boolean",
           "default": true,

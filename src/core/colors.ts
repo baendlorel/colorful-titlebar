@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+
 import { configs } from './configs';
 
 const hslaToRgba = (h: number, s: number, l: number): [number, number, number] => {
