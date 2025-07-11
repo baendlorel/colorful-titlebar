@@ -1,88 +1,116 @@
-# Idea Gradient Titlebar
+# Colorful Titlebar
 
-一个为 VS Code 添加渐变标题栏效果的扩展插件。
+[中文版本](README.zh-cn.md) | **English**
 
-## 功能特性
+A VS Code extension that adds colorful background colors to the title bar based on your project name.
 
-- ✨ 为 VS Code 标题栏添加美丽的渐变效果
-- 🎨 支持自定义渐变颜色
-- 📐 支持多种渐变方向（水平、垂直、对角线）
-- 🔧 可调节透明度
-- ⚡ 简单易用的配置界面
+## ✨ Features
 
-## 安装
+- 🎨 **Project-based Colors**: Automatically generates unique colors based on your project
+- 🔄 **Multiple Hash Sources**: Choose from project name, full path, or project name + date
+- � **Customizable Color Palettes**: Separate color schemes for light and dark themes
+- � **Smart Project Detection**: Configurable file/folder indicators to identify projects
+- 🎯 **Easy Commands**: Enable, disable, or refresh with simple commands
+- 🌍 **Multi-language Support**: Full Chinese and English interface
 
-1. 克隆或下载此项目
-2. 在项目目录中运行 `npm install`
-3. 运行 `npm run compile` 编译 TypeScript 代码
-4. 按 `F5` 在新的 VS Code 窗口中测试扩展
+## 📦 Installation
 
-## 使用方法
+1. Clone or download this project
+2. Run `pnpm install` in the project directory
+3. Run `pnpm build` to compile the extension
+4. Press `F5` to test the extension in a new VS Code window
 
-### 启用渐变标题栏
+## 🚀 Usage
 
-- 打开命令面板 (`Ctrl+Shift+P`)
-- 输入 "Enable Gradient Titlebar" 并选择
+### Commands
 
-### 禁用渐变标题栏
+- **Enable Colorful Titlebar**: `Ctrl+Shift+P` → "Enable Colorful Titlebar"
+- **Disable Colorful Titlebar**: `Ctrl+Shift+P` → "Disable Colorful Titlebar"
+- **Clear Titlebar Color**: `Ctrl+Shift+P` → "Clear Titlebar Color"
 
-- 打开命令面板 (`Ctrl+Shift+P`)
-- 输入 "Disable Gradient Titlebar" 并选择
+### Requirements
 
-### 配置渐变效果
+The extension requires VS Code's title bar style to be set to "custom". If not configured, the extension will prompt you to change it automatically.
 
-- 打开命令面板 (`Ctrl+Shift+P`)
-- 输入 "Configure Gradient Titlebar" 并选择
-- 按照提示配置渐变方向和透明度
+## ⚙️ Configuration
 
-## 配置选项
+Open VS Code settings and configure the following options:
 
-在 VS Code 设置中，您可以配置以下选项：
+### `colorful-titlebar.enabled`
 
-- `idea-gradient-titlebar.enabled`: 启用或禁用渐变标题栏效果
-- `idea-gradient-titlebar.gradientColors`: 渐变颜色数组
-- `idea-gradient-titlebar.direction`: 渐变方向（horizontal、vertical、diagonal）
-- `idea-gradient-titlebar.opacity`: 透明度（0-1）
+- **Type**: boolean
+- **Default**: `true`
+- **Description**: Enable or disable the colorful titlebar effect
 
-## 开发
+### `colorful-titlebar.hashSource`
 
-### 构建项目
+- **Type**: string
+- **Default**: `"projectName"`
+- **Options**:
+  - `"projectName"`: Generate color from project folder name only
+  - `"fullPath"`: Generate color from complete project path
+  - `"projectNameDate"`: Generate color from project name and current date
+- **Description**: Source for generating hash-based colors
 
-```bash
-npm run compile
-```
+### `colorful-titlebar.lightThemeColors`
 
-### 监听模式
+- **Type**: array of strings
+- **Default**: `["rgb(167, 139, 250)", "rgb(147, 197, 253)", ...]`
+- **Description**: Color palette for light themes
+- **Supports**: `#RRGGBB`, `#RRGGBBAA`, `rgb()`, `rgba()`, `hsl()`, `hsla()`
 
-```bash
-npm run watch
-```
+### `colorful-titlebar.darkThemeColors`
 
-### 运行 ESLint
+- **Type**: array of strings
+- **Default**: `["rgb(68, 0, 116)", "rgb(0, 47, 85)", ...]`
+- **Description**: Color palette for dark themes
+- **Supports**: `#RRGGBB`, `#RRGGBBAA`, `rgb()`, `rgba()`, `hsl()`, `hsla()`
 
-```bash
-npm run lint
-```
+### `colorful-titlebar.projectIndicators`
 
-## 注意事项
+- **Type**: array of strings
+- **Default**: `[".git", "package.json", "pom.xml", ...]`
+- **Description**: If your workspace contains one item of this array, we shall consider it as a **project** and generate an unique color for the titlebar.
 
-- 此扩展需要修改 VS Code 的 CSS 文件，因此需要重启 VS Code 才能看到效果
-- 在某些情况下，VS Code 可能会显示"不受支持"的警告，这是正常的
-- 如果遇到问题，可以使用禁用命令来恢复原始状态
+### `colorful-titlebar.showInformationMessages`
 
-## 许可证
+- **Type**: boolean
+- **Default**: `true`
+- **Description**: Whether to show information messages
 
-MIT License - 查看 [LICENSE](LICENSE) 文件了解详情。
+## 🔧 How It Works
 
-## 贡献
+1. **Project Detection**: Checks for configured indicator files (like `.git`, `package.json`)
+2. **Color Generation**: Creates a hash from the selected source (project name/path/date)
+3. **Color Selection**: Maps the hash to a color from your configured palette
+4. **Theme Awareness**: Uses different color palettes for light and dark themes
+5. **Titlebar Update**: Applies the color to VS Code's titlebar background
 
-欢迎提交 Issue 和 Pull Request！
+## 📋 Requirements
 
-## 更新日志
+- VS Code 1.74.0 or higher
+- Title bar style must be set to "custom" (extension will help you configure this)
+
+## ⚠️ Notes
+
+- The extension modifies VS Code's workspace settings
+- Different projects will have consistent colors based on your hash source choice
+- Colors automatically adapt to your current theme (light/dark)
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Issues and Pull Requests are welcome!
+
+## 📝 Changelog
 
 ### 0.0.1
 
-- 初始版本
-- 基本渐变标题栏功能
-- 配置选项
-- 启用/禁用命令
+- Initial release
+- Project-based color generation
+- Multi-language support
+- Customizable color palettes
+- Smart project detection
