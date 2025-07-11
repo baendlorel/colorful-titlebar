@@ -7,15 +7,21 @@ import { Msg } from './i18n';
 
 const enum ConfigKey {
   Enabled = 'enabled',
+  showInformationMessages = 'showInformationMessages',
   LightThemeColors = 'lightThemeColors',
   DarkThemeColors = 'darkThemeColors',
   ProjectIndicators = 'projectIndicators',
 }
 
 export const activate = async (_context: vscode.ExtensionContext) => {
-  const isCustomTitleBar = await ensureStyleIsCustom();
-  if (!isCustomTitleBar) {
-    return false; // 用户取消设置标题栏样式，不继续执行
+  const titleBarStyleCheckResult = await ensureTitleBarStyleIsCustom();
+  switch (titleBarStyleCheckResult) {
+    case TitleBarStyleCheckResult.Custom:
+      break;
+    case TitleBarStyleCheckResult.NotCustom:
+      return;
+    case TitleBarStyleCheckResult.JustSet:
+      return;
   }
 
   const config = vscode.workspace.getConfiguration('colorful-titlebar');
@@ -26,13 +32,13 @@ export const activate = async (_context: vscode.ExtensionContext) => {
 
   const cwd = vscode.workspace.workspaceFolders?.[0];
   if (!cwd) {
-    vscode.window.showInformationMessage(Msg.NotOpenWorkspace);
+    showInfo(Msg.NotWorkspace);
     return;
   }
 
   const isProject = await indicateProject(config, cwd);
   if (!isProject) {
-    vscode.window.showInformationMessage(Msg.NotProject);
+    showInfo(Msg.NotProject);
     return;
   }
 
@@ -52,7 +58,30 @@ export const activate = async (_context: vscode.ExtensionContext) => {
   // await purgeSettingsFile(section, value);
 };
 
-const ensureStyleIsCustom = async (): Promise<boolean> => {
+let showInfo: (message: string) => void = async (m: string) => {
+  const config = vscode.workspace.getConfiguration('colorful-titlebar');
+  const show = config.get<boolean>(ConfigKey.showInformationMessages, true);
+  if (show) {
+    showInfo = async (m: string) => {
+      const result = await vscode.window.showInformationMessage(m, Msg.NoMoreInfoPop);
+      if (result === Msg.NoMoreInfoPop) {
+        await config.update(ConfigKey.Enabled, false, vscode.ConfigurationTarget.Global);
+        await vscode.window.showInformationMessage(Msg.NoMoreInfoPopSet);
+      }
+    };
+    await showInfo(m);
+  } else {
+    showInfo = async (m: string) => {};
+  }
+};
+
+const enum TitleBarStyleCheckResult {
+  Custom,
+  NotCustom,
+  JustSet,
+}
+
+const ensureTitleBarStyleIsCustom = async (): Promise<TitleBarStyleCheckResult> => {
   // 检测当前标题栏样式设置
   const titleBarStyle = vscode.workspace.getConfiguration('window').get<string>('titleBarStyle');
 
@@ -67,25 +96,25 @@ const ensureStyleIsCustom = async (): Promise<boolean> => {
     configurationTarget = vscode.ConfigurationTarget.Workspace;
   }
 
-  if (titleBarStyle !== 'custom') {
-    const result = await vscode.window.showWarningMessage(
-      Msg.NotCustomTitleBarStyleHint(Msg.ConfigLevel[configurationTarget]),
-      Msg.SetTitleBarStyleToCustom,
-      Msg.Cancel
-    );
-
-    if (result === Msg.SetTitleBarStyleToCustom) {
-      await vscode.workspace
-        .getConfiguration('window')
-        .update('titleBarStyle', 'custom', configurationTarget);
-      vscode.window.showInformationMessage(Msg.SetTitleBarStyleToCustomSuccess);
-      return true;
-    } else {
-      return false;
-    }
+  if (titleBarStyle === 'custom') {
+    return TitleBarStyleCheckResult.Custom;
   }
 
-  return true;
+  const result = await vscode.window.showWarningMessage(
+    Msg.NotCustomTitleBarStyleHint(Msg.ConfigLevel[configurationTarget]),
+    Msg.SetTitleBarStyleToCustom,
+    Msg.Cancel
+  );
+
+  if (result === Msg.SetTitleBarStyleToCustom) {
+    await vscode.workspace
+      .getConfiguration('window')
+      .update('titleBarStyle', 'custom', configurationTarget);
+    vscode.window.showInformationMessage(Msg.SetTitleBarStyleToCustomSuccess);
+    return TitleBarStyleCheckResult.JustSet;
+  } else {
+    return TitleBarStyleCheckResult.NotCustom;
+  }
 };
 
 const indicateProject = async (

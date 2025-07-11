@@ -2,8 +2,11 @@ import vscode from 'vscode';
 
 export const Msg = (() => {
   const Zh = {
-    NotOpenWorkspace: '没有打开工作区文件夹，不改变标题栏颜色',
+    NoMoreInfoPop: '不再提示',
+    NoMoreInfoPopSet: '如果手动开启了提示，需重启VS Code后生效',
+    NotWorkspace: '没有打开工作区文件夹，不改变标题栏颜色',
     NotProject: '当前不是项目目录，不改变标题栏颜色',
+
     ConfigLevel: {
       [vscode.ConfigurationTarget.Workspace]: '工作区',
       [vscode.ConfigurationTarget.WorkspaceFolder]: '工作区文件夹',
@@ -19,7 +22,10 @@ export const Msg = (() => {
   };
 
   const En = {
-    NotOpenWorkspace: 'No workspace folder opened, titlebar color remains unchanged',
+    NoMoreInfoPop: 'Do not show this again',
+    NoMoreInfoPopSet:
+      'If you set `showInformationMessages` to `true`, please restart VS Code to make it work',
+    NotWorkspace: 'No workspace folder opened, titlebar color remains unchanged',
     NotProject: 'Current folder is not a project directory, titlebar color remains unchanged',
     ConfigLevel: {
       [vscode.ConfigurationTarget.Workspace]: 'Workspace',
@@ -33,7 +39,7 @@ export const Msg = (() => {
     SetTitleBarStyleToCustom: 'Set it for me',
     Cancel: 'Not now',
     SetTitleBarStyleToCustomSuccess:
-      '`titleBarStyle` has been set to custom, it will take effect after restarting VS Code',
+      '`titleBarStyle` has been set to custom, Please restart VS Code to make it work',
   };
 
   const locale = vscode.env.language.toLowerCase();

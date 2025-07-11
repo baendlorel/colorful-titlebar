@@ -32,6 +32,11 @@
           "default": true,
           "description": "Enable or disable the colorful titlebar effect"
         },
+        "colorful-titlebar.showInformationMessages": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to show information messages."
+        },
         "colorful-titlebar.lightThemeColors": {
           "type": "array",
           "default": [
