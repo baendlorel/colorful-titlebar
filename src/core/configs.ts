@@ -9,7 +9,6 @@ export const enum HashSource {
 }
 
 const enum Prop {
-  Enabled = 'enabled',
   ShowInfoPop = 'showInfoPop',
   LightThemeColors = 'lightThemeColors',
   DarkThemeColors = 'darkThemeColors',
@@ -75,10 +74,6 @@ class Config {
     return { value, target: vscode.ConfigurationTarget.Global };
   }
 
-  get [Prop.Enabled]() {
-    return Config.self.get<boolean>(Prop.Enabled, true);
-  }
-
   get [Prop.ShowInfoPop]() {
     return Config.self.get<boolean>(Prop.ShowInfoPop, true);
   }
@@ -131,9 +126,6 @@ class Config {
   }
 
   readonly set = {
-    async [Prop.Enabled](value: boolean) {
-      return Config.self.update(Prop.Enabled, value, vscode.ConfigurationTarget.Global);
-    },
     async [Prop.ShowInfoPop](value: boolean) {
       return Config.self.update(Prop.ShowInfoPop, value, vscode.ConfigurationTarget.Global);
     },

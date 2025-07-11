@@ -14,26 +14,9 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "colorful-titlebar.enable",
-        "title": "%command.enable.title%",
-        "category": "%extension.category%"
-      },
-      {
-        "command": "colorful-titlebar.disable",
-        "title": "%command.disable.title%",
-        "category": "%extension.category%"
-      }
-    ],
     "configuration": {
       "title": "%configuration.title%",
       "properties": {
-        "colorful-titlebar.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "%configuration.enabled.description%"
-        },
         "colorful-titlebar.showInfoPop": {
           "type": "boolean",
           "default": true,
