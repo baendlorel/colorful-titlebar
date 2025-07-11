@@ -21,12 +21,17 @@ const enum Consts {
   Name = 'colorful-titlebar',
 }
 
-/**
- * 本插件的配置数据
- */
-const thisConfig = vscode.workspace.getConfiguration(Consts.Name);
-
 class Config {
+  /**
+   * 本插件的配置数据
+   */
+  static readonly self = vscode.workspace.getConfiguration(Consts.Name);
+
+  /**
+   * 全局配置数据
+   */
+  readonly global = vscode.workspace.getConfiguration();
+
   /**
    * 按照 VS Code 设置优先级确定配置级别并返回配置数据
    * 优先级: WorkspaceFolder > Workspace > Global > Default
@@ -37,6 +42,14 @@ class Config {
   ): { value: T | undefined; target: vscode.ConfigurationTarget } {
     const value = config.get<T>(section);
     const inspection = config.inspect(section);
+    vscode.window.showInformationMessage(
+      `section:${section}, value:${value}, ${JSON.stringify(inspection)}`
+    );
+
+    if (value === undefined) {
+      // 如果没有设置，返回默认值和全局配置目标
+      return { value, target: vscode.ConfigurationTarget.Global };
+    }
 
     if (typeof inspection !== 'object' || inspection === null) {
       return { value, target: vscode.ConfigurationTarget.Global };
@@ -56,27 +69,27 @@ class Config {
   }
 
   get [Prop.Enabled]() {
-    return thisConfig.get<boolean>(Prop.Enabled, true);
+    return Config.self.get<boolean>(Prop.Enabled, true);
   }
 
   get [Prop.ShowInfoPop]() {
-    return thisConfig.get<boolean>(Prop.ShowInfoPop, true);
+    return Config.self.get<boolean>(Prop.ShowInfoPop, true);
   }
 
   get colorSet() {
     switch (vscode.window.activeColorTheme.kind) {
       case vscode.ColorThemeKind.Dark:
       case vscode.ColorThemeKind.HighContrast:
-        return thisConfig.get<string[]>(Prop.DarkThemeColors, defaultColorSet.dark);
+        return Config.self.get<string[]>(Prop.DarkThemeColors, defaultColorSet.dark);
       case vscode.ColorThemeKind.Light:
       case vscode.ColorThemeKind.HighContrastLight:
-        return thisConfig.get<string[]>(Prop.LightThemeColors, defaultColorSet.light);
+        return Config.self.get<string[]>(Prop.LightThemeColors, defaultColorSet.light);
     }
   }
 
   get [Prop.ProjectIndicators]() {
     // 此处配置和package.json保持一致
-    return thisConfig.get<string[]>(Prop.ProjectIndicators, [
+    return Config.self.get<string[]>(Prop.ProjectIndicators, [
       '.git',
       'package.json',
       'pom.xml',
@@ -107,19 +120,18 @@ class Config {
   }
 
   get [Prop.HashSource]() {
-    return thisConfig.get<string>(Prop.HashSource, HashSource.ProjectName);
+    return Config.self.get<string>(Prop.HashSource, HashSource.ProjectName);
   }
 
   readonly set = {
     async [Prop.Enabled](value: boolean) {
-      return thisConfig.update(Prop.Enabled, value, vscode.ConfigurationTarget.Global);
+      return Config.self.update(Prop.Enabled, value, vscode.ConfigurationTarget.Global);
     },
     async [Prop.ShowInfoPop](value: boolean) {
-      return thisConfig.update(Prop.ShowInfoPop, value, vscode.ConfigurationTarget.Global);
+      return Config.self.update(Prop.ShowInfoPop, value, vscode.ConfigurationTarget.Global);
     },
     async [Prop.HashSource](value: HashSource) {
-      const inspection = configs.inspect(thisConfig, Prop.HashSource);
-      return thisConfig.update(Prop.HashSource, value, inspection.target);
+      return Config.self.update(Prop.HashSource, value, vscode.ConfigurationTarget.Global);
     },
   };
 }

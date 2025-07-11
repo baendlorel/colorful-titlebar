@@ -72,10 +72,10 @@ const toHex = (n: number) => Math.round(n).toString(16).padStart(2, '0');
  * 支持从字符串解析颜色，混合颜色，转换为 hex 字符串等功能。
  */
 class RGBColor {
-  private r: number = 0;
-  private g: number = 0;
-  private b: number = 0;
-  private a: number = 1;
+  private r = 0;
+  private g = 0;
+  private b = 0;
+  private a = 1;
 
   constructor(s?: string) {
     const parsed = parseRgba(s);
@@ -163,8 +163,21 @@ export const defaultColorSet = {
     'rgb(0, 75, 28)',
     // 'rgb(99, 80, 0)',
     'rgb(124, 65, 1)',
-    'rgb(130, 0, 0)',
+    '#953131ff',
   ],
+};
+
+const getHashSource = (fullPath: string) => {
+  switch (configs.hashSource) {
+    case HashSource.ProjectName:
+      return basename(fullPath);
+    case HashSource.FullPath:
+      return fullPath;
+    case HashSource.ProjectNameDate:
+      return basename(fullPath) + new Date().toLocaleDateString();
+    default:
+      return basename(fullPath);
+  }
 };
 
 /**
@@ -174,7 +187,7 @@ export const defaultColorSet = {
  * @returns
  */
 export const getColor = (fullPath: string): RGBColor => {
-  const hashSource = configs.hashSource === HashSource.FullPath ? fullPath : basename(fullPath);
+  const hashSource = getHashSource(fullPath);
   const hash = Array.from(createHash('md5').update(hashSource).digest());
   const k = (hash[0] + hash[1] * 0xff) / 0xffff;
   return getColorByK(k, configs.colorSet);

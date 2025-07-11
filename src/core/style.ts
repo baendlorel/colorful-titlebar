@@ -12,9 +12,9 @@ const enum TBSCheckResult {
 }
 
 const enum TBS {
-  ParentSection = 'window',
-  Section = 'titleBarStyle',
+  GlobalSection = 'window.titleBarStyle',
   ExpectedValue = 'custom',
+  Section = 'workbench.colorCustomizations',
   ActiveBg = 'titleBar.activeBackground',
   InactiveBg = 'titleBar.inactiveBackground',
 }
@@ -24,16 +24,20 @@ interface TBSConfig {
   [TBS.InactiveBg]: string;
 }
 
-const ensureTitleBarStyleIsCustom = async (): Promise<TBSCheckResult> => {
+/**
+ * 全局的`titleBarStyle`配置必须是`custom`，修改标题栏颜色的操作才能生效
+ * @returns
+ */
+const ensureIsCustom = async (): Promise<TBSCheckResult> => {
   // 检测当前标题栏样式设置
-  const windowConfig = vscode.workspace.getConfiguration(TBS.ParentSection);
-  const { value, target } = configs.inspect<string>(windowConfig, TBS.Section);
+  const Global = vscode.ConfigurationTarget.Global;
+  const value = configs.global.get<string>(TBS.GlobalSection);
   if (value === TBS.ExpectedValue) {
     return TBSCheckResult.Custom;
   }
 
   const result = await vscode.window.showWarningMessage(
-    Msg.NotCustomTitleBarStyle(Msg.ConfigLevel[target]),
+    Msg.NotCustomTitleBarStyle(Msg.ConfigLevel[Global]),
     Msg.SetTitleBarStyleToCustom,
     Msg.Cancel
   );
@@ -42,13 +46,13 @@ const ensureTitleBarStyleIsCustom = async (): Promise<TBSCheckResult> => {
     return TBSCheckResult.NotCustom;
   }
 
-  await windowConfig.update(TBS.Section, TBS.ExpectedValue, target);
+  await configs.global.update(TBS.GlobalSection, TBS.ExpectedValue, Global);
   vscode.window.showInformationMessage(Msg.SetTitleBarStyleToCustomSuccess);
   return TBSCheckResult.JustSet;
 };
 
 export const isTitleBarStyleCustom = async () => {
-  const result = await ensureTitleBarStyleIsCustom();
+  const result = await ensureIsCustom();
   switch (result) {
     case TBSCheckResult.Custom:
       return true;
@@ -59,14 +63,13 @@ export const isTitleBarStyleCustom = async () => {
   }
 };
 
-export const updateTitleBarStyle = async (active: string, inactive: string) => {
+export const updateTitleBarColor = async (active: string, inactive: string) => {
   const newStyle = {
     [TBS.ActiveBg]: active,
     [TBS.InactiveBg]: inactive,
   };
 
-  const workspaceConfig = vscode.workspace.getConfiguration();
-  const oldStyle = workspaceConfig.get<TBSConfig>(TBS.Section);
+  const oldStyle = configs.global.get<TBSConfig>(TBS.Section);
   if (
     oldStyle &&
     oldStyle[TBS.ActiveBg] === newStyle[TBS.ActiveBg] &&
@@ -74,5 +77,5 @@ export const updateTitleBarStyle = async (active: string, inactive: string) => {
   ) {
     return;
   }
-  await workspaceConfig.update(TBS.Section, newStyle, vscode.ConfigurationTarget.Workspace);
+  await configs.global.update(TBS.Section, newStyle, vscode.ConfigurationTarget.Workspace);
 };

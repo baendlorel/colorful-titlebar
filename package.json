@@ -25,7 +25,7 @@
       }
     ],
     "configuration": {
-      "title": "Idea Colorful Titlebar",
+      "title": "Colorful Titlebar",
       "properties": {
         "colorful-titlebar.enabled": {
           "type": "boolean",
@@ -39,7 +39,7 @@
             "fullPath",
             "projectNameDate"
           ],
-          "default": "projectName",
+          "default": "fullPath",
           "description": "Source for generating hash-based colors. Use 'projectName' for project folder name only, or 'fullPath' for complete project path.",
           "enumDescriptions": [
             "Generate color hash from project folder name only",
@@ -47,7 +47,7 @@
             "Generate color hash from project name and date"
           ]
         },
-        "colorful-titlebar.showInformationMessages": {
+        "colorful-titlebar.showInfoPop": {
           "type": "boolean",
           "default": true,
           "description": "Whether to show information messages."
@@ -76,7 +76,7 @@
             "rgb(0, 66, 66)",
             "rgb(0, 75, 28)",
             "rgb(124, 65, 1)",
-            "rgb(130, 0, 0)"
+            "#721a1a"
           ],
           "description": "Colors to generate gradient for project-based titlebar color selection in dark themes. Supports `#RRGGBB`, `#RRGGBBAA`, `rgb(R,G,B)`, `rgba(R,G,B,A)`, `hsl(H,S,L)`, `hsla(H,S,L,A)`.",
           "items": {
@@ -113,7 +113,7 @@
             "Deno.json",
             "deno.jsonc"
           ],
-          "description": "Files or directories that indicate a project directory",
+          "description": "File or directory names(will not trim) that indicate a project directory.",
           "items": {
             "type": "string"
           }

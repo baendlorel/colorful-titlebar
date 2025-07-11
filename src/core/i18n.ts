@@ -29,8 +29,7 @@ export const Msg = (() => {
 
   const En = {
     NoMoreInfoPop: 'Do not show this again',
-    NoMoreInfoPopSet:
-      'If you set "showInformationMessages" to "true", please restart VS Code to make it work',
+    NoMoreInfoPopSet: 'If you set "showInfoPop" to "true", please restart VS Code to make it work',
     NotWorkspace: 'No workspace folder opened, titlebar color remains unchanged',
     NotProject: 'Current folder is not a project directory, titlebar color remains unchanged',
 

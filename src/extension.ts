@@ -3,7 +3,7 @@ import { basename } from 'node:path';
 
 import { configs } from './core/configs';
 import { Msg } from './core/i18n';
-import { isTitleBarStyleCustom, updateTitleBarStyle } from './core/style';
+import { isTitleBarStyleCustom, updateTitleBarColor } from './core/style';
 import { getColor } from './core/colors';
 import { indicateProject } from './core/indicate';
 import { SettingsCreationWatcher } from './core/watcher';
@@ -33,7 +33,7 @@ export const activate = async (_context: vscode.ExtensionContext) => {
   const projectName = basename(cwd.uri.fsPath);
   const color = getColor(cwd.uri.fsPath);
   const scw = new SettingsCreationWatcher(cwd.uri.fsPath);
-  await updateTitleBarStyle(color.toString(), color.toGreyDarkenString());
+  await updateTitleBarColor(color.toString(), color.toGreyDarkenString());
   showInfo(Msg.TitleBarColorSet(projectName, color.toString(), scw.isNew));
 };
 
@@ -45,6 +45,7 @@ const showInfo = configs.showInfoPop
         await vscode.window.showInformationMessage(Msg.NoMoreInfoPopSet);
       }
     }
-  : async (m: string) => {};
+  : // eslint-disable-next-line @typescript-eslint/no-empty-function
+    async (_: string) => {};
 
 export const deactivate = () => true;
