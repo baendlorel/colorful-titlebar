@@ -1,13 +1,12 @@
 import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 
 export class FileCreationWatcher {
   private readonly exists: boolean = false;
   private readonly filePath: string;
 
-  constructor(cwd: string) {
-    this.filePath = join(cwd, '.vscode', 'settings.json');
-    this.exists = existsSync(this.filePath);
+  constructor(path: string) {
+    this.filePath = path;
+    this.exists = existsSync(path);
   }
 
   /**

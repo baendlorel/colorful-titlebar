@@ -16,11 +16,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "colorful-titlebar.clear",
-        "title": "%command.clear.title%",
-        "category": "%extension.category%"
-      },
-      {
         "command": "colorful-titlebar.enable",
         "title": "%command.enable.title%",
         "category": "%extension.category%"
