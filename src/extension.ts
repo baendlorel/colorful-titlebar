@@ -56,9 +56,20 @@ const ensureStyleIsCustom = async (): Promise<boolean> => {
   // 检测当前标题栏样式设置
   const titleBarStyle = vscode.workspace.getConfiguration('window').get<string>('titleBarStyle');
 
+  const titleBarStyleInspect = vscode.workspace
+    .getConfiguration('window')
+    .inspect<string>('titleBarStyle');
+
+  let configurationTarget = vscode.ConfigurationTarget.Global;
+  if (titleBarStyleInspect?.workspaceFolderValue === titleBarStyle) {
+    configurationTarget = vscode.ConfigurationTarget.WorkspaceFolder;
+  } else if (titleBarStyleInspect?.workspaceValue === titleBarStyle) {
+    configurationTarget = vscode.ConfigurationTarget.Workspace;
+  }
+
   if (titleBarStyle !== 'custom') {
     const result = await vscode.window.showWarningMessage(
-      Msg.NotCustomTitleBarStyleHint,
+      Msg.NotCustomTitleBarStyleHint(Msg.ConfigLevel[configurationTarget]),
       Msg.SetTitleBarStyleToCustom,
       Msg.Cancel
     );
@@ -66,7 +77,7 @@ const ensureStyleIsCustom = async (): Promise<boolean> => {
     if (result === Msg.SetTitleBarStyleToCustom) {
       await vscode.workspace
         .getConfiguration('window')
-        .update('titleBarStyle', 'custom', vscode.ConfigurationTarget.Global);
+        .update('titleBarStyle', 'custom', configurationTarget);
       vscode.window.showInformationMessage(Msg.SetTitleBarStyleToCustomSuccess);
       return true;
     } else {
