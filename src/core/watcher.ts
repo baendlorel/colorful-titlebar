@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-export class SettingsCreationWatcher {
+export class FileCreationWatcher {
   private readonly exists: boolean = false;
   private readonly filePath: string;
 

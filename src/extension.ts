@@ -1,12 +1,10 @@
 import vscode from 'vscode';
-import { basename } from 'node:path';
 
 import { configs } from './core/configs';
 import { Msg } from './core/i18n';
 import { clearTitleBarColor, isTitleBarStyleCustom, updateTitleBarColor } from './core/style';
-import { getColor } from './core/colors';
 import { indicateProject } from './core/indicate';
-import { SettingsCreationWatcher } from './core/watcher';
+import { FileCreationWatcher } from './core/watcher';
 
 export const activate = async (context: vscode.ExtensionContext) => {
   // 注册命令
@@ -29,23 +27,21 @@ const applyTitleBarColor = async () => {
     return;
   }
 
-  const cwd = vscode.workspace.workspaceFolders?.[0];
-  if (!cwd) {
+  const dir = configs.dir;
+  if (!dir) {
     console.log(Msg.NotWorkspace);
     return;
   }
 
-  const isProject = await indicateProject(cwd);
+  const isProject = await indicateProject(dir);
   if (!isProject) {
     console.log(Msg.NotProject);
     return;
   }
 
-  const projectName = basename(cwd.uri.fsPath);
-  const color = getColor(cwd.uri.fsPath);
-  const scw = new SettingsCreationWatcher(cwd.uri.fsPath);
-  await updateTitleBarColor(color.toString(), color.toGreyDarkenString());
-  showInfo(Msg.TitleBarColorSet(projectName, color.toString(), scw.isNew));
+  const fw = new FileCreationWatcher(dir);
+  await updateTitleBarColor();
+  showInfo(Msg.TitleBarColorSet(fw.isNew));
 };
 
 const showInfo = configs.showInfoPop
@@ -64,7 +60,7 @@ export const deactivate = () => true;
 /**
  * Register all extension commands
  */
-function registerCommands(context: vscode.ExtensionContext) {
+const registerCommands = (context: vscode.ExtensionContext) => {
   const enableCommand = vscode.commands.registerCommand('colorful-titlebar.enable', async () => {
     await configs.set.enabled(true);
     vscode.window.showInformationMessage(Msg.CommandEnable);
@@ -74,9 +70,14 @@ function registerCommands(context: vscode.ExtensionContext) {
 
   const disableCommand = vscode.commands.registerCommand('colorful-titlebar.disable', async () => {
     await configs.set.enabled(false);
-    await clearTitleBarColor();
-    vscode.window.showInformationMessage(Msg.CommandDisable);
+    const settingsRemoved = await clearTitleBarColor();
+    vscode.window.showInformationMessage(Msg.CommandDisable(settingsRemoved));
   });
 
-  context.subscriptions.push(enableCommand, disableCommand);
-}
+  const clearCommand = vscode.commands.registerCommand('colorful-titlebar.clear', async () => {
+    const settingsRemoved = await clearTitleBarColor();
+    vscode.window.showInformationMessage(Msg.CommandDisable(settingsRemoved));
+  });
+
+  context.subscriptions.push(enableCommand, disableCommand, clearCommand);
+};

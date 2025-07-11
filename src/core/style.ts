@@ -1,7 +1,10 @@
 import vscode from 'vscode';
+import { join } from 'node:path';
+import { readdir, readFile, rm } from 'node:fs/promises';
 
 import { Msg } from './i18n';
 import { configs } from './configs';
+import { getColor } from './colors';
 
 // $ TBS -> TitleBarStyle
 
@@ -63,10 +66,12 @@ export const isTitleBarStyleCustom = async () => {
   }
 };
 
-export const updateTitleBarColor = async (active: string, inactive: string) => {
+export const updateTitleBarColor = async () => {
+  const color = getColor(configs.dir);
+
   const newStyle = {
-    [TBS.ActiveBg]: active,
-    [TBS.InactiveBg]: inactive,
+    [TBS.ActiveBg]: color.toString(),
+    [TBS.InactiveBg]: color.toGreyDarkenString(),
   };
 
   const oldStyle = configs.global.get<TBSConfig>(TBS.Section);
@@ -86,4 +91,15 @@ export const clearTitleBarColor = async () => {
     [TBS.InactiveBg]: undefined,
   };
   await configs.global.update(TBS.Section, emptyStyle, vscode.ConfigurationTarget.Workspace);
+
+  // 如果.vscode下只有settings一个文件，而且内容和上面的compact一样，那么删除.vscode
+  const settingsPath = join(configs.dir, '.vscode'); // , 'settings.json'
+  const list = await readdir(settingsPath);
+  const content = await readFile(join(settingsPath, 'settings.json'), 'utf-8');
+
+  if (list.length === 1 && content.replace(/\s/g, '') === `{"workbench.colorCustomizations":{}}`) {
+    await rm(settingsPath, { recursive: true, force: true });
+    return true;
+  }
+  return false;
 };

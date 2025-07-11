@@ -32,6 +32,13 @@ class Config {
    */
   readonly global = vscode.workspace.getConfiguration();
 
+  readonly dir: string;
+
+  constructor() {
+    const cwd = vscode.workspace.workspaceFolders?.[0];
+    this.dir = cwd?.uri.fsPath ?? '';
+  }
+
   /**
    * 按照 VS Code 设置优先级确定配置级别并返回配置数据
    * 优先级: WorkspaceFolder > Workspace > Global > Default

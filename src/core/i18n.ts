@@ -8,7 +8,11 @@ export const Msg = (() => {
     NotProject: '当前不是项目目录，不改变标题栏颜色',
 
     CommandEnable: 'Colorful Titlebar 已开启',
-    CommandDisable: 'Colorful Titlebar 已关闭（已改变的标题栏颜色需手动恢复），后续不会再改变颜色',
+    CommandDisable: (settingsRemoved: boolean) =>
+      `Colorful Titlebar 已关闭（已改变的标题栏颜色需手动恢复），后续不会再改变颜色${
+        settingsRemoved ? '，".vscode/settings.json"也已删除' : ''
+      }`,
+    CommandClear: '标题栏颜色已清空',
 
     ConfigLevel: {
       [vscode.ConfigurationTarget.Workspace]: '工作区',
@@ -17,10 +21,8 @@ export const Msg = (() => {
     },
 
     // 设置标题栏颜色
-    TitleBarColorSet: (hashSource: string, hexColor: string, settingsCreated: boolean) =>
-      `"${hashSource}"的标题栏颜色已设为${hexColor}${
-        settingsCreated ? '，已创建settings.json' : ''
-      }`,
+    TitleBarColorSet: (settingsCreated: boolean) =>
+      `标题栏颜色已更新${settingsCreated ? '，已创建settings.json' : ''}`,
 
     // 设置全局标题栏样式
     NotCustomTitleBarStyle: (level: string) =>
@@ -37,8 +39,12 @@ export const Msg = (() => {
     NotProject: 'Current folder is not a project directory, titlebar color remains unchanged',
 
     CommandEnable: 'Colorful Titlebar enabled',
-    CommandDisable:
-      'Colorful Titlebar disabled (titlebar colors changed, please restore them manually). Will not change colors in the future',
+    CommandDisable: (settingsRemoved: boolean) =>
+      `Colorful Titlebar disabled (titlebar colors changed, please restore them manually)${
+        settingsRemoved ? '. ".vscode/settings.json" is also removed.' : ''
+      }`,
+
+    CommandClear: 'Titlebar colors cleared',
 
     ConfigLevel: {
       [vscode.ConfigurationTarget.Workspace]: 'Workspace',
@@ -47,9 +53,9 @@ export const Msg = (() => {
     },
 
     // 设置标题栏颜色
-    TitleBarColorSet: (hashSource: string, hexColor: string, settingsCreated: boolean) =>
-      `TitleBar color for "${hashSource}" has been set to ${hexColor}${
-        settingsCreated ? ', settings.json has been created' : ''
+    TitleBarColorSet: (settingsCreated: boolean) =>
+      `TitleBar color has been updated${
+        settingsCreated ? ', "settings.json" has been created' : ''
       }`,
 
     // 设置全局标题栏样式

@@ -16,6 +16,11 @@
   "contributes": {
     "commands": [
       {
+        "command": "colorful-titlebar.clear",
+        "title": "Clear Titlebar Color of current workspace",
+        "category": "Colorful Titlebar"
+      },
+      {
         "command": "colorful-titlebar.enable",
         "title": "Enable Colorful Titlebar",
         "category": "Colorful Titlebar"
