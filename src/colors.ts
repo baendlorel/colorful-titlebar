@@ -1,6 +1,73 @@
 import { createHash } from 'node:crypto';
 
+const hslaToRgba = (h: number, s: number, l: number): [number, number, number] => {
+  const C = (1 - Math.abs(2 * l - 1)) * s;
+  const X = C * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - C / 2;
+
+  let r1 = 0,
+    g1 = 0,
+    b1 = 0;
+
+  if (h < 60) {
+    [r1, g1, b1] = [C, X, 0];
+  } else if (h < 120) {
+    [r1, g1, b1] = [X, C, 0];
+  } else if (h < 180) {
+    [r1, g1, b1] = [0, C, X];
+  } else if (h < 240) {
+    [r1, g1, b1] = [0, X, C];
+  } else if (h < 300) {
+    [r1, g1, b1] = [X, 0, C];
+  } else {
+    [r1, g1, b1] = [C, 0, X];
+  }
+
+  // 转换到 [0, 255] 并取整
+  return [Math.round((r1 + m) * 255), Math.round((g1 + m) * 255), Math.round((b1 + m) * 255)];
+};
+
+const parseRgba = (s: string | undefined) => {
+  s = s?.replace(/\s/g, '') || '';
+
+  const hexMatch = s.match(/^#([0-9a-fA-F]{6})([0-9a-fA-F]{2})?$/);
+  if (hexMatch) {
+    const hex = hexMatch[1];
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    const a = hexMatch[2] ? parseInt(hexMatch[2], 16) / 255 : 1;
+    return [r, g, b, a];
+  }
+
+  const rgbaMatch = s.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+  if (rgbaMatch) {
+    const r = parseInt(rgbaMatch[1], 10);
+    const g = parseInt(rgbaMatch[2], 10);
+    const b = parseInt(rgbaMatch[3], 10);
+    const a = rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1;
+    return [r, g, b, a];
+  }
+
+  const hslaMatch = s.match(/hsla?\((\d+),\s*(\d+)%?,\s*(\d+)%?(?:,\s*([\d.]+))?\)/);
+  if (hslaMatch) {
+    const h = parseInt(hslaMatch[1], 10);
+    const s = parseInt(hslaMatch[2], 10) / 100;
+    const l = parseInt(hslaMatch[3], 10) / 100;
+    const a = hslaMatch[4] ? parseFloat(hslaMatch[4]) : 1;
+    const [r, g, b] = hslaToRgba(h, s, l);
+    return [r, g, b, a];
+  }
+
+  return [0, 0, 0, 1];
+};
+
 const toHex = (n: number) => Math.round(n).toString(16).padStart(2, '0');
+
+/**
+ * RGBColor 类用于处理 RGB 颜色。
+ * 支持从字符串解析颜色，混合颜色，转换为 hex 字符串等功能。
+ */
 class RGBColor {
   private r: number = 0;
   private g: number = 0;
@@ -8,23 +75,11 @@ class RGBColor {
   private a: number = 1;
 
   constructor(s?: string) {
-    if (!s) {
-      return;
-    }
-    s = s.replace(/\s/g, '');
-    const matched = s.match(/\d+/g);
-    if (!matched || (matched.length !== 3 && matched.length !== 4)) {
-      console.error(
-        'Invalid RGB color string:',
-        s,
-        'expected format "#000000, #00000000, rgb(r, g, b), rgba(r, g, b, a), hsl, hsla". Now return black'
-      );
-      return;
-    }
-
-    this.r = parseInt(matched[0], 10);
-    this.g = parseInt(matched[1], 10);
-    this.b = parseInt(matched[2], 10);
+    const parsed = parseRgba(s);
+    this.r = parsed[0];
+    this.g = parsed[1];
+    this.b = parsed[2];
+    this.a = parsed[3];
   }
 
   plain() {
@@ -88,12 +143,7 @@ class RGBColor {
   }
 }
 
-interface ColorSet {
-  dark: string[];
-  light: string[];
-}
-
-const defaultColorSet: ColorSet = {
+export const defaultColorSet = {
   light: [
     'rgb(167, 139, 250)',
     'rgb(147, 197, 253)',
@@ -117,25 +167,21 @@ const defaultColorSet: ColorSet = {
 /**
  * 根据项目名称获取颜色套组
  * @param name 项目名称，用哈希计算出0~1之间的数字`k`
- * @param isDarkTheme 是否为暗色主题
- * @param colorSet 颜色套组可能从`config`中获取，没有则使用默认套组
+ * @param colorSet 颜色套组从`config`中获取，没有则使用默认套组
  * @returns
  */
-export function getColor(name: string, isDarkTheme: boolean, colorSet?: ColorSet): RGBColor {
+export const getColor = (name: string, colorSet: string[]): RGBColor => {
   const hash = Array.from(createHash('md5').update(name).digest());
   const k = (hash[0] + hash[1] * 0xff) / 0xffff;
-  return getColorByK(k, isDarkTheme, colorSet);
-}
+  return getColorByK(k, colorSet);
+};
 
-export function getColorByK(k: number, isDarkTheme: boolean, colorSet?: ColorSet) {
-  colorSet = colorSet ?? defaultColorSet;
-  const table = (isDarkTheme ? colorSet.dark : colorSet.light).slice();
-
-  const n = table.length;
+export const getColorByK = (k: number, colorSet: string[]) => {
+  const n = colorSet.length;
   const a = Math.floor(k * n);
   const b = (a + 1) % n; // 如果不取余数，会在a=length-1时，b=length而提取到undefined，最终解析出黑色
   const factor = (k - a / n) * n;
-  const c1 = new RGBColor(table[a]);
-  const c2 = new RGBColor(table[b]);
+  const c1 = new RGBColor(colorSet[a]);
+  const c2 = new RGBColor(colorSet[b]);
   return c1.mix(c2, factor);
-}
+};

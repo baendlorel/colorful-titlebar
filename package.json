@@ -17,52 +17,68 @@
     "commands": [
       {
         "command": "colorful-titlebar.enable",
-        "title": "Enable Gradient Titlebar"
+        "title": "Enable Colorful Titlebar"
       },
       {
         "command": "colorful-titlebar.disable",
-        "title": "Disable Gradient Titlebar"
-      },
-      {
-        "command": "colorful-titlebar.configure",
-        "title": "Configure Gradient Titlebar"
+        "title": "Disable Colorful Titlebar"
       }
     ],
     "configuration": {
-      "title": "Idea Gradient Titlebar",
+      "title": "Idea Colorful Titlebar",
       "properties": {
         "colorful-titlebar.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable or disable the gradient titlebar effect"
+          "description": "Enable or disable the colorful titlebar effect"
         },
-        "colorful-titlebar.gradientColors": {
+        "colorful-titlebar.lightThemeColors": {
           "type": "array",
           "default": [
-            "#667eea",
-            "#764ba2"
+            "rgb(167, 139, 250)",
+            "rgb(147, 197, 253)",
+            "rgb(128, 203, 196)",
+            "rgb(172, 243, 157)",
+            "rgb(250, 204, 21)",
+            "rgb(253, 151, 31)",
+            "rgb(251, 113, 133)"
           ],
-          "description": "Colors for the gradient effect",
+          "description": "Colors to generate gradient for project-based titlebar color selection in light themes.  Supports `#RRGGBB`, `#RRGGBBAA`, `rgb(R,G,B)`, `rgba(R,G,B,A)`, `hsl(H,S,L)`, `hsla(H,S,L,A)`.",
           "items": {
             "type": "string"
           }
         },
-        "colorful-titlebar.direction": {
-          "type": "string",
-          "enum": [
-            "horizontal",
-            "vertical",
-            "diagonal"
+        "colorful-titlebar.darkThemeColors": {
+          "type": "array",
+          "default": [
+            "rgb(68, 0, 116)",
+            "rgb(0, 47, 85)",
+            "rgb(0, 66, 66)",
+            "rgb(0, 75, 28)",
+            "rgb(124, 65, 1)",
+            "rgb(130, 0, 0)"
           ],
-          "default": "horizontal",
-          "description": "Direction of the gradient"
+          "description": "Colors to generate gradient for project-based titlebar color selection in dark themes. Supports `#RRGGBB`, `#RRGGBBAA`, `rgb(R,G,B)`, `rgba(R,G,B,A)`, `hsl(H,S,L)`, `hsla(H,S,L,A)`.",
+          "items": {
+            "type": "string"
+          }
         },
-        "colorful-titlebar.opacity": {
-          "type": "number",
-          "default": 0.8,
-          "minimum": 0,
-          "maximum": 1,
-          "description": "Opacity of the gradient effect"
+        "colorful-titlebar.projectIndicators": {
+          "type": "array",
+          "default": [
+            ".git",
+            "package.json",
+            "pom.xml",
+            "Cargo.toml",
+            "go.mod",
+            "README.md",
+            "LICENSE",
+            "requirements.txt"
+          ],
+          "description": "Files or directories that indicate a project directory",
+          "items": {
+            "type": "string"
+          }
         }
       }
     }
