@@ -2,12 +2,19 @@ import vscode from 'vscode';
 
 import { defaultColorSet } from '@/core/colors';
 
+export const enum HashSource {
+  ProjectName = 'projectName',
+  FullPath = 'fullPath',
+  ProjectNameDate = 'projectNameDate',
+}
+
 const enum Prop {
   Enabled = 'enabled',
   ShowInfoPop = 'showInfoPop',
   LightThemeColors = 'lightThemeColors',
   DarkThemeColors = 'darkThemeColors',
   ProjectIndicators = 'projectIndicators',
+  HashSource = 'hashSource',
 }
 
 const enum Consts {
@@ -99,13 +106,20 @@ class Config {
     ]);
   }
 
+  get [Prop.HashSource]() {
+    return thisConfig.get<string>(Prop.HashSource, HashSource.ProjectName);
+  }
+
   readonly set = {
     async [Prop.Enabled](value: boolean) {
       return thisConfig.update(Prop.Enabled, value, vscode.ConfigurationTarget.Global);
     },
     async [Prop.ShowInfoPop](value: boolean) {
-      const inspection = configs.inspect(thisConfig, Prop.ShowInfoPop);
-      return thisConfig.update(Prop.ShowInfoPop, value, inspection.target);
+      return thisConfig.update(Prop.ShowInfoPop, value, vscode.ConfigurationTarget.Global);
+    },
+    async [Prop.HashSource](value: HashSource) {
+      const inspection = configs.inspect(thisConfig, Prop.HashSource);
+      return thisConfig.update(Prop.HashSource, value, inspection.target);
     },
   };
 }

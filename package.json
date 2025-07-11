@@ -36,13 +36,15 @@
           "type": "string",
           "enum": [
             "projectName",
-            "fullPath"
+            "fullPath",
+            "projectNameDate"
           ],
           "default": "projectName",
           "description": "Source for generating hash-based colors. Use 'projectName' for project folder name only, or 'fullPath' for complete project path.",
           "enumDescriptions": [
             "Generate color hash from project folder name only",
-            "Generate color hash from complete project path"
+            "Generate color hash from complete project path",
+            "Generate color hash from project name and date"
           ]
         },
         "colorful-titlebar.showInformationMessages": {

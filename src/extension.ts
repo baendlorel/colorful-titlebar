@@ -31,7 +31,7 @@ export const activate = async (_context: vscode.ExtensionContext) => {
   }
 
   const projectName = basename(cwd.uri.fsPath);
-  const color = getColor(projectName);
+  const color = getColor(cwd.uri.fsPath);
   const scw = new SettingsCreationWatcher(cwd.uri.fsPath);
   await updateTitleBarStyle(color.toString(), color.toGreyDarkenString());
   showInfo(Msg.TitleBarColorSet(projectName, color.toString(), scw.isNew));

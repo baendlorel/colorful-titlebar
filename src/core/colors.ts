@@ -1,6 +1,7 @@
+import { basename } from 'node:path';
 import { createHash } from 'node:crypto';
 
-import { configs } from './configs';
+import { configs, HashSource } from './configs';
 
 const hslaToRgba = (h: number, s: number, l: number): [number, number, number] => {
   const C = (1 - Math.abs(2 * l - 1)) * s;
@@ -168,12 +169,13 @@ export const defaultColorSet = {
 
 /**
  * 根据项目名称获取颜色套组
- * @param name 项目名称，用哈希计算出0~1之间的数字`k`
+ * @param fullPath 项目目录，用哈希计算出0~1之间的数字`k`
  * @param colorSet 颜色套组从`config`中获取，没有则使用默认套组
  * @returns
  */
-export const getColor = (name: string): RGBColor => {
-  const hash = Array.from(createHash('md5').update(name).digest());
+export const getColor = (fullPath: string): RGBColor => {
+  const hashSource = configs.hashSource === HashSource.FullPath ? fullPath : basename(fullPath);
+  const hash = Array.from(createHash('md5').update(hashSource).digest());
   const k = (hash[0] + hash[1] * 0xff) / 0xffff;
   return getColorByK(k, configs.colorSet);
 };
