@@ -1,6 +1,6 @@
 import vscode from 'vscode';
-import { basename, join } from 'node:path';
-import fs from 'node:fs/promises';
+import { basename } from 'node:path';
+import { readdir } from 'node:fs/promises';
 
 import { defaultColorSet, getColor } from './colors';
 import { Msg } from './i18n';
@@ -13,8 +13,12 @@ const enum ConfigKey {
 }
 
 export const activate = async (_context: vscode.ExtensionContext) => {
-  const config = vscode.workspace.getConfiguration('colorful-titlebar');
+  const isCustomTitleBar = await ensureStyleIsCustom();
+  if (!isCustomTitleBar) {
+    return false; // 用户取消设置标题栏样式，不继续执行
+  }
 
+  const config = vscode.workspace.getConfiguration('colorful-titlebar');
   const enabled = config.get<boolean>(ConfigKey.Enabled, true);
   if (!enabled) {
     return false;
@@ -22,13 +26,13 @@ export const activate = async (_context: vscode.ExtensionContext) => {
 
   const cwd = vscode.workspace.workspaceFolders?.[0];
   if (!cwd) {
-    vscode.window.showInformationMessage(Msg.notOpenWorkspace);
+    vscode.window.showInformationMessage(Msg.NotOpenWorkspace);
     return;
   }
 
   const isProject = await indicateProject(config, cwd);
-  if (isProject) {
-    vscode.window.showInformationMessage(Msg.notProject);
+  if (!isProject) {
+    vscode.window.showInformationMessage(Msg.NotProject);
     return;
   }
 
@@ -48,11 +52,36 @@ export const activate = async (_context: vscode.ExtensionContext) => {
   // await purgeSettingsFile(section, value);
 };
 
+const ensureStyleIsCustom = async (): Promise<boolean> => {
+  // 检测当前标题栏样式设置
+  const titleBarStyle = vscode.workspace.getConfiguration('window').get<string>('titleBarStyle');
+
+  if (titleBarStyle !== 'custom') {
+    const result = await vscode.window.showWarningMessage(
+      Msg.NotCustomTitleBarStyleHint,
+      Msg.SetTitleBarStyleToCustom,
+      Msg.Cancel
+    );
+
+    if (result === Msg.SetTitleBarStyleToCustom) {
+      await vscode.workspace
+        .getConfiguration('window')
+        .update('titleBarStyle', 'custom', vscode.ConfigurationTarget.Global);
+      vscode.window.showInformationMessage(Msg.SetTitleBarStyleToCustomSuccess);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 const indicateProject = async (
   config: vscode.WorkspaceConfiguration,
   cwd: vscode.WorkspaceFolder
 ): Promise<boolean> => {
-  const list = await fs.readdir(cwd.uri.fsPath);
+  const list = await readdir(cwd.uri.fsPath);
   const indicators = config.get<string[]>(ConfigKey.ProjectIndicators, []);
   for (let i = 0; i < indicators.length; i++) {
     if (list.includes(indicators[i])) {
