@@ -1,8 +1,9 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { basename, join } from 'node:path';
 import fs from 'node:fs/promises';
 
 import { defaultColorSet, getColor } from './colors';
+import { Msg } from './i18n';
 
 const enum ConfigKey {
   Enabled = 'enabled',
@@ -21,13 +22,13 @@ export const activate = async (_context: vscode.ExtensionContext) => {
 
   const cwd = vscode.workspace.workspaceFolders?.[0];
   if (!cwd) {
-    vscode.window.showInformationMessage(`没有打开工作区文件夹，不改变颜色`);
+    vscode.window.showInformationMessage(Msg.notOpenWorkspace);
     return;
   }
 
   const isProject = await indicateProject(config, cwd);
   if (isProject) {
-    vscode.window.showInformationMessage(`当前不是项目目录，不改变颜色`);
+    vscode.window.showInformationMessage(Msg.notProject);
     return;
   }
 
@@ -69,36 +70,6 @@ const getColorSet = (config: vscode.WorkspaceConfiguration): string[] => {
     case vscode.ColorThemeKind.Light:
     case vscode.ColorThemeKind.HighContrastLight:
       return config.get<string[]>(ConfigKey.LightThemeColors, defaultColorSet.light);
-  }
-};
-
-// & 删除settings文件后，样式将直接变回去
-const purgeSettingsFile = async (section: string, value: unknown) => {
-  const cwd = vscode.workspace.workspaceFolders?.[0];
-  if (!cwd) {
-    vscode.window.showInformationMessage(`没有找到工作目录`);
-    return;
-  }
-
-  const vscodeSettingsPath = join(cwd.uri.fsPath, '.vscode');
-  const configFilePath = join(vscodeSettingsPath, 'settings.json');
-
-  try {
-    const files = await fs.readdir(vscodeSettingsPath);
-    if (files.length === 1 && files[0] === 'settings.json') {
-      vscode.window.showInformationMessage(`删除? ${configFilePath}`);
-    }
-
-    const content = await fs.readFile(configFilePath, 'utf8');
-    const compactContent = content.replace(/\s/g, '');
-    const compactBgColorSetting = JSON.stringify({ [section]: value });
-
-    if (compactContent === compactBgColorSetting) {
-      vscode.window.showInformationMessage(`只包含彩色标题栏！: ${compactContent}`);
-      await fs.unlink(configFilePath);
-    }
-  } catch (error) {
-    vscode.window.showErrorMessage(`读取失败: ${(error as Error).message}`);
   }
 };
 

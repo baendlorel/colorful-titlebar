@@ -1,4 +1,4 @@
-import { getColor, getColorByK } from '@/colors';
+import { defaultColorSet, getColor, getColorByK } from '@/colors';
 
 const names = [
   'Ava-Kingsley',
@@ -105,9 +105,9 @@ const names = [
 const lines1: string[] = [];
 const lines2: string[] = [];
 for (const name of names) {
-  const c1 = getColor(name, false).plain();
+  const c1 = getColor(name, defaultColorSet.light).plain();
   lines1.push(`\x1b[48;2;${c1.r};${c1.g};${c1.b}m \x1b[0m`);
-  const c2 = getColor(name, true).plain();
+  const c2 = getColor(name, defaultColorSet.dark).plain();
   lines2.push(`\x1b[48;2;${c2.r};${c2.g};${c2.b}m \x1b[0m`);
 }
 console.log(lines1.join(''));
@@ -116,9 +116,9 @@ console.log(lines2.join(''));
 const lines3: string[] = [];
 const lines4: string[] = [];
 for (let i = 0; i < 100; i++) {
-  const c3 = getColorByK(i / 100, false).plain();
+  const c3 = getColorByK(i / 100, defaultColorSet.light).plain();
   lines3.push(`\x1b[48;2;${c3.r};${c3.g};${c3.b}m \x1b[0m`);
-  const c4 = getColorByK(i / 100, true).plain();
+  const c4 = getColorByK(i / 100, defaultColorSet.dark).plain();
   lines4.push(`\x1b[48;2;${c4.r};${c4.g};${c4.b}m \x1b[0m`);
 }
 console.log(lines3.join(''));
