@@ -17,11 +17,13 @@
     "commands": [
       {
         "command": "colorful-titlebar.enable",
-        "title": "Enable Colorful Titlebar"
+        "title": "Enable Colorful Titlebar",
+        "category": "Colorful Titlebar"
       },
       {
         "command": "colorful-titlebar.disable",
-        "title": "Disable Colorful Titlebar"
+        "title": "Disable Colorful Titlebar",
+        "category": "Colorful Titlebar"
       }
     ],
     "configuration": {
@@ -32,6 +34,11 @@
           "default": true,
           "description": "Enable or disable the colorful titlebar effect"
         },
+        "colorful-titlebar.showInfoPop": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to show information messages."
+        },
         "colorful-titlebar.hashSource": {
           "type": "string",
           "enum": [
@@ -39,18 +46,13 @@
             "fullPath",
             "projectNameDate"
           ],
-          "default": "fullPath",
+          "default": "projectName",
           "description": "Source for generating hash-based colors. Use 'projectName' for project folder name only, or 'fullPath' for complete project path.",
           "enumDescriptions": [
             "Generate color hash from project folder name only",
-            "Generate color hash from complete project path",
-            "Generate color hash from project name and date"
+            "Generate color hash from complete project path, so same project in different locations will have different colors",
+            "Generate color hash from project name and date, making it unique everyday"
           ]
-        },
-        "colorful-titlebar.showInfoPop": {
-          "type": "boolean",
-          "default": true,
-          "description": "Whether to show information messages."
         },
         "colorful-titlebar.lightThemeColors": {
           "type": "array",

@@ -3,12 +3,23 @@ import { basename } from 'node:path';
 
 import { configs } from './core/configs';
 import { Msg } from './core/i18n';
-import { isTitleBarStyleCustom, updateTitleBarColor } from './core/style';
+import { clearTitleBarColor, isTitleBarStyleCustom, updateTitleBarColor } from './core/style';
 import { getColor } from './core/colors';
 import { indicateProject } from './core/indicate';
 import { SettingsCreationWatcher } from './core/watcher';
 
-export const activate = async (_context: vscode.ExtensionContext) => {
+export const activate = async (context: vscode.ExtensionContext) => {
+  // 注册命令
+  registerCommands(context);
+
+  // 应用标题栏颜色
+  await applyTitleBarColor();
+};
+
+/**
+ * 加载核心逻辑s
+ */
+const applyTitleBarColor = async () => {
   const isCustom = await isTitleBarStyleCustom();
   if (!isCustom) {
     return;
@@ -49,3 +60,23 @@ const showInfo = configs.showInfoPop
     async (_: string) => {};
 
 export const deactivate = () => true;
+
+/**
+ * Register all extension commands
+ */
+function registerCommands(context: vscode.ExtensionContext) {
+  const enableCommand = vscode.commands.registerCommand('colorful-titlebar.enable', async () => {
+    await configs.set.enabled(true);
+    vscode.window.showInformationMessage(Msg.CommandEnable);
+    // 重新执行插件逻辑
+    await applyTitleBarColor();
+  });
+
+  const disableCommand = vscode.commands.registerCommand('colorful-titlebar.disable', async () => {
+    await configs.set.enabled(false);
+    await clearTitleBarColor();
+    vscode.window.showInformationMessage(Msg.CommandDisable);
+  });
+
+  context.subscriptions.push(enableCommand, disableCommand);
+}

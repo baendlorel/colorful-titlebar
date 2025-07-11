@@ -7,6 +7,9 @@ export const Msg = (() => {
     NotWorkspace: '没有打开工作区文件夹，不改变标题栏颜色',
     NotProject: '当前不是项目目录，不改变标题栏颜色',
 
+    CommandEnable: 'Colorful Titlebar 已开启',
+    CommandDisable: 'Colorful Titlebar 已关闭（已改变的标题栏颜色需手动恢复），后续不会再改变颜色',
+
     ConfigLevel: {
       [vscode.ConfigurationTarget.Workspace]: '工作区',
       [vscode.ConfigurationTarget.WorkspaceFolder]: '工作区文件夹',
@@ -32,6 +35,10 @@ export const Msg = (() => {
     NoMoreInfoPopSet: 'If you set "showInfoPop" to "true", please restart VS Code to make it work',
     NotWorkspace: 'No workspace folder opened, titlebar color remains unchanged',
     NotProject: 'Current folder is not a project directory, titlebar color remains unchanged',
+
+    CommandEnable: 'Colorful Titlebar enabled',
+    CommandDisable:
+      'Colorful Titlebar disabled (titlebar colors changed, please restore them manually). Will not change colors in the future',
 
     ConfigLevel: {
       [vscode.ConfigurationTarget.Workspace]: 'Workspace',

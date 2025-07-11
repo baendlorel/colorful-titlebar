@@ -79,3 +79,11 @@ export const updateTitleBarColor = async (active: string, inactive: string) => {
   }
   await configs.global.update(TBS.Section, newStyle, vscode.ConfigurationTarget.Workspace);
 };
+
+export const clearTitleBarColor = async () => {
+  const emptyStyle = {
+    [TBS.ActiveBg]: undefined,
+    [TBS.InactiveBg]: undefined,
+  };
+  await configs.global.update(TBS.Section, emptyStyle, vscode.ConfigurationTarget.Workspace);
+};
