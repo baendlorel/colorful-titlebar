@@ -18,16 +18,13 @@ const enum TitleBarStyle {
 const ensureTitleBarStyleIsCustom = async (): Promise<TitleBarStyleCheckResult> => {
   // 检测当前标题栏样式设置
   const windowConfig = vscode.workspace.getConfiguration(TitleBarStyle.ParentSection);
-  const curStyle = windowConfig.get<string>(TitleBarStyle.Section);
-  if (curStyle === TitleBarStyle.ExpectedValue) {
+  const { value, target } = configs.inspect<string>(windowConfig, TitleBarStyle.Section);
+  if (value === TitleBarStyle.ExpectedValue) {
     return TitleBarStyleCheckResult.Custom;
   }
 
-  const style = windowConfig.inspect<string>(TitleBarStyle.Section);
-  const configTarget = configs.getConfigTarget(curStyle, style);
-
   const result = await vscode.window.showWarningMessage(
-    Msg.NotCustomTitleBarStyle(Msg.ConfigLevel[configTarget]),
+    Msg.NotCustomTitleBarStyle(Msg.ConfigLevel[target]),
     Msg.SetTitleBarStyleToCustom,
     Msg.Cancel
   );
@@ -36,7 +33,7 @@ const ensureTitleBarStyleIsCustom = async (): Promise<TitleBarStyleCheckResult> 
     return TitleBarStyleCheckResult.NotCustom;
   }
 
-  await windowConfig.update(TitleBarStyle.Section, TitleBarStyle.ExpectedValue, configTarget);
+  await windowConfig.update(TitleBarStyle.Section, TitleBarStyle.ExpectedValue, target);
   vscode.window.showInformationMessage(Msg.SetTitleBarStyleToCustomSuccess);
   return TitleBarStyleCheckResult.JustSet;
 };

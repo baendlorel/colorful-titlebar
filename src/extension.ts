@@ -2,10 +2,10 @@ import vscode from 'vscode';
 import { basename } from 'node:path';
 import { readdir } from 'node:fs/promises';
 
-import { Msg } from './core/i18n';
-import { defaultColorSet, getColor } from './core/colors';
-import { isTitleBarStyleCustom } from './core/ensure-custom';
 import { configs } from './core/configs';
+import { Msg } from './core/i18n';
+import { isTitleBarStyleCustom } from './core/ensure-custom';
+import { getColor } from './core/colors';
 
 const enum TitleBarStyle {
   ParentSection = 'colorful-titlebar',
@@ -74,7 +74,7 @@ let showInfo: (message: string) => void = async (m: string) => {
     showInfo = async (m: string) => {
       const result = await vscode.window.showInformationMessage(m, Msg.NoMoreInfoPop);
       if (result === Msg.NoMoreInfoPop) {
-        await configs.setshowInformationMessages(false);
+        await configs.set.showInformationMessages(false);
         await vscode.window.showInformationMessage(Msg.NoMoreInfoPopSet);
       }
     };
