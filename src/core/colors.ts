@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { configs } from './configs';
 
 const hslaToRgba = (h: number, s: number, l: number): [number, number, number] => {
   const C = (1 - Math.abs(2 * l - 1)) * s;
@@ -170,10 +171,10 @@ export const defaultColorSet = {
  * @param colorSet 颜色套组从`config`中获取，没有则使用默认套组
  * @returns
  */
-export const getColor = (name: string, colorSet: string[]): RGBColor => {
+export const getColor = (name: string): RGBColor => {
   const hash = Array.from(createHash('md5').update(name).digest());
   const k = (hash[0] + hash[1] * 0xff) / 0xffff;
-  return getColorByK(k, colorSet);
+  return getColorByK(k, configs.colorSet);
 };
 
 export const getColorByK = (k: number, colorSet: string[]) => {
