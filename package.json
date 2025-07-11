@@ -27,7 +27,7 @@
     "url": "https://github.com/baendlorel/colorful-titlebar/issues"
   },
   "license": "MIT",
-  "icon": "icon.png",
+  "icon": "assets/icon.png",
   "galleryBanner": {
     "color": "#1e1e1e",
     "theme": "dark"
