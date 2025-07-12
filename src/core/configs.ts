@@ -14,6 +14,7 @@ const enum Prop {
   DarkThemeColors = 'darkThemeColors',
   ProjectIndicators = 'projectIndicators',
   HashSource = 'hashSource',
+  WorkbenchCssPath = 'workbenchCssPath',
 }
 
 const enum Consts {
@@ -125,12 +126,19 @@ class Config {
     return Config.self.get<string>(Prop.HashSource, HashSource.ProjectName);
   }
 
+  get [Prop.WorkbenchCssPath]() {
+    return Config.self.get<string>(Prop.WorkbenchCssPath, '');
+  }
+
   readonly set = {
-    async [Prop.ShowInfoPop](value: boolean) {
+    [Prop.ShowInfoPop](value: boolean) {
       return Config.self.update(Prop.ShowInfoPop, value, vscode.ConfigurationTarget.Global);
     },
-    async [Prop.HashSource](value: HashSource) {
+    [Prop.HashSource](value: HashSource) {
       return Config.self.update(Prop.HashSource, value, vscode.ConfigurationTarget.Global);
+    },
+    [Prop.WorkbenchCssPath](value: string) {
+      return Config.self.update(Prop.WorkbenchCssPath, value, vscode.ConfigurationTarget.Global);
     },
   };
 }

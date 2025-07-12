@@ -137,6 +137,11 @@
           "items": {
             "type": "string"
           }
+        },
+        "colorful-titlebar.workbenchCssPath": {
+          "type": "string",
+          "default": "",
+          "description": "%configuration.workbenchCssPath.description%"
         }
       }
     }

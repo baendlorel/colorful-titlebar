@@ -10,5 +10,6 @@
   "configuration.hashSource.projectNameDate.description": "从项目名称和日期生成颜色哈希，使其每天都是唯一的",
   "configuration.lightThemeColors.description": "用于在浅色主题中生成基于项目的标题栏颜色选择渐变的颜色。支持 `#RRGGBB`、`#RRGGBBAA`、`rgb(R,G,B)`、`rgba(R,G,B,A)`、`hsl(H,S,L)`、`hsla(H,S,L,A)`",
   "configuration.darkThemeColors.description": "用于在深色主题中生成基于项目的标题栏颜色选择渐变的颜色。支持 `#RRGGBB`、`#RRGGBBAA`、`rgb(R,G,B)`、`rgba(R,G,B,A)`、`hsl(H,S,L)`、`hsla(H,S,L,A)`",
-  "configuration.projectIndicators.description": "指示项目目录的文件或目录名称（不会修剪）"
+  "configuration.projectIndicators.description": "指示项目目录的文件或目录名称（不会修剪）",
+  "configuration.workbenchCssPath.description": "workbench.desktop.main.css 文件的路径，使用搜索工具可知晓其位置，开启渐变必须要修改它"
 }

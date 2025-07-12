@@ -3,13 +3,14 @@ import { join } from 'node:path';
 
 import { configs } from './core/configs';
 import { Msg } from './core/i18n';
-import { isTitleBarStyleCustom, updateTitleBarColor } from './core/style';
+import { registerCommands } from './commands';
 import { indicateProject } from './core/indicate';
+import { isTitleBarStyleCustom, updateTitleBarColor } from './core/style';
 import { FileCreationWatcher } from './core/watcher';
 
 export const activate = async (context: vscode.ExtensionContext) => {
   // 注册命令
-  // registerCommands(context);
+  registerCommands(context);
 
   // 应用标题栏颜色
   await applyTitleBarColor();
@@ -47,8 +48,3 @@ const showInfo = configs.showInfoPop
     }
   : // eslint-disable-next-line @typescript-eslint/no-empty-function
     async (_: string) => {};
-
-const registerCommands = (context: vscode.ExtensionContext) => {
-  const commands: vscode.Disposable[] = [];
-  context.subscriptions.push(...commands);
-};

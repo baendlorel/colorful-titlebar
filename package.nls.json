@@ -10,5 +10,6 @@
   "configuration.hashSource.projectNameDate.description": "Generate color hash from project name and date, making it unique everyday",
   "configuration.lightThemeColors.description": "Colors to generate gradient for project-based titlebar color selection in light themes. Supports `#RRGGBB`, `#RRGGBBAA`, `rgb(R,G,B)`, `rgba(R,G,B,A)`, `hsl(H,S,L)`, `hsla(H,S,L,A)`",
   "configuration.darkThemeColors.description": "Colors to generate gradient for project-based titlebar color selection in dark themes. Supports `#RRGGBB`, `#RRGGBBAA`, `rgb(R,G,B)`, `rgba(R,G,B,A)`, `hsl(H,S,L)`, `hsla(H,S,L,A)`",
-  "configuration.projectIndicators.description": "File or directory names (will not trim) that indicate a project directory"
+  "configuration.projectIndicators.description": "File or directory names (will not trim) that indicate a project directory",
+  "configuration.workbenchCssPath.description": "Path to the \"workbench.desktop.main.css\" file. Need to modify it to enable gradient"
 }

@@ -7,12 +7,13 @@ export const Msg = (() => {
     NotWorkspace: '没有打开工作区文件夹，不改变标题栏颜色',
     NotProject: '当前不是项目目录，不改变标题栏颜色',
 
-    CommandEnable: 'Colorful Titlebar 已开启',
-    CommandDisable: (settingsRemoved: boolean) =>
-      `Colorful Titlebar 已关闭（已改变的标题栏颜色需手动恢复），后续不会再改变颜色${
-        settingsRemoved ? '，".vscode/settings.json"也已删除' : ''
-      }`,
-    CommandClear: '标题栏颜色已清空',
+    Commands: {
+      enableGradient: {
+        prompt: '启用渐变色标题栏需要修改workbench.desktop.main.css，请提供该文件地址',
+        workbenchCssPathInvalid: 'workbench.desktop.main.css 路径无效，请检查',
+      },
+      disableGradient: '',
+    },
 
     ConfigLevel: {
       [vscode.ConfigurationTarget.Workspace]: '工作区',
@@ -38,13 +39,14 @@ export const Msg = (() => {
     NotWorkspace: 'No workspace folder opened, titlebar color remains unchanged',
     NotProject: 'Current folder is not a project directory, titlebar color remains unchanged',
 
-    CommandEnable: 'Colorful Titlebar enabled',
-    CommandDisable: (settingsRemoved: boolean) =>
-      `Colorful Titlebar disabled (titlebar colors changed, please restore them manually)${
-        settingsRemoved ? '. ".vscode/settings.json" is also removed.' : ''
-      }`,
-
-    CommandClear: 'Titlebar colors cleared',
+    Commands: {
+      enableGradient: {
+        prompt: '启用渐变色标题栏需要修改workbench.desktop.main.css，请提供该文件地址',
+        workbenchCssPathInvalid:
+          'The path to "workbench.desktop.main.css" is invalid, please check',
+      },
+      disableGradient: 'Turn off gradient titlebar',
+    },
 
     ConfigLevel: {
       [vscode.ConfigurationTarget.Workspace]: 'Workspace',
