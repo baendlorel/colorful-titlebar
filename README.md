@@ -8,9 +8,8 @@ A VS Code extension that adds colorful background colors to the title bar based 
 
 - 🎨 **Project-based Colors**: Automatically generates unique colors based on your project
 - 🔄 **Multiple Hash Sources**: Choose from project name, full path, or project name + date
-- � **Customizable Color Palettes**: Separate color schemes for light and dark themes
-- � **Smart Project Detection**: Configurable file/folder indicators to identify projects
-- 🎯 **Easy Commands**: Enable, disable, or refresh with simple commands
+- 🌈 **Customizable Color Palettes**: Separate color schemes for light and dark themes
+- 📁 **Smart Project Detection**: Configurable file/folder indicators to identify projects
 - 🌍 **Multi-language Support**: Full Chinese and English interface
 
 ## 📦 Installation
