@@ -1,10 +1,8 @@
 {
   "extension.category": "彩色标题栏",
-  "command.clear.title": "清除标题栏颜色",
-  "command.enable.title": "启用彩色标题栏",
-  "command.disable.title": "禁用彩色标题栏",
+  "command.enableGradient.title": "启用标题栏渐变",
+  "command.disableGradient.title": "禁用标题栏渐变",
   "configuration.title": "彩色标题栏",
-  "configuration.enabled.description": "启用或禁用彩色标题栏效果",
   "configuration.showInfoPop.description": "是否显示信息提示消息",
   "configuration.hashSource.description": "生成基于哈希的颜色的源",
   "configuration.hashSource.projectName.description": "仅从项目文件夹名称生成颜色哈希",

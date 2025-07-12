@@ -37,6 +37,18 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "commands": [
+      {
+        "command": "colorful-titlebar.enableGradient",
+        "title": "%command.enableGradient.title%",
+        "category": "%extension.category%"
+      },
+      {
+        "command": "colorful-titlebar.disableGradient",
+        "title": "%command.disableGradient.title%",
+        "category": "%extension.category%"
+      }
+    ],
     "configuration": {
       "title": "%configuration.title%",
       "properties": {

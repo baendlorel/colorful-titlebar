@@ -1,11 +1,11 @@
 # Icon Requirements
 
-Please create an icon file named `icon.png` with the following specifications:
+Please create an icon file with the following specifications:
 
+- **theme**: idea gradient titlebar
 - **Size**: 128x128 pixels
-- **Format**: PNG
 - **Content**: Should represent a colorful titlebar or rainbow/palette theme
-- **Style**: Modern, clean, matches VS Code's design language
+- **Style**: Modern, clean, cute, matches VS Code's design language
 
 Suggested design elements:
 
