@@ -41,6 +41,10 @@ A VS Code extension that adds colorful background colors to the title bar based 
 
   ![Bright Left Effect](assets/light-left.png)
 
+- **Arc Left**: Radial gradient with a bright effect from the left side 2
+
+  ![Arc Left Effect](assets/arc-left.png)
+
 ### Requirements
 
 The extension requires VS Code's title bar style to be set to "custom". If not configured, the extension will prompt you to change it automatically.

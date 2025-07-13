@@ -35,11 +35,15 @@
 
 - **亮中心**: 带有亮中心效果的线性渐变
 
-  ![亮中心效果](assets/light-center.png)
+  ![亮中心](assets/light-center.png)
 
 - **亮左侧**: 从左侧产生亮效果的径向渐变
 
-  ![亮左侧效果](assets/light-left.png)
+  ![亮左侧](assets/light-left.png)
+
+- **左侧弧光**: 从左侧产生亮效果的径向渐变 2
+
+  ![左侧弧光](assets/arc-left.png)
 
 ### 前置要求
 
