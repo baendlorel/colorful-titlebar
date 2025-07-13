@@ -23,7 +23,7 @@ export const deactivate = () => true;
  */
 const applyTitleBarColor = async () => {
   const isCustom = await isTitleBarStyleCustom();
-  if (!isCustom || !configs.dir) {
+  if (!isCustom || !configs.cwd) {
     return;
   }
 
@@ -33,7 +33,7 @@ const applyTitleBarColor = async () => {
     return;
   }
 
-  const fw = new FileCreationWatcher(join(configs.dir, '.vscode', 'settings.json'));
+  const fw = new FileCreationWatcher(join(configs.cwd, '.vscode', 'settings.json'));
   await updateTitleBarColor();
   showInfo(Msg.TitleBarColorSet(fw.isNew));
 };

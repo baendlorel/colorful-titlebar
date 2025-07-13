@@ -32,11 +32,11 @@ class Config {
    */
   readonly global = vscode.workspace.getConfiguration();
 
-  readonly dir: string;
+  readonly cwd: string;
 
   constructor() {
     const cwd = vscode.workspace.workspaceFolders?.[0];
-    this.dir = cwd?.uri.fsPath ?? '';
+    this.cwd = cwd?.uri.fsPath ?? '';
   }
 
   /**

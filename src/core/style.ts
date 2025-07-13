@@ -5,7 +5,7 @@ import { readdir, readFile, rm } from 'node:fs/promises';
 import { Msg } from './i18n';
 import { configs } from './configs';
 import { getColor } from './colors';
-import { TitleBarStyle } from './consts';
+import { SettingsJson, TitleBarStyle } from './consts';
 
 // $ TBS -> TitleBarStyle
 
@@ -60,7 +60,7 @@ export const isTitleBarStyleCustom = async () => {
 };
 
 export const updateTitleBarColor = async () => {
-  const color = getColor(configs.dir);
+  const color = getColor(configs.cwd);
 
   const newStyle = {
     [TitleBarStyle.ActiveBg]: color.toString(),
@@ -94,11 +94,11 @@ export const clearTitleBarColor = async () => {
   );
 
   // 如果.vscode下只有settings一个文件，而且内容和上面的compact一样，那么删除.vscode
-  const settingsPath = join(configs.dir, '.vscode'); // , 'settings.json'
+  const settingsPath = join(configs.cwd, SettingsJson.Dir); // , 'settings.json'
   const list = await readdir(settingsPath);
-  const content = await readFile(join(settingsPath, 'settings.json'), 'utf-8');
+  const content = await readFile(join(settingsPath, SettingsJson.FileName), 'utf-8');
 
-  if (list.length === 1 && content.replace(/\s/g, '') === `{"workbench.colorCustomizations":{}}`) {
+  if (list.length === 1 && content.replace(/\s/g, '') === SettingsJson.MinimumContent) {
     await rm(settingsPath, { recursive: true, force: true });
     return true;
   }
