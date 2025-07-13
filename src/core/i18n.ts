@@ -16,7 +16,7 @@ export const Msg = (() => {
           brightCenter: '中间较亮',
           brightLeft: '左侧较亮',
         },
-        success: '修改css文件成功！重启VS Code后生效',
+        success: '修改css文件成功！重启VS Code生效。若碰到提示VS Code损坏，可以直接点击“不再显示”',
         failed: '修改css文件失败！',
         backup: {
           notFound: (filePath?: string) => {
@@ -66,7 +66,8 @@ export const Msg = (() => {
           brightCenter: 'Bright Center',
           brightLeft: 'Bright Left',
         },
-        success: 'CSS file modified successfully! Restart VS Code to apply changes',
+        success:
+          'CSS file modified successfully! Restart VS Code to apply changes. If you see a message like "Your Code installation appears to be corrupt. Please reinstall.", you can simply click never show again.',
         failed: 'CSS file modification failed!',
         backup: {
           notFound: (filePath?: string) => {
