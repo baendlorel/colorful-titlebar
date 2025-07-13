@@ -1,16 +1,15 @@
 import { readdir } from 'node:fs/promises';
 
 import { configs } from './configs';
-import { PromiseResult, Result } from './consts';
+import { CTError } from './ct-error';
 
-export const beProject = async (): PromiseResult => {
+export const beProject = async () => {
   const list = await readdir(configs.cwd);
   const indicators = configs.projectIndicators;
-
   for (let i = 0; i < list.length; i++) {
     if (indicators.includes(list[i])) {
-      return Result.succ();
+      return;
     }
   }
-  return Result.fail();
+  throw CTError.cancel;
 };

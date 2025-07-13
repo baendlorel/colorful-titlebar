@@ -23,6 +23,7 @@ export default tseslint.config(
   },
   {
     rules: {
+      '@typescript-eslint/prefer-literal-enum-member': 'off',
       '@typescript-eslint/no-inferrable-types': 'warn',
       '@typescript-eslint/prefer-for-of': 'off',
       '@typescript-eslint/unified-signatures': 'off',
@@ -34,6 +35,22 @@ export default tseslint.config(
           caughtErrorsIgnorePattern: '^_',
         },
       ],
+      // 命名约定
+      '@typescript-eslint/naming-convention': [
+        'warn',
+        {
+          selector: 'variableLike',
+          format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+          // 允许以下划线开头的变量（用于未使用的变量）
+          leadingUnderscore: 'allow',
+        },
+        {
+          selector: 'typeLike',
+          format: ['PascalCase'],
+        },
+      ],
+      // 复杂度限制
+      complexity: ['warn', { max: 15 }],
     },
   }
 );

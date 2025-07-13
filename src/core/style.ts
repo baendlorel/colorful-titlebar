@@ -5,17 +5,11 @@ import { readdir, readFile, rm } from 'node:fs/promises';
 import { Msg } from './i18n';
 import { configs } from './configs';
 import { getColor } from './colors';
-import { PromiseResult, Result, SettingsJson, TitleBarStyle } from './consts';
-import { showInfoMsg, showWarnMsg } from './notifications';
+import { SettingsJson, TitleBarStyle } from './consts';
+import { showWarnMsg } from './notifications';
+import { CTError, poper } from './ct-error';
 
 // $ TBS -> TitleBarStyle
-
-const enum TBSCheckResult {
-  Custom,
-  NotCustom,
-  JustSet,
-}
-
 interface TBSConfig {
   [TitleBarStyle.ActiveBg]: string;
   [TitleBarStyle.InactiveBg]: string;
@@ -24,12 +18,12 @@ interface TBSConfig {
 /**
  * 全局的`titleBarStyle`配置必须是`custom`，修改标题栏颜色的操作才能生效
  */
-export const beCustom = async (): PromiseResult => {
+export const beCustom = poper(async (): Promise<string> => {
   // 检测当前标题栏样式设置
   const Global = vscode.ConfigurationTarget.Global;
   const value = configs.global.get<string>(TitleBarStyle.Section);
   if (value === TitleBarStyle.Expected) {
-    return Result.succ();
+    return '';
   }
 
   const result = await showWarnMsg(
@@ -39,12 +33,12 @@ export const beCustom = async (): PromiseResult => {
   );
 
   if (result !== Msg.SetTitleBarStyleToCustom) {
-    return Result.fail();
+    throw CTError.cancel;
   }
 
   await configs.global.update(TitleBarStyle.Section, TitleBarStyle.Expected, Global);
-  return Result.succ(Msg.SetTitleBarStyleToCustomSuccess);
-};
+  return Msg.SetTitleBarStyleToCustomSuccess;
+});
 
 export const updateTitleBarColor = async () => {
   const color = getColor(configs.cwd);

@@ -3,6 +3,8 @@ import { Consts, TitleBarStyle } from './consts';
 
 export const Msg = (() => {
   const Zh = {
+    Unknown: '未知',
+
     NoMoreInfoPop: '不再提示',
     NoMoreInfoPopSet: '如果手动开启了提示，需重启VS Code后生效',
     NotWorkspace: '没有打开工作区文件夹，不改变标题栏颜色',
@@ -18,8 +20,9 @@ export const Msg = (() => {
           brightCenter: '中间较亮',
           brightLeft: '左侧较亮',
         },
+        invalidStyle: '无效的样式',
         success: '修改css文件成功！重启VS Code生效。若碰到提示VS Code损坏，可以直接点击“不再显示”',
-        failed: '修改css文件失败！',
+        fail: '修改css文件失败！',
         backup: {
           notFound: (filePath?: string) => {
             filePath = filePath ? `（${filePath}）` : '';
@@ -30,7 +33,7 @@ export const Msg = (() => {
         },
         restore: {
           success: '备份css文件成功',
-          failed: '备份css文件失败！',
+          fail: '备份css文件失败！',
         },
       },
       disableGradient: {
@@ -57,6 +60,7 @@ export const Msg = (() => {
   };
 
   const En = {
+    Unknown: 'unknown',
     NoMoreInfoPop: 'Do not show this again',
     NoMoreInfoPopSet: 'If you set "showInfoPop" to "true", please restart VS Code to make it work',
     NotWorkspace: 'No workspace folder opened, titlebar color remains unchanged',
@@ -72,9 +76,10 @@ export const Msg = (() => {
           brightCenter: 'Bright Center',
           brightLeft: 'Bright Left',
         },
+        invalidStyle: 'Invalid style',
         success:
           'CSS file modified successfully! Restart VS Code to apply changes. If you see a message like "Your Code installation appears to be corrupt. Please reinstall.", you can simply click never show again.',
-        failed: 'CSS file modification failed!',
+        fail: 'CSS file modification failed!',
         backup: {
           notFound: (filePath?: string) => {
             filePath = filePath ? `(${filePath})` : '';
@@ -85,7 +90,7 @@ export const Msg = (() => {
         },
         restore: {
           success: 'CSS file restored successfully',
-          failed: 'Backup CSS file restoration failed!',
+          fail: 'Backup CSS file restoration failed!',
         },
       },
       disableGradient: {

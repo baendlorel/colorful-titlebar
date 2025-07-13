@@ -1,51 +1,39 @@
 import vscode from 'vscode';
 import { Commands } from './core/consts';
 import { Msg } from './core/i18n';
-import { backupCss, ensureValidCssPath, hackCss, restoreCss } from './core/gradient';
-import { showErrMsg, showInfoMsg } from './core/notifications';
+import { backupCss, getCssPath, hackCss, restoreCss } from './core/gradient';
+import { showInfoMsg } from './core/notifications';
+import { catcher } from './core/ct-error';
 
 export const registerCommands = (context: vscode.ExtensionContext) => {
   const commands: vscode.Disposable[] = [
-    vscode.commands.registerCommand(Commands.EnableGradient, async () => {
-      const cssPathResult = await ensureValidCssPath();
-      if (cssPathResult.fail) {
-        return showErrMsg(cssPathResult);
-      }
-      const cssPath = cssPathResult.data as string;
+    vscode.commands.registerCommand(
+      Commands.EnableGradient,
+      catcher(async () => {
+        const cssPath = await getCssPath();
 
-      const gradientStyle = await vscode.window.showQuickPick([
-        Msg.Commands.enableGradient.style.brightCenter,
-        Msg.Commands.enableGradient.style.brightLeft,
-      ]);
-      if (gradientStyle === undefined) {
-        return;
-      }
+        const gradientStyle = await vscode.window.showQuickPick([
+          Msg.Commands.enableGradient.style.brightCenter,
+          Msg.Commands.enableGradient.style.brightLeft,
+        ]);
+        if (gradientStyle === undefined) {
+          return;
+        }
 
-      // & 已确保cssPath是能用的
-      const backup = await backupCss(cssPath);
-      if (backup.fail) {
-        return showErrMsg(backup);
-      }
-
-      const hack = await hackCss(cssPath, gradientStyle);
-      if (hack.fail) {
-        return showErrMsg(backup);
-      }
-
-      showInfoMsg(hack.msg + backup.msg);
-    }),
-    vscode.commands.registerCommand(Commands.DisableGradient, async () => {
-      const cssPathResult = await ensureValidCssPath();
-      if (cssPathResult.fail) {
-        return showErrMsg(cssPathResult);
-      }
-      const restoreResult = await restoreCss(cssPathResult.data as string);
-      if (restoreResult.succ) {
-        return showErrMsg(Msg.Commands.disableGradient.fail + restoreResult.msg);
-      } else {
-        return showInfoMsg(restoreResult);
-      }
-    }),
+        // & 已确保cssPath是能用的
+        const backupSuccMsg = await backupCss(cssPath);
+        const hackSuccMsg = await hackCss(cssPath, gradientStyle);
+        showInfoMsg(hackSuccMsg + backupSuccMsg);
+      })
+    ),
+    vscode.commands.registerCommand(
+      Commands.DisableGradient,
+      catcher(async () => {
+        const cssPath = await getCssPath();
+        const restoreSuccMsg = await restoreCss(cssPath);
+        showInfoMsg(restoreSuccMsg);
+      })
+    ),
   ];
 
   context.subscriptions.push(...commands);

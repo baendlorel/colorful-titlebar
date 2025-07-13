@@ -4,7 +4,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 
 import { Msg } from './i18n';
 import { configs } from './configs';
-import { PromiseResult, Result } from './consts';
+import { CTError, poper } from './ct-error';
 
 const enum CssParam {
   Darkness = '0.24',
@@ -28,11 +28,11 @@ const getBackground = (gradientStyle: string) => {
     case Enable.style.brightLeft:
       return Css.BrightLeft;
     default:
-      return Css.BrightLeft;
+      throw CTError.create(Enable.invalidStyle);
   }
 };
 
-const compact = (arr: TemplateStringsArray, ...values: any[]) => {
+const compact = (arr: TemplateStringsArray, ...values: string[]) => {
   const strs: string[] = [];
   for (let i = 0; i < values.length; i++) {
     strs.push(arr[i].replace(/\s/g, ''), values[i]);
@@ -41,10 +41,10 @@ const compact = (arr: TemplateStringsArray, ...values: any[]) => {
   return strs.join('');
 };
 
-export const ensureValidCssPath = async (): PromiseResult<string | null> => {
+export const getCssPath = async (): Promise<string> => {
   let cssPath = configs.workbenchCssPath;
   if (existsSync(cssPath)) {
-    return Result.resolve(cssPath);
+    return cssPath;
   }
 
   const input = await vscode.window.showInputBox({
@@ -56,20 +56,18 @@ export const ensureValidCssPath = async (): PromiseResult<string | null> => {
       existsSync(value.trim()) ? null : Enable.workbenchCssPathInvalid,
   });
   if (!input) {
-    return Result.fail();
+    throw CTError.cancel;
   }
 
   cssPath = input.trim();
   await configs.set.workbenchCssPath(cssPath);
-  return Result.resolve(cssPath);
+  return cssPath;
 };
 
-// fixme 测试发现改了主css文件后，启动会报错，提示vscode损坏
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const hackCss = async (cssPath: string, gradientStyle: string): PromiseResult => {
-  const background = getBackground(gradientStyle);
+export const hackCss = poper(async (cssPath: string, gradientStyle: string): Promise<string> => {
   const style = compact`${Css.Token}${Css.Selector} {
     content: "";
     position: absolute;
@@ -78,54 +76,39 @@ export const hackCss = async (cssPath: string, gradientStyle: string): PromiseRe
     width: 100%;
     height: 100%;
     transform: translate(-50%, -50%);
-    background: ${background};
+    background: ${getBackground(gradientStyle)};
     mix-blend-mode: overlay;
     pointer-events: none;
   }\n`;
 
-  try {
-    let css = await readFile(cssPath, 'utf8');
-
-    if (css.includes(Css.Token)) {
-      css = css.replace(new RegExp(`${Css.Token}[^\n]*\n`), style);
-    } else {
-      css = `${css}\n${style}\n`;
-    }
-
-    await writeFile(cssPath, css, 'utf8');
-    return Result.succ(Enable.success);
-  } catch (error) {
-    return Result.err(error, Enable.failed);
+  let css = await readFile(cssPath, 'utf8');
+  if (css.includes(Css.Token)) {
+    css = css.replace(new RegExp(`${Css.Token}[^\n]*\n`), style);
+  } else {
+    css = `${css}\n${style}\n`;
   }
-};
+  await writeFile(cssPath, css, 'utf8');
+  return Enable.success;
+}, Enable.fail);
 
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const backupCss = async (cssPath: string): PromiseResult => {
-  try {
-    const buffer = await readFile(cssPath);
-    await writeFile(`${cssPath}.${Css.BackupSuffix}`, buffer);
-    return Result.succ(Enable.backup.success);
-  } catch (error) {
-    return Result.err(error, Enable.backup.fail);
-  }
-};
+export const backupCss = poper(async (cssPath: string): Promise<string> => {
+  const buffer = await readFile(cssPath);
+  await writeFile(`${cssPath}.${Css.BackupSuffix}`, buffer);
+  return Enable.backup.success;
+}, Enable.backup.fail);
 
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const restoreCss = async (cssPath: string): PromiseResult => {
-  try {
-    const backupPath = `${cssPath}.${Css.BackupSuffix}`;
-    if (!existsSync(backupPath)) {
-      return Result.succ(Enable.backup.notFound(backupPath));
-    }
-    const buffer = await readFile(backupPath);
-    await writeFile(cssPath, buffer);
-
-    return Result.succ(Enable.restore.success);
-  } catch (error) {
-    return Result.err(error, Enable.restore.failed);
+export const restoreCss = poper(async (cssPath: string): Promise<string> => {
+  const backupPath = `${cssPath}.${Css.BackupSuffix}`;
+  if (!existsSync(backupPath)) {
+    throw CTError.create(Enable.backup.notFound(backupPath));
   }
-};
+  const buffer = await readFile(backupPath);
+  await writeFile(cssPath, buffer);
+  return Enable.restore.success;
+}, Enable.restore.fail);

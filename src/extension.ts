@@ -1,13 +1,11 @@
 import vscode from 'vscode';
-import { join } from 'node:path';
 
 import { configs } from './core/configs';
-import { Msg } from './core/i18n';
 import { registerCommands } from './commands';
 import { beProject } from './core/indicate';
-import { beCustom, updateTitleBarColor } from './core/style';
-import { FileCreationWatcher } from './core/watcher';
-import { popInfo, showInfoMsg, showWarnMsg } from './core/notifications';
+import { beCustom, clearTitleBarColor, updateTitleBarColor } from './core/style';
+import { showInfoMsg } from './core/notifications';
+import { catcher } from './core/ct-error';
 
 export const activate = async (context: vscode.ExtensionContext) => {
   // 注册命令
@@ -17,28 +15,21 @@ export const activate = async (context: vscode.ExtensionContext) => {
   await applyTitleBarColor();
 };
 
-export const deactivate = () => true;
+export const deactivate = catcher(clearTitleBarColor);
 
 /**
  * 加载核心逻辑
  */
-const applyTitleBarColor = async () => {
-  const beCustomResult = await beCustom();
-  if (beCustomResult.fail) {
-    return showWarnMsg(beCustomResult);
-  }
-
+const applyTitleBarColor = catcher(async () => {
   if (!configs.cwd) {
     return;
   }
 
-  const beProjectResult = await beProject();
-  if (beProjectResult.fail) {
-    return showInfoMsg(beProjectResult);
+  const beCustomSuccMsg = await beCustom();
+  if (beCustomSuccMsg) {
+    showInfoMsg(beCustomSuccMsg);
   }
 
-  // const fw = new FileCreationWatcher(join(configs.cwd, '.vscode', 'settings.json'));
+  await beProject();
   await updateTitleBarColor();
-  // 不再显示
-  // popInfo(Msg.TitleBarColorSet(fw.isNew));
-};
+});
