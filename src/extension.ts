@@ -7,6 +7,7 @@ import { registerCommands } from './commands';
 import { indicateProject } from './core/indicate';
 import { isTitleBarStyleCustom, updateTitleBarColor } from './core/style';
 import { FileCreationWatcher } from './core/watcher';
+import { popInfo } from './core/notifications';
 
 export const activate = async (context: vscode.ExtensionContext) => {
   // 注册命令
@@ -35,16 +36,6 @@ const applyTitleBarColor = async () => {
 
   const fw = new FileCreationWatcher(join(configs.cwd, '.vscode', 'settings.json'));
   await updateTitleBarColor();
-  showInfo(Msg.TitleBarColorSet(fw.isNew));
+  // 不再显示
+  // showInfo(Msg.TitleBarColorSet(fw.isNew));
 };
-
-const showInfo = configs.showInfoPop
-  ? async (m: string) => {
-      const result = await vscode.window.showInformationMessage(m, Msg.NoMoreInfoPop);
-      if (result === Msg.NoMoreInfoPop) {
-        await configs.set.showInfoPop(false);
-        await vscode.window.showInformationMessage(Msg.NoMoreInfoPopSet);
-      }
-    }
-  : // eslint-disable-next-line @typescript-eslint/no-empty-function
-    async (_: string) => {};

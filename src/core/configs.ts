@@ -1,6 +1,7 @@
 import vscode from 'vscode';
 
 import { defaultColorSet } from '@/core/colors';
+import { showInfoMsg } from './notifications';
 
 export const enum HashSource {
   ProjectName = 'projectName',
@@ -49,9 +50,7 @@ class Config {
   ): { value: T | undefined; target: vscode.ConfigurationTarget } {
     const value = config.get<T>(section);
     const inspection = config.inspect(section);
-    vscode.window.showInformationMessage(
-      `section:${section}, value:${value}, ${JSON.stringify(inspection)}`
-    );
+    showInfoMsg(`section:${section}, value:${value}, ${JSON.stringify(inspection)}`);
 
     if (value === undefined) {
       // 如果没有设置，返回默认值和全局配置目标

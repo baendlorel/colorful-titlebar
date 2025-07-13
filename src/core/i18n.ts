@@ -10,7 +10,9 @@ export const Msg = (() => {
 
     Commands: {
       enableGradient: {
-        prompt: `启用渐变色标题栏需要修改${Consts.MainCssFileName}，请提供该文件地址`,
+        title: `${Consts.MainCssFileName}文件地址`,
+        prompt: `启用渐变色标题栏需要修改${Consts.MainCssFileName}，请提供该文件地址（WSl 需要映射到子系统内部的地址）`,
+        placeHolder: `例如：../../${Consts.MainCssFileName}`,
         workbenchCssPathInvalid: `${Consts.MainCssFileName}路径无效，请检查`,
         gradientStyle: {
           brightCenter: '中间较亮',
@@ -24,13 +26,15 @@ export const Msg = (() => {
             return `未找到备份的css文件${filePath}！如果样式出现混乱，您可能需要重新安装VS Code`;
           },
           success: '备份css文件成功',
+          fail: '备份css文件失败！',
+        },
+        restore: {
+          success: '备份css文件成功',
           failed: '备份css文件失败！',
-          restoredSucceeded: '恢复css文件成功',
-          restoredFailed: '恢复css文件失败！',
         },
       },
       disableGradient: {
-        failed: '关闭渐变色标题栏失败！',
+        fail: '关闭渐变色标题栏失败！',
       },
     },
 
@@ -60,7 +64,9 @@ export const Msg = (() => {
 
     Commands: {
       enableGradient: {
-        prompt: `To enable gradient titlebar, please provide the path to "${Consts.MainCssFileName}"`,
+        title: `${Consts.MainCssFileName} Path`,
+        prompt: `To enable gradient titlebar, please provide the path to "${Consts.MainCssFileName}". WSL paths should map to the internal path of the subsystem`,
+        placeHolder: `Example: ../../${Consts.MainCssFileName}`,
         workbenchCssPathInvalid: `The path to "${Consts.MainCssFileName}" is invalid, please check`,
         gradientStyle: {
           brightCenter: 'Bright Center',
@@ -71,17 +77,19 @@ export const Msg = (() => {
         failed: 'CSS file modification failed!',
         backup: {
           notFound: (filePath?: string) => {
-            filePath = filePath ? `（${filePath}）` : '';
+            filePath = filePath ? `(${filePath})` : '';
             return `Backup CSS file not found${filePath}! If the style is messed up, you may need to reinstall VS Code`;
           },
           success: 'Backup CSS file created successfully',
-          failed: 'Backup CSS file failed!',
-          restoredSucceeded: 'CSS file restored successfully',
-          restoredFailed: 'Backup CSS file restoration failed！',
+          fail: 'Backup CSS file failed!',
+        },
+        restore: {
+          success: 'CSS file restored successfully',
+          failed: 'Backup CSS file restoration failed!',
         },
       },
       disableGradient: {
-        failed: 'Disabling gradient titlebar failed!',
+        fail: 'Disabling gradient titlebar failed!',
       },
     },
 

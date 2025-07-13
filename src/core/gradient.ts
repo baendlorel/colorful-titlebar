@@ -4,6 +4,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 
 import { Msg } from './i18n';
 import { configs } from './configs';
+import { PromiseResult, Result } from './consts';
 
 const enum CssParam {
   Darkness = '0.24',
@@ -38,34 +39,34 @@ const compact = (strings: TemplateStringsArray, ...values: any[]) => {
   return strs.join('');
 };
 
-export const ensureValidCssPath = async (): Promise<string | null> => {
+export const ensureValidCssPath = async (): PromiseResult<string | null> => {
   let cssPath = configs.workbenchCssPath;
   if (existsSync(cssPath)) {
-    return cssPath;
+    return Result.resolve(cssPath);
   }
 
   const input = await vscode.window.showInputBox({
+    title: Msg.Commands.enableGradient.title,
     prompt: Msg.Commands.enableGradient.prompt,
-    placeHolder: '例如：linear-gradient(to right, #ff7e5f, #feb47b)',
+    placeHolder: Msg.Commands.enableGradient.placeHolder,
+    ignoreFocusOut: true,
+    validateInput: (value: string) =>
+      existsSync(value.trim()) ? null : Msg.Commands.enableGradient.workbenchCssPathInvalid,
   });
   if (!input) {
-    return null;
+    return Result.fail();
   }
 
   cssPath = input.trim();
-  if (!existsSync(cssPath)) {
-    vscode.window.showWarningMessage(Msg.Commands.enableGradient.workbenchCssPathInvalid);
-    return null;
-  }
   await configs.set.workbenchCssPath(cssPath);
-  return cssPath;
+  return Result.resolve(cssPath);
 };
 
 // fixme 测试发现改了主css文件后，启动会报错，提示vscode损坏
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const hackCss = async (cssPath: string, gradientStyle: string): Promise<boolean> => {
+export const hackCss = async (cssPath: string, gradientStyle: string): PromiseResult => {
   const background = getBackground(gradientStyle);
   const style = compact`${Css.Token}${Css.Selector} {
     content: "";
@@ -90,55 +91,51 @@ export const hackCss = async (cssPath: string, gradientStyle: string): Promise<b
     }
 
     await writeFile(cssPath, css, 'utf8');
-    return true;
+    return Result.succ(Msg.Commands.enableGradient.success);
   } catch (error) {
     const msg =
       error instanceof Error
         ? Msg.Commands.enableGradient.failed + error.message
         : Msg.Commands.enableGradient.failed;
-    vscode.window.showErrorMessage(msg);
-    return false;
+    return Result.fail(msg);
   }
 };
 
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const backupCss = async (cssPath: string): Promise<boolean> => {
+export const backupCss = async (cssPath: string): PromiseResult => {
   try {
     const buffer = await readFile(cssPath);
     await writeFile(`${cssPath}.${Css.BackupSuffix}`, buffer);
-    return true;
+    return { succ: true, data: null, msg: Msg.Commands.enableGradient.backup.success };
   } catch (error) {
     const msg =
       error instanceof Error
-        ? Msg.Commands.enableGradient.backup.failed + error.message
-        : Msg.Commands.enableGradient.backup.failed;
-    vscode.window.showErrorMessage(msg);
-    return false;
+        ? Msg.Commands.enableGradient.backup.fail + error.message
+        : Msg.Commands.enableGradient.backup.fail;
+    return Result.fail(msg);
   }
 };
 
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const restoreCss = async (cssPath: string): Promise<boolean> => {
+export const restoreCss = async (cssPath: string): PromiseResult => {
   try {
     const backupPath = `${cssPath}.${Css.BackupSuffix}`;
-    vscode.window.showWarningMessage(backupPath);
     if (!existsSync(backupPath)) {
-      vscode.window.showWarningMessage(Msg.Commands.enableGradient.backup.notFound(backupPath));
-      return false;
+      return Result.succ(Msg.Commands.enableGradient.backup.notFound(backupPath));
     }
     const buffer = await readFile(backupPath);
     await writeFile(cssPath, buffer);
-    return true;
+
+    return Result.succ(Msg.Commands.enableGradient.restore.success);
   } catch (error) {
     const msg =
       error instanceof Error
-        ? Msg.Commands.enableGradient.backup.restoredFailed + error.message
-        : Msg.Commands.enableGradient.backup.restoredFailed;
-    vscode.window.showErrorMessage(msg);
-    return false;
+        ? Msg.Commands.enableGradient.restore.failed + error.message
+        : Msg.Commands.enableGradient.restore.failed;
+    return Result.fail(msg);
   }
 };

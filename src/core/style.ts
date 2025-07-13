@@ -6,6 +6,7 @@ import { Msg } from './i18n';
 import { configs } from './configs';
 import { getColor } from './colors';
 import { SettingsJson, TitleBarStyle } from './consts';
+import { showInfoMsg, showWarnMsg } from './notifications';
 
 // $ TBS -> TitleBarStyle
 
@@ -32,7 +33,7 @@ const ensureIsCustom = async (): Promise<TBSCheckResult> => {
     return TBSCheckResult.Custom;
   }
 
-  const result = await vscode.window.showWarningMessage(
+  const result = await showWarnMsg(
     Msg.NotCustomTitleBarStyle(Msg.ConfigLevel[Global]),
     Msg.SetTitleBarStyleToCustom,
     Msg.Cancel
@@ -43,7 +44,7 @@ const ensureIsCustom = async (): Promise<TBSCheckResult> => {
   }
 
   await configs.global.update(TitleBarStyle.Section, TitleBarStyle.Expected, Global);
-  vscode.window.showInformationMessage(Msg.SetTitleBarStyleToCustomSuccess);
+  showInfoMsg(Msg.SetTitleBarStyleToCustomSuccess);
   return TBSCheckResult.JustSet;
 };
 
