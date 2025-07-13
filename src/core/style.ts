@@ -4,50 +4,13 @@ import { readdir, readFile, rm } from 'node:fs/promises';
 
 import { Msg } from '@/common/i18n';
 import { configs } from '@/common/configs';
+import { SettingsJson, TitleBarStyle } from '@/common/consts';
 import { getColor } from './colors';
-import { SettingsJson, TitleBarStyle } from '../common/consts';
-import { showInfoMsg, showWarnMsg } from '../common/notifications';
 
 interface StyleConfig {
   [TitleBarStyle.ActiveBg]: string;
   [TitleBarStyle.InactiveBg]: string;
 }
-
-const checkDirIsProject = async () => {
-  const list = await readdir(configs.cwd);
-  const indicators = configs.projectIndicators;
-  for (let i = 0; i < list.length; i++) {
-    if (indicators.includes(list[i])) {
-      return true;
-    }
-  }
-  return false;
-};
-
-/**
- * 全局的`titleBarStyle`配置必须是`custom`，修改标题栏颜色的操作才能生效
- */
-const tryCustom = async (): Promise<boolean> => {
-  // 检测当前标题栏样式设置
-  const Global = vscode.ConfigurationTarget.Global;
-  const value = configs.global.get<string>(TitleBarStyle.Section);
-  if (value === TitleBarStyle.Expected) {
-    return true;
-  }
-
-  const result = await showWarnMsg(
-    Msg.NotCustomTitleBarStyle(Msg.ConfigLevel[Global]),
-    Msg.SetTitleBarStyleToCustom,
-    Msg.Cancel
-  );
-  if (result !== Msg.SetTitleBarStyleToCustom) {
-    throw false;
-  }
-
-  await configs.global.update(TitleBarStyle.Section, TitleBarStyle.Expected, Global);
-  showInfoMsg(Msg.SetTitleBarStyleToCustomSuccess);
-  return true;
-};
 
 /**
  * 设置标题栏颜色
@@ -110,3 +73,41 @@ export const clearTitleBarColor = async () => {
     await rm(settingsPath, { recursive: true, force: true });
   }
 };
+
+// # region Checking
+const checkDirIsProject = async () => {
+  const list = await readdir(configs.cwd);
+  const indicators = configs.projectIndicators;
+  for (let i = 0; i < list.length; i++) {
+    if (indicators.includes(list[i])) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
+ * 全局的`titleBarStyle`配置必须是`custom`，修改标题栏颜色的操作才能生效
+ */
+const tryCustom = async (): Promise<boolean> => {
+  // 检测当前标题栏样式设置
+  const Global = vscode.ConfigurationTarget.Global;
+  const value = configs.global.get<string>(TitleBarStyle.Section);
+  if (value === TitleBarStyle.Expected) {
+    return true;
+  }
+
+  const result = await vscode.window.showWarningMessage(
+    Msg.NotCustomTitleBarStyle(Msg.ConfigLevel[Global]),
+    Msg.SetTitleBarStyleToCustom,
+    Msg.Cancel
+  );
+  if (result !== Msg.SetTitleBarStyleToCustom) {
+    throw false;
+  }
+
+  await configs.global.update(TitleBarStyle.Section, TitleBarStyle.Expected, Global);
+  vscode.window.showInformationMessage(Msg.SetTitleBarStyleToCustomSuccess);
+  return true;
+};
+// # endregion

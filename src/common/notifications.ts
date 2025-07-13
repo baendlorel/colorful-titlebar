@@ -24,21 +24,3 @@ export const suggestInfo = configs.showSuggest
       return result;
     }
   : async (_: string) => undefined;
-
-/**
- * 如果message为`falsy`则不显示
- * @param o 字符串或Result对象
- */
-export const showErrMsg = vscode.window.showErrorMessage;
-
-/**
- * 如果message为`falsy`则不显示
- * @param o 字符串或Result对象
- */
-export const showWarnMsg = vscode.window.showWarningMessage;
-
-/**
- * 如果message为`falsy`则不显示
- * @param o 字符串或Result对象
- */
-export const showInfoMsg = vscode.window.showInformationMessage;

@@ -5,7 +5,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { Msg } from '@/common/i18n';
 import { configs } from '@/common/configs';
 import { catcher } from '@/common/catcher';
-import { showErrMsg, showInfoMsg, suggestInfo } from '@/common/notifications';
+import { suggestInfo } from '@/common/notifications';
 
 const enum CssParam {
   Darkness = '0.28',
@@ -22,26 +22,7 @@ const enum Css {
 
 const Enable = Msg.Commands.enableGradient;
 
-const getBackground = (gradientStyle: string) => {
-  switch (gradientStyle) {
-    case Enable.style.brightCenter:
-      return Css.BrightCenter;
-    case Enable.style.brightLeft:
-      return Css.BrightLeft;
-    default:
-      return Css.BrightLeft;
-  }
-};
-
-const compact = (arr: TemplateStringsArray, ...values: string[]) => {
-  const strs: string[] = [];
-  for (let i = 0; i < values.length; i++) {
-    strs.push(arr[i].replace(/\s/g, ''), values[i]);
-  }
-  strs.push(arr[arr.length - 1].replace(/\s/g, ''));
-  return strs.join('');
-};
-
+// # region Main
 const suggest = async () => {
   // 如果已经记载了主css路径并嵌入了样式，则无需弹出建议
   const cssPath = configs.workbenchCssPath;
@@ -57,7 +38,7 @@ const suggest = async () => {
   if (now !== sugg.button) {
     return;
   }
-  enable();
+  await enable();
 };
 
 const enable = catcher(async () => {
@@ -88,6 +69,7 @@ const disable = catcher(async () => {
 });
 
 export const gradient = { disable, enable, suggest };
+// # endregion
 
 /**
  * 获取主css文件的路径
@@ -105,7 +87,7 @@ const getMainCssPath = async (): Promise<string | null> => {
     placeHolder: Enable.placeHolder,
     ignoreFocusOut: true,
   });
-  if (!input || existsSync(input.trim())) {
+  if (!input || !existsSync(input.trim())) {
     return null;
   }
 
@@ -118,7 +100,17 @@ const getMainCssPath = async (): Promise<string | null> => {
  * 会在command注册的地方就确认`cssPath`是否存在
  */
 const hackCss = async (cssPath: string, gradientStyle: string): Promise<void> => {
-  const style = compact`${Css.Token}${Css.Selector} {
+  let bg = Css.BrightLeft;
+  switch (gradientStyle) {
+    case Enable.style.brightCenter:
+      bg = Css.BrightCenter;
+      break;
+    case Enable.style.brightLeft:
+      bg = Css.BrightLeft;
+      break;
+  }
+
+  const style = `${Css.Token}${Css.Selector} {
     content: "";
     position: absolute;
     top: 50%;
@@ -126,16 +118,16 @@ const hackCss = async (cssPath: string, gradientStyle: string): Promise<void> =>
     width: 100%;
     height: 100%;
     transform: translate(-50%, -50%);
-    background: ${getBackground(gradientStyle)};
+    background: ${bg};
     mix-blend-mode: overlay;
     pointer-events: none;
-  }\n`;
+  }`.replace(/\n[\s]+/g, '');
 
   let css = await readFile(cssPath, 'utf8');
   css = css.replace(new RegExp(`${Css.Token}[^\n]*\n`), '');
   css = `${css}\n${style}\n`;
   await writeFile(cssPath, css, 'utf8');
-  showInfoMsg(Enable.success);
+  vscode.window.showInformationMessage(Enable.success);
 };
 
 /**
@@ -152,10 +144,10 @@ const backupCss = async (cssPath: string): Promise<void> => {
 const restoreCss = async (cssPath: string): Promise<void> => {
   const backupPath = `${cssPath}.${Css.BackupSuffix}`;
   if (!existsSync(backupPath)) {
-    showErrMsg(Enable.backup.notFound(backupPath));
+    vscode.window.showErrorMessage(Enable.backup.notFound(backupPath));
     return;
   }
   const buffer = await readFile(backupPath);
   await writeFile(cssPath, buffer);
-  showInfoMsg(Enable.restore.success);
+  vscode.window.showInformationMessage(Enable.restore.success);
 };
