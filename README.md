@@ -11,6 +11,11 @@ A VS Code extension that adds colorful background colors to the title bar based 
 - 🌈 **Customizable Color Palettes**: Separate color schemes for light and dark themes
 - 📁 **Smart Project Detection**: Configurable file/folder indicators to identify projects
 - 🌍 **Multi-language Support**: Full Chinese and English interface
+- ✨ **Gradient Overlay Effects**: Add beautiful gradient overlays to enhance the titlebar appearance (requires CSS hacking)
+
+## ⚠️ Important Notice
+
+**The gradient feature modifies VS Code's core CSS files**, which may trigger VS Code's integrity check and show a "corrupted" warning. This is expected behavior and doesn't affect functionality. The extension automatically creates backups before any modifications.
 
 ## 📦 Installation
 
@@ -23,13 +28,24 @@ A VS Code extension that adds colorful background colors to the title bar based 
 
 ### Commands
 
-- **Enable Colorful Titlebar**: `Ctrl+Shift+P` → "Enable Colorful Titlebar"
-- **Disable Colorful Titlebar**: `Ctrl+Shift+P` → "Disable Colorful Titlebar"
-- **Clear Titlebar Color**: `Ctrl+Shift+P` → "Clear Titlebar Color"
+- **Enable Gradient Overlay**: `Ctrl+Shift+P` → "Enable Titlebar Gradient"
+- **Disable Gradient Overlay**: `Ctrl+Shift+P` → "Disable Titlebar Gradient"
+
+### Gradient Styles
+
+- **Bright Center**: Linear gradient with a bright center effect
+
+  ![Bright Center Effect](assets/light-center.png)
+
+- **Bright Left**: Radial gradient with a bright effect from the left side
+
+  ![Bright Left Effect](assets/light-left.png)
 
 ### Requirements
 
 The extension requires VS Code's title bar style to be set to "custom". If not configured, the extension will prompt you to change it automatically.
+
+**For gradient features**: The extension needs to modify VS Code's core CSS files. It will automatically detect your VS Code installation or allow you to specify a custom path.
 
 ## ⚙️ Configuration
 
@@ -71,7 +87,13 @@ Open VS Code settings and configure the following options:
 - **Default**: `[".git", "package.json", "pom.xml", ...]`
 - **Description**: If your workspace contains one item of this array, we shall consider it as a **project** and generate an unique color for the titlebar.
 
-### `colorful-titlebar.showInformationMessages`
+### `colorful-titlebar.workbenchCssPath`
+
+- **Type**: string
+- **Default**: `""`
+- **Description**: Custom path to the workbench.desktop.main.css file.
+
+### `colorful-titlebar.showInfoPop`
 
 - **Type**: boolean
 - **Default**: `true`
@@ -79,11 +101,21 @@ Open VS Code settings and configure the following options:
 
 ## 🔧 How It Works
 
+### Basic Color Application
+
 1. **Project Detection**: Checks for configured indicator files (like `.git`, `package.json`)
 2. **Color Generation**: Creates a hash from the selected source (project name/path/date)
 3. **Color Selection**: Maps the hash to a color from your configured palette
 4. **Theme Awareness**: Uses different color palettes for light and dark themes
 5. **Titlebar Update**: Applies the color to VS Code's titlebar background
+
+### Gradient Enhancement (Advanced)
+
+1. **CSS File Detection**: Locates VS Code's `workbench.desktop.main.css` file
+2. **Automatic Backup**: Creates a backup before any modifications
+3. **CSS Injection**: Adds gradient overlay styles with a unique token
+4. **Style Selection**: Choose from different gradient effects (bright center, bright left)
+5. **Easy Restoration**: Remove gradients with the disable command, which restores from backup
 
 ## 📋 Requirements
 
@@ -92,9 +124,12 @@ Open VS Code settings and configure the following options:
 
 ## ⚠️ Notes
 
-- The extension modifies VS Code's workspace settings
+- The extension modifies VS Code's workspace settings for basic color functionality
+- **Gradient features modify VS Code's core CSS files** and may trigger integrity warnings
 - Different projects will have consistent colors based on your hash source choice
 - Colors automatically adapt to your current theme (light/dark)
+- Gradient overlays are automatically backed up and can be safely removed
+- VS Code may show "corrupted" warnings when using gradient features - this is expected and safe
 
 ## 📄 License
 
@@ -113,3 +148,7 @@ Issues and Pull Requests are welcome!
 - Multi-language support
 - Customizable color palettes
 - Smart project detection
+
+### 1.0.0
+
+- Beautiful gradient overlay effects. Inspired by Idea

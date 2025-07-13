@@ -4,7 +4,7 @@ import { configs } from './core/configs';
 import { registerCommands } from './commands';
 import { checkDirIsProject } from './core/indicate';
 import { isCustom, updateTitleBarColor } from './core/style';
-import { catcher } from './core/ct-error';
+import { catcher } from './core/catcher';
 
 export const activate = async (context: vscode.ExtensionContext) => {
   // 注册命令

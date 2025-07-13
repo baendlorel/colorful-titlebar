@@ -1,6 +1,5 @@
 import vscode from 'vscode';
 
-import { showInfoMsg } from './notifications';
 import { DefaultColorSet, HashSource } from './consts';
 
 const enum Prop {
@@ -44,7 +43,6 @@ class Config {
   ): { value: T | undefined; target: vscode.ConfigurationTarget } {
     const value = config.get<T>(section);
     const inspection = config.inspect(section);
-    showInfoMsg(`section:${section}, value:${value}, ${JSON.stringify(inspection)}`);
 
     if (value === undefined) {
       // 如果没有设置，返回默认值和全局配置目标

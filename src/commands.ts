@@ -2,7 +2,7 @@ import vscode from 'vscode';
 import { Commands } from './core/consts';
 import { Msg } from './core/i18n';
 import { backupCss, getMainCssPath, hackCss, restoreCss } from './core/gradient';
-import { catcher } from './core/ct-error';
+import { catcher } from './core/catcher';
 
 export const registerCommands = (context: vscode.ExtensionContext) => {
   const commands: vscode.Disposable[] = [
