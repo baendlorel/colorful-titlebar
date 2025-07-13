@@ -4,6 +4,7 @@
   "command.disableGradient.title": "禁用标题栏渐变",
   "configuration.title": "彩色标题栏",
   "configuration.showInfoPop.description": "是否显示信息提示消息",
+  "configuration.showSuggest.description": "是否显示建议消息",
   "configuration.hashSource.description": "生成基于哈希的颜色的源",
   "configuration.hashSource.projectName.description": "仅从项目文件夹名称生成颜色哈希",
   "configuration.hashSource.fullPath.description": "从完整项目路径生成颜色哈希，因此不同位置的相同项目将具有不同的颜色",

@@ -4,6 +4,7 @@ import { DefaultColorSet, HashSource } from './consts';
 
 const enum Prop {
   ShowInfoPop = 'showInfoPop',
+  ShowSuggest = 'showSuggest',
   LightThemeColors = 'lightThemeColors',
   DarkThemeColors = 'darkThemeColors',
   ProjectIndicators = 'projectIndicators',
@@ -70,6 +71,10 @@ class Config {
     return Config.self.get<boolean>(Prop.ShowInfoPop, true);
   }
 
+  get [Prop.ShowSuggest]() {
+    return Config.self.get<boolean>(Prop.ShowSuggest, true);
+  }
+
   get colorSet() {
     switch (vscode.window.activeColorTheme.kind) {
       case vscode.ColorThemeKind.Dark:
@@ -124,6 +129,9 @@ class Config {
   readonly set = {
     [Prop.ShowInfoPop](value: boolean) {
       return Config.self.update(Prop.ShowInfoPop, value, vscode.ConfigurationTarget.Global);
+    },
+    [Prop.ShowSuggest](value: boolean) {
+      return Config.self.update(Prop.ShowSuggest, value, vscode.ConfigurationTarget.Global);
     },
     [Prop.HashSource](value: HashSource) {
       return Config.self.update(Prop.HashSource, value, vscode.ConfigurationTarget.Global);

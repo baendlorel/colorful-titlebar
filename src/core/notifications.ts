@@ -4,15 +4,26 @@ import { configs } from './configs';
 import { Msg } from './i18n';
 
 export const popInfo = configs.showInfoPop
-  ? async (msg: string) => {
-      const result = await vscode.window.showInformationMessage(msg, Msg.NoMoreInfoPop);
-      if (result === Msg.NoMoreInfoPop) {
+  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async (msg: string, ...items: any[]) => {
+      const result = await vscode.window.showInformationMessage(msg, ...items, Msg.DontShowAgain);
+      if (result === Msg.DontShowAgain) {
         await configs.set.showInfoPop(false);
-        vscode.window.showInformationMessage(Msg.NoMoreInfoPopSet);
       }
+      return result;
     }
-  : // eslint-disable-next-line @typescript-eslint/no-empty-function
-    async (_: string) => {};
+  : async (_: string) => undefined;
+
+export const suggestInfo = configs.showSuggest
+  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async (msg: string, ...items: any[]) => {
+      const result = await vscode.window.showInformationMessage(msg, ...items, Msg.DontShowAgain);
+      if (result === Msg.DontShowAgain) {
+        await configs.set.showSuggest(false);
+      }
+      return result;
+    }
+  : async (_: string) => undefined;
 
 /**
  * 如果message为`falsy`则不显示

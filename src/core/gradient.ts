@@ -4,7 +4,8 @@ import { readFile, writeFile } from 'node:fs/promises';
 
 import { Msg } from './i18n';
 import { configs } from './configs';
-import { showErrMsg, showInfoMsg } from './notifications';
+import { showErrMsg, showInfoMsg, suggestInfo } from './notifications';
+import { catcher } from './catcher';
 
 const enum CssParam {
   Darkness = '0.24',
@@ -41,11 +42,58 @@ const compact = (arr: TemplateStringsArray, ...values: string[]) => {
   return strs.join('');
 };
 
+const suggest = async () => {
+  // 如果已经记载了主css路径并嵌入了样式，则无需弹出建议
+  const cssPath = configs.workbenchCssPath;
+  if (configs.workbenchCssPath) {
+    const content = await readFile(cssPath, 'utf8');
+    if (content.includes(Css.Token)) {
+      return;
+    }
+  }
+
+  const sugg = Msg.Commands.enableGradient.suggest;
+  const now = await suggestInfo(sugg.msg, sugg.button);
+  if (now !== sugg.button) {
+    return;
+  }
+  enable();
+};
+
+const enable = catcher(async () => {
+  const cssPath = await getMainCssPath();
+  if (!cssPath) {
+    return;
+  }
+
+  const gradientStyle = await vscode.window.showQuickPick([
+    Msg.Commands.enableGradient.style.brightCenter,
+    Msg.Commands.enableGradient.style.brightLeft,
+  ]);
+  if (!gradientStyle) {
+    return;
+  }
+
+  // & 已确保cssPath是能用的
+  await backupCss(cssPath);
+  await hackCss(cssPath, gradientStyle);
+});
+
+const disable = catcher(async () => {
+  const cssPath = await getMainCssPath();
+  if (!cssPath) {
+    return;
+  }
+  await restoreCss(cssPath);
+});
+
+export const gradient = { disable, enable, suggest };
+
 /**
  * 获取主css文件的路径
  * @returns 如果路径上没找到文件或用户放弃输入，返回`null`
  */
-export const getMainCssPath = async (): Promise<string | null> => {
+const getMainCssPath = async (): Promise<string | null> => {
   let cssPath = configs.workbenchCssPath;
   if (existsSync(cssPath)) {
     return cssPath;
@@ -69,7 +117,7 @@ export const getMainCssPath = async (): Promise<string | null> => {
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const hackCss = async (cssPath: string, gradientStyle: string): Promise<void> => {
+const hackCss = async (cssPath: string, gradientStyle: string): Promise<void> => {
   const style = compact`${Css.Token}${Css.Selector} {
     content: "";
     position: absolute;
@@ -93,7 +141,7 @@ export const hackCss = async (cssPath: string, gradientStyle: string): Promise<v
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const backupCss = async (cssPath: string): Promise<void> => {
+const backupCss = async (cssPath: string): Promise<void> => {
   const buffer = await readFile(cssPath);
   await writeFile(`${cssPath}.${Css.BackupSuffix}`, buffer);
 };
@@ -101,7 +149,7 @@ export const backupCss = async (cssPath: string): Promise<void> => {
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const restoreCss = async (cssPath: string): Promise<void> => {
+const restoreCss = async (cssPath: string): Promise<void> => {
   const backupPath = `${cssPath}.${Css.BackupSuffix}`;
   if (!existsSync(backupPath)) {
     showErrMsg(Enable.backup.notFound(backupPath));

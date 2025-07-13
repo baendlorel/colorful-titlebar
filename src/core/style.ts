@@ -13,10 +13,21 @@ interface StyleConfig {
   [TitleBarStyle.InactiveBg]: string;
 }
 
+const checkDirIsProject = async () => {
+  const list = await readdir(configs.cwd);
+  const indicators = configs.projectIndicators;
+  for (let i = 0; i < list.length; i++) {
+    if (indicators.includes(list[i])) {
+      return true;
+    }
+  }
+  return false;
+};
+
 /**
  * 全局的`titleBarStyle`配置必须是`custom`，修改标题栏颜色的操作才能生效
  */
-export const isCustom = async (): Promise<boolean> => {
+const tryCustom = async (): Promise<boolean> => {
   // 检测当前标题栏样式设置
   const Global = vscode.ConfigurationTarget.Global;
   const value = configs.global.get<string>(TitleBarStyle.Section);
@@ -41,7 +52,22 @@ export const isCustom = async (): Promise<boolean> => {
 /**
  * 设置标题栏颜色
  */
-export const updateTitleBarColor = async () => {
+export const applyTitleBarColor = async () => {
+  if (!configs.cwd) {
+    return;
+  }
+
+  // 如果标题栏样式不是custom，则不设置颜色
+  const globalTitleBarStyleIsCustom = await tryCustom();
+  if (!globalTitleBarStyleIsCustom) {
+    return;
+  }
+
+  const isProject = await checkDirIsProject();
+  if (!isProject) {
+    return;
+  }
+
   const color = getColor(configs.cwd);
   const newStyle = {
     [TitleBarStyle.ActiveBg]: color.toString(),

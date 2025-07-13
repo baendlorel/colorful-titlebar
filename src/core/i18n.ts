@@ -5,13 +5,16 @@ export const Msg = (() => {
   const Zh = {
     Unknown: '未知',
 
-    NoMoreInfoPop: '不再提示',
-    NoMoreInfoPopSet: '如果手动开启了提示，需重启VS Code后生效',
+    DontShowAgain: { button: '不再提示' },
     NotWorkspace: '没有打开工作区文件夹，不改变标题栏颜色',
     NotProject: '当前不是项目目录，不改变标题栏颜色',
 
     Commands: {
       enableGradient: {
+        suggest: {
+          msg: '已支持美丽的标题栏渐变色！需要开启吗？',
+          button: '来，立刻开启！',
+        },
         title: `${Consts.MainCssFileName}文件地址`,
         prompt: `启用渐变色标题栏需要修改${Consts.MainCssFileName}，请提供该文件地址（WSl 需要映射到子系统内部的地址）`,
         placeHolder: `例如：../../${Consts.MainCssFileName}`,
@@ -61,13 +64,16 @@ export const Msg = (() => {
 
   const En = {
     Unknown: 'unknown',
-    NoMoreInfoPop: 'Do not show this again',
-    NoMoreInfoPopSet: 'If you set "showInfoPop" to "true", please restart VS Code to make it work',
+    DontShowAgain: { button: 'Do not show again' },
     NotWorkspace: 'No workspace folder opened, titlebar color remains unchanged',
     NotProject: 'Current folder is not a project directory, titlebar color remains unchanged',
 
     Commands: {
       enableGradient: {
+        suggest: {
+          msg: 'Gradient titlebar is supported! Do you want to enable it now?',
+          button: 'YES! Enable it now!',
+        },
         title: `${Consts.MainCssFileName} Path`,
         prompt: `To enable gradient titlebar, please provide the path to "${Consts.MainCssFileName}". WSL paths should map to the internal path of the subsystem`,
         placeHolder: `Example: ../../${Consts.MainCssFileName}`,
