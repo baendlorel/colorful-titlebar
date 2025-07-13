@@ -1,7 +1,8 @@
 import { basename } from 'node:path';
 import { createHash } from 'node:crypto';
 
-import { configs, HashSource } from './configs';
+import { HashSource } from './consts';
+import { configs } from './configs';
 
 const hslaToRgba = (h: number, s: number, l: number): [number, number, number] => {
   const C = (1 - Math.abs(2 * l - 1)) * s;

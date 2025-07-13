@@ -76,10 +76,7 @@ export const clearTitleBarColor = async () => {
   const settingsPath = join(configs.cwd, SettingsJson.Dir); // , 'settings.json'
   const list = await readdir(settingsPath);
   const content = await readFile(join(settingsPath, SettingsJson.FileName), 'utf-8');
-
   if (list.length === 1 && content.replace(/\s/g, '') === SettingsJson.MinimumContent) {
     await rm(settingsPath, { recursive: true, force: true });
-    return true;
   }
-  return false;
 };

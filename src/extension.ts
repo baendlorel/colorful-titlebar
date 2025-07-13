@@ -25,10 +25,11 @@ const applyTitleBarColor = catcher(async () => {
     return;
   }
 
-  const beCustomSuccMsg = await beCustom();
-  if (beCustomSuccMsg) {
-    showInfoMsg(beCustomSuccMsg);
-  }
+  await beCustom().then((v) => {
+    if (v) {
+      showInfoMsg(v);
+    }
+  });
 
   await beProject();
   await updateTitleBarColor();

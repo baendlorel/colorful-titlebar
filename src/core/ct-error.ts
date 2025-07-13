@@ -60,9 +60,14 @@ export const catcher =
 
 export const poper =
   <T extends (...args: any[]) => any>(func: T, msg?: string) =>
-  async (...args: Parameters<T>): Promise<ReturnType<T>> => {
+  async (...args: Parameters<T>): Promise<any> => {
     try {
-      return await func(...args);
+      const result = func(...args);
+      if (result instanceof Promise) {
+        return (await result) as ReturnType<T>;
+      } else {
+        return result;
+      }
     } catch (error) {
       if (error instanceof CTError) {
         throw error; // 向顶层弹出

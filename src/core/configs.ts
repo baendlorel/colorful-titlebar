@@ -2,12 +2,7 @@ import vscode from 'vscode';
 
 import { defaultColorSet } from '@/core/colors';
 import { showInfoMsg } from './notifications';
-
-export const enum HashSource {
-  ProjectName = 'projectName',
-  FullPath = 'fullPath',
-  ProjectNameDate = 'projectNameDate',
-}
+import { HashSource } from './consts';
 
 const enum Prop {
   ShowInfoPop = 'showInfoPop',

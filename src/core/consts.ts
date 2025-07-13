@@ -20,3 +20,9 @@ export const enum Commands {
   EnableGradient = 'colorful-titlebar.enableGradient',
   DisableGradient = 'colorful-titlebar.disableGradient',
 }
+
+export const enum HashSource {
+  ProjectName = 'projectName',
+  FullPath = 'fullPath',
+  ProjectNameDate = 'projectNameDate',
+}
