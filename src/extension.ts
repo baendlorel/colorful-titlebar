@@ -2,10 +2,10 @@ import vscode from 'vscode';
 
 import { configs } from './core/configs';
 import { registerCommands } from './commands';
-import { beProject } from './core/indicate';
-import { beCustom, clearTitleBarColor, updateTitleBarColor } from './core/style';
-import { showInfoMsg } from './core/notifications';
+import { checkDirIsProject } from './core/indicate';
+import { checkGlobalStyle, clearTitleBarColor, updateTitleBarColor } from './core/style';
 import { catcher } from './core/ct-error';
+import { Result } from './core/consts';
 
 export const activate = async (context: vscode.ExtensionContext) => {
   // 注册命令
@@ -25,12 +25,15 @@ const applyTitleBarColor = catcher(async () => {
     return;
   }
 
-  await beCustom().then((v) => {
-    if (v) {
-      showInfoMsg(v);
-    }
-  });
+  const checkResult = await checkGlobalStyle();
+  if (checkResult === Result.Cancel) {
+    return;
+  }
 
-  await beProject();
+  const isProject = await checkDirIsProject();
+  if (!isProject) {
+    return;
+  }
+
   await updateTitleBarColor();
 });

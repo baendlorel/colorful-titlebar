@@ -1,3 +1,9 @@
+export const enum Result {
+  Succ,
+  Fail,
+  Cancel,
+}
+
 export const enum Consts {
   MainCssFileName = 'workbench.desktop.main.css',
 }

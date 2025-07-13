@@ -5,12 +5,10 @@ import { readdir, readFile, rm } from 'node:fs/promises';
 import { Msg } from './i18n';
 import { configs } from './configs';
 import { getColor } from './colors';
-import { SettingsJson, TitleBarStyle } from './consts';
-import { showWarnMsg } from './notifications';
-import { CTError, poper } from './ct-error';
+import { Result, SettingsJson, TitleBarStyle } from './consts';
+import { showInfoMsg, showWarnMsg } from './notifications';
 
-// $ TBS -> TitleBarStyle
-interface TBSConfig {
+interface StyleConfig {
   [TitleBarStyle.ActiveBg]: string;
   [TitleBarStyle.InactiveBg]: string;
 }
@@ -18,12 +16,12 @@ interface TBSConfig {
 /**
  * 全局的`titleBarStyle`配置必须是`custom`，修改标题栏颜色的操作才能生效
  */
-export const beCustom = poper(async (): Promise<string> => {
+export const checkGlobalStyle = async (): Promise<Result> => {
   // 检测当前标题栏样式设置
   const Global = vscode.ConfigurationTarget.Global;
   const value = configs.global.get<string>(TitleBarStyle.Section);
   if (value === TitleBarStyle.Expected) {
-    return '';
+    return Result.Succ;
   }
 
   const result = await showWarnMsg(
@@ -31,22 +29,25 @@ export const beCustom = poper(async (): Promise<string> => {
     Msg.SetTitleBarStyleToCustom,
     Msg.Cancel
   );
-
   if (result !== Msg.SetTitleBarStyleToCustom) {
-    throw CTError.cancel;
+    throw Result.Cancel;
   }
 
   await configs.global.update(TitleBarStyle.Section, TitleBarStyle.Expected, Global);
-  return Msg.SetTitleBarStyleToCustomSuccess;
-});
+  showInfoMsg(Msg.SetTitleBarStyleToCustomSuccess);
+  return Result.Succ;
+};
 
+/**
+ * 设置标题栏颜色
+ */
 export const updateTitleBarColor = async () => {
   const color = getColor(configs.cwd);
   const newStyle = {
     [TitleBarStyle.ActiveBg]: color.toString(),
     [TitleBarStyle.InactiveBg]: color.toGreyDarkenString(),
   };
-  const oldStyle = configs.global.get<TBSConfig>(TitleBarStyle.WorkbenchSection);
+  const oldStyle = configs.global.get<StyleConfig>(TitleBarStyle.WorkbenchSection);
   if (
     oldStyle &&
     oldStyle[TitleBarStyle.ActiveBg] === newStyle[TitleBarStyle.ActiveBg] &&
@@ -61,6 +62,9 @@ export const updateTitleBarColor = async () => {
   );
 };
 
+/**
+ * 将计算的标题栏颜色清空
+ */
 export const clearTitleBarColor = async () => {
   const emptyStyle = {
     [TitleBarStyle.ActiveBg]: undefined,
