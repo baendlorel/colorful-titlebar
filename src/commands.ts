@@ -1,5 +1,5 @@
 import vscode from 'vscode';
-import { Commands } from './core/consts';
+import { Commands } from './common/consts';
 import { gradient } from './core/gradient';
 
 export const registerCommands = (context: vscode.ExtensionContext) => {

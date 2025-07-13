@@ -1,4 +1,4 @@
-import { defaultColorSet, getColor, getColorByK } from '@/core/colors';
+import { getColor } from '@/core/colors';
 
 const names = [
   'Ava-Kingsley',

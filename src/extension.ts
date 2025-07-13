@@ -1,6 +1,6 @@
 import vscode from 'vscode';
 
-import { catcher } from './core/catcher';
+import { catcher } from './common/catcher';
 import { applyTitleBarColor } from './core/style';
 import { gradient } from './core/gradient';
 import { registerCommands } from './commands';

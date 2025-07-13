@@ -2,11 +2,11 @@ import vscode from 'vscode';
 import { join } from 'node:path';
 import { readdir, readFile, rm } from 'node:fs/promises';
 
-import { Msg } from './i18n';
-import { configs } from './configs';
+import { Msg } from '@/common/i18n';
+import { configs } from '@/common/configs';
 import { getColor } from './colors';
-import { SettingsJson, TitleBarStyle } from './consts';
-import { showInfoMsg, showWarnMsg } from './notifications';
+import { SettingsJson, TitleBarStyle } from '../common/consts';
+import { showInfoMsg, showWarnMsg } from '../common/notifications';
 
 interface StyleConfig {
   [TitleBarStyle.ActiveBg]: string;

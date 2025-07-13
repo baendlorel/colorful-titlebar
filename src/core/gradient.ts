@@ -2,13 +2,13 @@ import vscode from 'vscode';
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 
-import { Msg } from './i18n';
-import { configs } from './configs';
-import { showErrMsg, showInfoMsg, suggestInfo } from './notifications';
-import { catcher } from './catcher';
+import { Msg } from '@/common/i18n';
+import { configs } from '@/common/configs';
+import { catcher } from '@/common/catcher';
+import { showErrMsg, showInfoMsg, suggestInfo } from '@/common/notifications';
 
 const enum CssParam {
-  Darkness = '0.24',
+  Darkness = '0.28',
   Brightness = '0.48',
 }
 
