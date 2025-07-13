@@ -4,7 +4,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 
 import { Msg } from './i18n';
 import { configs } from './configs';
-import { CTError, poper } from './ct-error';
+import { showErrMsg, showInfoMsg } from './notifications';
 
 const enum CssParam {
   Darkness = '0.24',
@@ -28,7 +28,7 @@ const getBackground = (gradientStyle: string) => {
     case Enable.style.brightLeft:
       return Css.BrightLeft;
     default:
-      throw CTError.create(Enable.invalidStyle);
+      return Css.BrightLeft;
   }
 };
 
@@ -41,7 +41,11 @@ const compact = (arr: TemplateStringsArray, ...values: string[]) => {
   return strs.join('');
 };
 
-export const getCssPath = async (): Promise<string> => {
+/**
+ * 获取主css文件的路径
+ * @returns 如果路径上没找到文件或用户放弃输入，返回`null`
+ */
+export const getMainCssPath = async (): Promise<string | null> => {
   let cssPath = configs.workbenchCssPath;
   if (existsSync(cssPath)) {
     return cssPath;
@@ -52,11 +56,9 @@ export const getCssPath = async (): Promise<string> => {
     prompt: Enable.prompt,
     placeHolder: Enable.placeHolder,
     ignoreFocusOut: true,
-    validateInput: (value: string) =>
-      existsSync(value.trim()) ? null : Enable.workbenchCssPathInvalid,
   });
-  if (!input) {
-    throw CTError.cancel;
+  if (!input || existsSync(input.trim())) {
+    return null;
   }
 
   cssPath = input.trim();
@@ -67,7 +69,7 @@ export const getCssPath = async (): Promise<string> => {
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const hackCss = poper(async (cssPath: string, gradientStyle: string): Promise<string> => {
+export const hackCss = async (cssPath: string, gradientStyle: string): Promise<void> => {
   const style = compact`${Css.Token}${Css.Selector} {
     content: "";
     position: absolute;
@@ -82,33 +84,30 @@ export const hackCss = poper(async (cssPath: string, gradientStyle: string): Pro
   }\n`;
 
   let css = await readFile(cssPath, 'utf8');
-  if (css.includes(Css.Token)) {
-    css = css.replace(new RegExp(`${Css.Token}[^\n]*\n`), style);
-  } else {
-    css = `${css}\n${style}\n`;
-  }
+  css = css.replace(new RegExp(`${Css.Token}[^\n]*\n`), '');
+  css = `${css}\n${style}\n`;
   await writeFile(cssPath, css, 'utf8');
-  return Enable.success;
-}, Enable.fail);
+  showInfoMsg(Enable.success);
+};
 
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const backupCss = poper(async (cssPath: string): Promise<string> => {
+export const backupCss = async (cssPath: string): Promise<void> => {
   const buffer = await readFile(cssPath);
   await writeFile(`${cssPath}.${Css.BackupSuffix}`, buffer);
-  return Enable.backup.success;
-}, Enable.backup.fail);
+};
 
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const restoreCss = poper(async (cssPath: string): Promise<string> => {
+export const restoreCss = async (cssPath: string): Promise<void> => {
   const backupPath = `${cssPath}.${Css.BackupSuffix}`;
   if (!existsSync(backupPath)) {
-    throw CTError.create(Enable.backup.notFound(backupPath));
+    showErrMsg(Enable.backup.notFound(backupPath));
+    return;
   }
   const buffer = await readFile(backupPath);
   await writeFile(cssPath, buffer);
-  return Enable.restore.success;
-}, Enable.restore.fail);
+  showInfoMsg(Enable.restore.success);
+};

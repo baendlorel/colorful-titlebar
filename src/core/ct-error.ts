@@ -40,38 +40,11 @@ export const catcher =
   async (...args: Parameters<T>): Promise<void> => {
     try {
       await func(...args);
-      return;
     } catch (error) {
-      if (error instanceof CTError) {
-        // 用户取消的情形，不报错直接返回
-        if (error.userCancel) {
-          return;
-        }
-
-        const m = error.situation;
-        if (m) {
-          vscode.window.showErrorMessage(m);
-        }
+      if (error instanceof Error) {
+        vscode.window.showErrorMessage(error.message);
       } else {
         vscode.window.showErrorMessage(String(error));
       }
-    }
-  };
-
-export const poper =
-  <T extends (...args: any[]) => any>(func: T, msg?: string) =>
-  async (...args: Parameters<T>): Promise<any> => {
-    try {
-      const result = func(...args);
-      if (result instanceof Promise) {
-        return (await result) as ReturnType<T>;
-      } else {
-        return result;
-      }
-    } catch (error) {
-      if (error instanceof CTError) {
-        throw error; // 向顶层弹出
-      }
-      throw CTError.create(msg ?? '', error);
     }
   };
