@@ -65,7 +65,7 @@ export const ensureValidCssPath = async (): Promise<string | null> => {
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const hackCss = async (cssPath: string, gradientStyle: string) => {
+export const hackCss = async (cssPath: string, gradientStyle: string): Promise<boolean> => {
   const background = getBackground(gradientStyle);
   const style = compact`${Css.Token}${Css.Selector} {
     content: "";
@@ -90,46 +90,55 @@ export const hackCss = async (cssPath: string, gradientStyle: string) => {
     }
 
     await writeFile(cssPath, css, 'utf8');
+    return true;
   } catch (error) {
-    if (error instanceof Error) {
-      vscode.window.showErrorMessage(`${Msg.Commands.enableGradient.failed} ${error.message}`);
-    }
+    const msg =
+      error instanceof Error
+        ? Msg.Commands.enableGradient.failed + error.message
+        : Msg.Commands.enableGradient.failed;
+    vscode.window.showErrorMessage(msg);
+    return false;
   }
 };
 
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const backupCss = async (cssPath: string) => {
+export const backupCss = async (cssPath: string): Promise<boolean> => {
   try {
     const buffer = await readFile(cssPath);
     await writeFile(`${cssPath}.${Css.BackupSuffix}`, buffer);
+    return true;
   } catch (error) {
-    if (error instanceof Error) {
-      vscode.window.showErrorMessage(
-        `${Msg.Commands.enableGradient.backup.failed} ${error.message}`
-      );
-    }
+    const msg =
+      error instanceof Error
+        ? Msg.Commands.enableGradient.backup.failed + error.message
+        : Msg.Commands.enableGradient.backup.failed;
+    vscode.window.showErrorMessage(msg);
+    return false;
   }
 };
 
 /**
  * 会在command注册的地方就确认`cssPath`是否存在
  */
-export const restoreCss = async (cssPath: string) => {
+export const restoreCss = async (cssPath: string): Promise<boolean> => {
   try {
     const backupPath = `${cssPath}.${Css.BackupSuffix}`;
+    vscode.window.showWarningMessage(backupPath);
     if (!existsSync(backupPath)) {
       vscode.window.showWarningMessage(Msg.Commands.enableGradient.backup.notFound(backupPath));
-      return;
+      return false;
     }
     const buffer = await readFile(backupPath);
     await writeFile(cssPath, buffer);
+    return true;
   } catch (error) {
-    if (error instanceof Error) {
-      vscode.window.showErrorMessage(
-        `${Msg.Commands.enableGradient.backup.restoredFailed} ${error.message}`
-      );
-    }
+    const msg =
+      error instanceof Error
+        ? Msg.Commands.enableGradient.backup.restoredFailed + error.message
+        : Msg.Commands.enableGradient.backup.restoredFailed;
+    vscode.window.showErrorMessage(msg);
+    return false;
   }
 };

@@ -21,11 +21,14 @@ export const registerCommands = (context: vscode.ExtensionContext) => {
       }
 
       // & 已确保cssPath是能用的
-      await backupCss(cssPath);
-      await hackCss(cssPath, gradientStyle);
-      const backupSucc = Msg.Commands.enableGradient.backup.success;
-      const succ = Msg.Commands.enableGradient.success;
-      vscode.window.showInformationMessage(`${backupSucc} ${succ}`);
+      const backupSucc = await backupCss(cssPath);
+      const hackSucc = await hackCss(cssPath, gradientStyle);
+      // 都成功的时候再输出，不成功的情况会在 backupCss 和 hackCss 中处理
+      if (backupSucc && hackSucc) {
+        const msg =
+          Msg.Commands.enableGradient.backup.success + Msg.Commands.enableGradient.success;
+        vscode.window.showInformationMessage(msg);
+      }
     }),
     vscode.commands.registerCommand(Commands.DisableGradient, async () => {
       const cssPath = await ensureValidCssPath();

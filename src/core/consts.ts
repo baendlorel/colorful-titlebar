@@ -20,3 +20,9 @@ export const enum Commands {
   EnableGradient = 'colorful-titlebar.enableGradient',
   DisableGradient = 'colorful-titlebar.disableGradient',
 }
+
+export interface Result<T> {
+  succ: boolean;
+  data: T | null;
+  msg: string;
+}
