@@ -1,33 +1,42 @@
 import vscode from 'vscode';
+import { Commands } from './core/consts';
 import { Msg } from './core/i18n';
-import { configs } from './core/configs';
-import { existsSync } from 'node:fs';
-import { hackCss } from './core/gradient';
+import { backupCss, ensureValidCssPath, hackCss, restoreCss } from './core/gradient';
 
 export const registerCommands = (context: vscode.ExtensionContext) => {
   const commands: vscode.Disposable[] = [
-    vscode.commands.registerCommand('colorful-titlebar.enableGradient', async () => {
-      let cssPath = configs.workbenchCssPath;
-      if (!existsSync(cssPath)) {
-        const input = await vscode.window.showInputBox({
-          prompt: Msg.Commands.enableGradient.prompt,
-          placeHolder: '例如：linear-gradient(to right, #ff7e5f, #feb47b)',
-        });
-        if (!input) {
-          return;
-        }
-
-        cssPath = input.trim();
-        if (!existsSync(cssPath)) {
-          vscode.window.showWarningMessage(Msg.Commands.enableGradient.workbenchCssPathInvalid);
-          return;
-        }
-        await configs.set.workbenchCssPath(cssPath);
+    vscode.commands.registerCommand(Commands.EnableGradient, async () => {
+      const cssPath = await ensureValidCssPath();
+      if (cssPath === null) {
+        return;
       }
 
-      await hackCss(cssPath);
+      const gradientStyle = await vscode.window.showQuickPick([
+        Msg.Commands.enableGradient.gradientStyle.brightCenter,
+        Msg.Commands.enableGradient.gradientStyle.brightLeft,
+      ]);
+
+      if (gradientStyle === undefined) {
+        return;
+      }
+
+      // & 已确保cssPath是能用的
+      await backupCss(cssPath);
+      await hackCss(cssPath, gradientStyle);
+      const backupSucc = Msg.Commands.enableGradient.backup.success;
+      const succ = Msg.Commands.enableGradient.success;
+      vscode.window.showInformationMessage(`${backupSucc} ${succ}`);
     }),
-    vscode.commands.registerCommand('colorful-titlebar.disableGradient', async () => {}),
+    vscode.commands.registerCommand(Commands.DisableGradient, async () => {
+      const cssPath = await ensureValidCssPath();
+      if (cssPath === null) {
+        const notFound = Msg.Commands.enableGradient.backup.notFound();
+        vscode.window.showErrorMessage(`${Msg.Commands.enableGradient.failed} ${notFound}`);
+        return;
+      }
+      await restoreCss(cssPath);
+      vscode.window.showInformationMessage(Msg.Commands.enableGradient.backup.restoredSucceeded);
+    }),
   ];
   context.subscriptions.push(...commands);
 };

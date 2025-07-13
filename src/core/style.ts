@@ -5,6 +5,7 @@ import { readdir, readFile, rm } from 'node:fs/promises';
 import { Msg } from './i18n';
 import { configs } from './configs';
 import { getColor } from './colors';
+import { TitleBarStyle } from './consts';
 
 // $ TBS -> TitleBarStyle
 
@@ -14,17 +15,9 @@ const enum TBSCheckResult {
   JustSet,
 }
 
-const enum TBS {
-  GlobalSection = 'window.titleBarStyle',
-  ExpectedValue = 'custom',
-  Section = 'workbench.colorCustomizations',
-  ActiveBg = 'titleBar.activeBackground',
-  InactiveBg = 'titleBar.inactiveBackground',
-}
-
 interface TBSConfig {
-  [TBS.ActiveBg]: string;
-  [TBS.InactiveBg]: string;
+  [TitleBarStyle.ActiveBg]: string;
+  [TitleBarStyle.InactiveBg]: string;
 }
 
 /**
@@ -34,8 +27,8 @@ interface TBSConfig {
 const ensureIsCustom = async (): Promise<TBSCheckResult> => {
   // 检测当前标题栏样式设置
   const Global = vscode.ConfigurationTarget.Global;
-  const value = configs.global.get<string>(TBS.GlobalSection);
-  if (value === TBS.ExpectedValue) {
+  const value = configs.global.get<string>(TitleBarStyle.Section);
+  if (value === TitleBarStyle.Expected) {
     return TBSCheckResult.Custom;
   }
 
@@ -49,7 +42,7 @@ const ensureIsCustom = async (): Promise<TBSCheckResult> => {
     return TBSCheckResult.NotCustom;
   }
 
-  await configs.global.update(TBS.GlobalSection, TBS.ExpectedValue, Global);
+  await configs.global.update(TitleBarStyle.Section, TitleBarStyle.Expected, Global);
   vscode.window.showInformationMessage(Msg.SetTitleBarStyleToCustomSuccess);
   return TBSCheckResult.JustSet;
 };
@@ -70,27 +63,35 @@ export const updateTitleBarColor = async () => {
   const color = getColor(configs.dir);
 
   const newStyle = {
-    [TBS.ActiveBg]: color.toString(),
-    [TBS.InactiveBg]: color.toGreyDarkenString(),
+    [TitleBarStyle.ActiveBg]: color.toString(),
+    [TitleBarStyle.InactiveBg]: color.toGreyDarkenString(),
   };
 
-  const oldStyle = configs.global.get<TBSConfig>(TBS.Section);
+  const oldStyle = configs.global.get<TBSConfig>(TitleBarStyle.WorkbenchSection);
   if (
     oldStyle &&
-    oldStyle[TBS.ActiveBg] === newStyle[TBS.ActiveBg] &&
-    oldStyle[TBS.InactiveBg] === newStyle[TBS.InactiveBg]
+    oldStyle[TitleBarStyle.ActiveBg] === newStyle[TitleBarStyle.ActiveBg] &&
+    oldStyle[TitleBarStyle.InactiveBg] === newStyle[TitleBarStyle.InactiveBg]
   ) {
     return;
   }
-  await configs.global.update(TBS.Section, newStyle, vscode.ConfigurationTarget.Workspace);
+  await configs.global.update(
+    TitleBarStyle.WorkbenchSection,
+    newStyle,
+    vscode.ConfigurationTarget.Workspace
+  );
 };
 
 export const clearTitleBarColor = async () => {
   const emptyStyle = {
-    [TBS.ActiveBg]: undefined,
-    [TBS.InactiveBg]: undefined,
+    [TitleBarStyle.ActiveBg]: undefined,
+    [TitleBarStyle.InactiveBg]: undefined,
   };
-  await configs.global.update(TBS.Section, emptyStyle, vscode.ConfigurationTarget.Workspace);
+  await configs.global.update(
+    TitleBarStyle.WorkbenchSection,
+    emptyStyle,
+    vscode.ConfigurationTarget.Workspace
+  );
 
   // 如果.vscode下只有settings一个文件，而且内容和上面的compact一样，那么删除.vscode
   const settingsPath = join(configs.dir, '.vscode'); // , 'settings.json'
