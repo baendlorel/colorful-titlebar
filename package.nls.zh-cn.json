@@ -1,6 +1,6 @@
 {
   "extension.category": "彩色标题栏",
-  "command.enableGradient.title": "启用标题栏渐变",
+  "command.enableGradient.title": "启用/切换标题栏渐变",
   "command.disableGradient.title": "禁用标题栏渐变",
   "configuration.title": "彩色标题栏",
   "configuration.showInfoPop.description": "是否显示信息提示消息",

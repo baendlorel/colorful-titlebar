@@ -32,11 +32,11 @@ export const enum AfterStyle {
   ArcLeft = `${Css.Selector}{
       content: '';
       position: absolute;
-      width: 200%;
-      height: 269%;
-      top: -56%;
-      left: -6%;
-      background: radial-gradient(ellipse, rgba(5, 5, 5, 0) 0%, rgba(255, 255, 255, 0.25) 50%, rgba(255, 255, 255, 0.82) 65%);
+      width: 100%;
+      height: 125%;
+      top: 15%;
+      left: 15%;
+      background: radial-gradient(ellipse, rgba(255, 255, 255, 1) 0%, rgba(5, 5, 5, 0) 72%);
       pointer-events: none;
       mix-blend-mode: overlay;
     }`,

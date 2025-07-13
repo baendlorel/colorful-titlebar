@@ -1,6 +1,6 @@
 {
   "extension.category": "Colorful Titlebar",
-  "command.enableGradient.title": "Enable Titlebar Gradient",
+  "command.enableGradient.title": "Enable/Switch Titlebar Gradient",
   "command.disableGradient.title": "Disable Titlebar Gradient",
   "configuration.title": "Colorful Titlebar",
   "configuration.showInfoPop.description": "Whether to show information messages",
