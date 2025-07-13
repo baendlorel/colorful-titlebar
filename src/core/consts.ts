@@ -80,6 +80,12 @@ export class Result<T = null> {
     }
   }
 
+  static err(e: unknown, msg?: string): Result {
+    const m = e instanceof Error ? e.message : String(e);
+    msg = msg ?? '';
+    return new Result(false, null, msg ? `${msg} ${m}` : m);
+  }
+
   succ: boolean;
   data: T;
   msg: string;

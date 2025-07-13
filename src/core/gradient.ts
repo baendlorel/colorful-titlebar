@@ -19,23 +19,25 @@ const enum Css {
   BrightLeft = `radial-gradient(circle at 15% 50%, rgba(255, 255, 255, ${CssParam.Brightness}) 0%, transparent 24%, rgba(5, 5, 5, ${CssParam.Darkness}) 50%, transparent 80%)`,
 }
 
+const Enable = Msg.Commands.enableGradient;
+
 const getBackground = (gradientStyle: string) => {
   switch (gradientStyle) {
-    case Msg.Commands.enableGradient.gradientStyle.brightCenter:
+    case Enable.style.brightCenter:
       return Css.BrightCenter;
-    case Msg.Commands.enableGradient.gradientStyle.brightLeft:
+    case Enable.style.brightLeft:
       return Css.BrightLeft;
     default:
       return Css.BrightLeft;
   }
 };
 
-const compact = (strings: TemplateStringsArray, ...values: any[]) => {
+const compact = (arr: TemplateStringsArray, ...values: any[]) => {
   const strs: string[] = [];
   for (let i = 0; i < values.length; i++) {
-    strs.push(strings[i].replace(/\s/g, ''), values[i]);
+    strs.push(arr[i].replace(/\s/g, ''), values[i]);
   }
-  strs.push(strings[strings.length - 1].replace(/\s/g, ''));
+  strs.push(arr[arr.length - 1].replace(/\s/g, ''));
   return strs.join('');
 };
 
@@ -46,12 +48,12 @@ export const ensureValidCssPath = async (): PromiseResult<string | null> => {
   }
 
   const input = await vscode.window.showInputBox({
-    title: Msg.Commands.enableGradient.title,
-    prompt: Msg.Commands.enableGradient.prompt,
-    placeHolder: Msg.Commands.enableGradient.placeHolder,
+    title: Enable.title,
+    prompt: Enable.prompt,
+    placeHolder: Enable.placeHolder,
     ignoreFocusOut: true,
     validateInput: (value: string) =>
-      existsSync(value.trim()) ? null : Msg.Commands.enableGradient.workbenchCssPathInvalid,
+      existsSync(value.trim()) ? null : Enable.workbenchCssPathInvalid,
   });
   if (!input) {
     return Result.fail();
@@ -91,13 +93,9 @@ export const hackCss = async (cssPath: string, gradientStyle: string): PromiseRe
     }
 
     await writeFile(cssPath, css, 'utf8');
-    return Result.succ(Msg.Commands.enableGradient.success);
+    return Result.succ(Enable.success);
   } catch (error) {
-    const msg =
-      error instanceof Error
-        ? Msg.Commands.enableGradient.failed + error.message
-        : Msg.Commands.enableGradient.failed;
-    return Result.fail(msg);
+    return Result.err(error, Enable.failed);
   }
 };
 
@@ -108,13 +106,9 @@ export const backupCss = async (cssPath: string): PromiseResult => {
   try {
     const buffer = await readFile(cssPath);
     await writeFile(`${cssPath}.${Css.BackupSuffix}`, buffer);
-    return { succ: true, data: null, msg: Msg.Commands.enableGradient.backup.success };
+    return Result.succ(Enable.backup.success);
   } catch (error) {
-    const msg =
-      error instanceof Error
-        ? Msg.Commands.enableGradient.backup.fail + error.message
-        : Msg.Commands.enableGradient.backup.fail;
-    return Result.fail(msg);
+    return Result.err(error, Enable.backup.fail);
   }
 };
 
@@ -125,17 +119,13 @@ export const restoreCss = async (cssPath: string): PromiseResult => {
   try {
     const backupPath = `${cssPath}.${Css.BackupSuffix}`;
     if (!existsSync(backupPath)) {
-      return Result.succ(Msg.Commands.enableGradient.backup.notFound(backupPath));
+      return Result.succ(Enable.backup.notFound(backupPath));
     }
     const buffer = await readFile(backupPath);
     await writeFile(cssPath, buffer);
 
-    return Result.succ(Msg.Commands.enableGradient.restore.success);
+    return Result.succ(Enable.restore.success);
   } catch (error) {
-    const msg =
-      error instanceof Error
-        ? Msg.Commands.enableGradient.restore.failed + error.message
-        : Msg.Commands.enableGradient.restore.failed;
-    return Result.fail(msg);
+    return Result.err(error, Enable.restore.failed);
   }
 };

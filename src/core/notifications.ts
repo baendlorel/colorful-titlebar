@@ -5,15 +5,16 @@ import { Msg } from './i18n';
 import { Result } from './consts';
 
 export const popInfo = configs.showInfoPop
-  ? async (m: string) => {
-      const result = await vscode.window.showInformationMessage(m, Msg.NoMoreInfoPop);
+  ? async (m: string | Result<any>) => {
+      const msg = m instanceof Result ? m.msg : m;
+      const result = await vscode.window.showInformationMessage(msg, Msg.NoMoreInfoPop);
       if (result === Msg.NoMoreInfoPop) {
         await configs.set.showInfoPop(false);
-        await vscode.window.showInformationMessage(Msg.NoMoreInfoPopSet);
+        return vscode.window.showInformationMessage(Msg.NoMoreInfoPopSet);
       }
     }
   : // eslint-disable-next-line @typescript-eslint/no-empty-function
-    async (_: string) => {};
+    async (_: string | Result<any>) => {};
 
 /**
  * 如果message为`falsy`则不显示

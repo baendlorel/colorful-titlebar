@@ -5,7 +5,7 @@ import { readdir, readFile, rm } from 'node:fs/promises';
 import { Msg } from './i18n';
 import { configs } from './configs';
 import { getColor } from './colors';
-import { SettingsJson, TitleBarStyle } from './consts';
+import { PromiseResult, Result, SettingsJson, TitleBarStyle } from './consts';
 import { showInfoMsg, showWarnMsg } from './notifications';
 
 // $ TBS -> TitleBarStyle
@@ -23,14 +23,13 @@ interface TBSConfig {
 
 /**
  * 全局的`titleBarStyle`配置必须是`custom`，修改标题栏颜色的操作才能生效
- * @returns
  */
-const ensureIsCustom = async (): Promise<TBSCheckResult> => {
+export const beCustom = async (): PromiseResult => {
   // 检测当前标题栏样式设置
   const Global = vscode.ConfigurationTarget.Global;
   const value = configs.global.get<string>(TitleBarStyle.Section);
   if (value === TitleBarStyle.Expected) {
-    return TBSCheckResult.Custom;
+    return Result.succ();
   }
 
   const result = await showWarnMsg(
@@ -40,37 +39,19 @@ const ensureIsCustom = async (): Promise<TBSCheckResult> => {
   );
 
   if (result !== Msg.SetTitleBarStyleToCustom) {
-    return TBSCheckResult.NotCustom;
+    return Result.fail();
   }
 
   await configs.global.update(TitleBarStyle.Section, TitleBarStyle.Expected, Global);
-  showInfoMsg(Msg.SetTitleBarStyleToCustomSuccess);
-  return TBSCheckResult.JustSet;
-};
-
-/**
- * 全局配置必须要是`custom`样式，修改标题栏颜色才会有用
- */
-export const wishTitleBarStyleIsCustom = async () => {
-  const result = await ensureIsCustom();
-  switch (result) {
-    case TBSCheckResult.Custom:
-      return true;
-    case TBSCheckResult.NotCustom:
-      return false;
-    case TBSCheckResult.JustSet:
-      return false;
-  }
+  return Result.succ(Msg.SetTitleBarStyleToCustomSuccess);
 };
 
 export const updateTitleBarColor = async () => {
   const color = getColor(configs.cwd);
-
   const newStyle = {
     [TitleBarStyle.ActiveBg]: color.toString(),
     [TitleBarStyle.InactiveBg]: color.toGreyDarkenString(),
   };
-
   const oldStyle = configs.global.get<TBSConfig>(TitleBarStyle.WorkbenchSection);
   if (
     oldStyle &&

@@ -14,10 +14,9 @@ export const registerCommands = (context: vscode.ExtensionContext) => {
       const cssPath = cssPathResult.data as string;
 
       const gradientStyle = await vscode.window.showQuickPick([
-        Msg.Commands.enableGradient.gradientStyle.brightCenter,
-        Msg.Commands.enableGradient.gradientStyle.brightLeft,
+        Msg.Commands.enableGradient.style.brightCenter,
+        Msg.Commands.enableGradient.style.brightLeft,
       ]);
-
       if (gradientStyle === undefined) {
         return;
       }
@@ -40,11 +39,14 @@ export const registerCommands = (context: vscode.ExtensionContext) => {
       if (cssPathResult.fail) {
         return showErrMsg(cssPathResult);
       }
-      const cssPath = cssPathResult.data as string;
-
-      const restoreResult = await restoreCss(cssPath);
-      (restoreResult.succ ? showInfoMsg : showErrMsg)(restoreResult);
+      const restoreResult = await restoreCss(cssPathResult.data as string);
+      if (restoreResult.succ) {
+        return showErrMsg(Msg.Commands.disableGradient.fail + restoreResult.msg);
+      } else {
+        return showInfoMsg(restoreResult);
+      }
     }),
   ];
+
   context.subscriptions.push(...commands);
 };

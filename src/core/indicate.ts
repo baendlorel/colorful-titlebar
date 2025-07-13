@@ -3,7 +3,7 @@ import { readdir } from 'node:fs/promises';
 import { configs } from './configs';
 import { PromiseResult, Result } from './consts';
 
-export const wishItWereProject = async (): PromiseResult => {
+export const beProject = async (): PromiseResult => {
   const list = await readdir(configs.cwd);
   const indicators = configs.projectIndicators;
 

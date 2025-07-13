@@ -14,7 +14,7 @@ export const Msg = (() => {
         prompt: `启用渐变色标题栏需要修改${Consts.MainCssFileName}，请提供该文件地址（WSl 需要映射到子系统内部的地址）`,
         placeHolder: `例如：../../${Consts.MainCssFileName}`,
         workbenchCssPathInvalid: `${Consts.MainCssFileName}路径无效，请检查`,
-        gradientStyle: {
+        style: {
           brightCenter: '中间较亮',
           brightLeft: '左侧较亮',
         },
@@ -68,7 +68,7 @@ export const Msg = (() => {
         prompt: `To enable gradient titlebar, please provide the path to "${Consts.MainCssFileName}". WSL paths should map to the internal path of the subsystem`,
         placeHolder: `Example: ../../${Consts.MainCssFileName}`,
         workbenchCssPathInvalid: `The path to "${Consts.MainCssFileName}" is invalid, please check`,
-        gradientStyle: {
+        style: {
           brightCenter: 'Bright Center',
           brightLeft: 'Bright Left',
         },
