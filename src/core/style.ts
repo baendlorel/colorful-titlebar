@@ -48,7 +48,10 @@ const ensureIsCustom = async (): Promise<TBSCheckResult> => {
   return TBSCheckResult.JustSet;
 };
 
-export const isTitleBarStyleCustom = async () => {
+/**
+ * 全局配置必须要是`custom`样式，修改标题栏颜色才会有用
+ */
+export const wishTitleBarStyleIsCustom = async () => {
   const result = await ensureIsCustom();
   switch (result) {
     case TBSCheckResult.Custom:

@@ -4,8 +4,8 @@ import { join } from 'node:path';
 import { configs } from './core/configs';
 import { Msg } from './core/i18n';
 import { registerCommands } from './commands';
-import { indicateProject } from './core/indicate';
-import { isTitleBarStyleCustom, updateTitleBarColor } from './core/style';
+import { wishItWereProject } from './core/indicate';
+import { wishTitleBarStyleIsCustom, updateTitleBarColor } from './core/style';
 import { FileCreationWatcher } from './core/watcher';
 import { popInfo } from './core/notifications';
 
@@ -23,13 +23,13 @@ export const deactivate = () => true;
  * 加载核心逻辑
  */
 const applyTitleBarColor = async () => {
-  const isCustom = await isTitleBarStyleCustom();
+  const isCustom = await wishTitleBarStyleIsCustom();
   if (!isCustom || !configs.cwd) {
     return;
   }
 
-  const isProject = await indicateProject();
-  if (!isProject) {
+  const wishItWereProjectResult = await wishItWereProject();
+  if (wishItWereProjectResult.fail) {
     console.log(Msg.NotProject);
     return;
   }

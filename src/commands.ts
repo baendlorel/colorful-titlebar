@@ -8,7 +8,7 @@ export const registerCommands = (context: vscode.ExtensionContext) => {
   const commands: vscode.Disposable[] = [
     vscode.commands.registerCommand(Commands.EnableGradient, async () => {
       const cssPathResult = await ensureValidCssPath();
-      if (!cssPathResult.succ) {
+      if (cssPathResult.fail) {
         return showErrMsg(cssPathResult);
       }
       const cssPath = cssPathResult.data as string;
@@ -24,11 +24,12 @@ export const registerCommands = (context: vscode.ExtensionContext) => {
 
       // & 已确保cssPath是能用的
       const backup = await backupCss(cssPath);
-      if (!backup.succ) {
+      if (backup.fail) {
         return showErrMsg(backup);
       }
+
       const hack = await hackCss(cssPath, gradientStyle);
-      if (!hack.succ) {
+      if (hack.fail) {
         return showErrMsg(backup);
       }
 
@@ -36,17 +37,13 @@ export const registerCommands = (context: vscode.ExtensionContext) => {
     }),
     vscode.commands.registerCommand(Commands.DisableGradient, async () => {
       const cssPathResult = await ensureValidCssPath();
-      if (!cssPathResult.succ) {
+      if (cssPathResult.fail) {
         return showErrMsg(cssPathResult);
       }
       const cssPath = cssPathResult.data as string;
 
       const restoreResult = await restoreCss(cssPath);
-      if (restoreResult.succ) {
-        showInfoMsg(restoreResult);
-      } else {
-        showErrMsg(restoreResult);
-      }
+      (restoreResult.succ ? showInfoMsg : showErrMsg)(restoreResult);
     }),
   ];
   context.subscriptions.push(...commands);

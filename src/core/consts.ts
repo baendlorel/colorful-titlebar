@@ -26,6 +26,11 @@ export class Result<T = null> {
    * Creates a successful Result with a message.
    * @param msg The message for the result.
    */
+  static succ(): Result<null>;
+  /**
+   * Creates a successful Result with a message.
+   * @param msg The message for the result.
+   */
   static succ(msg: string): Result<null>;
   /**
    * Creates a successful Result with data and a message.
@@ -33,8 +38,10 @@ export class Result<T = null> {
    * @param msg The message for the result.
    */
   static succ<T = null>(data: T, msg: string): Result<T>;
-  static succ<T = null>(...args: [string] | [T, string]): Result<T> {
+  static succ<T = null>(...args: [] | [string] | [T, string]): Result<T> {
     switch (args.length) {
+      case 0:
+        return new Result<T>(true, null as T, '');
       case 1:
         return new Result<T>(true, null as T, args[0] as string);
       case 2:
@@ -76,6 +83,10 @@ export class Result<T = null> {
   succ: boolean;
   data: T;
   msg: string;
+  get fail() {
+    return !this.succ;
+  }
+
   constructor(...args: [boolean, T, string] | [T, string] | [string]) {
     switch (args.length) {
       case 1: {
