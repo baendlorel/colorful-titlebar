@@ -6,19 +6,7 @@ import { Msg } from '@/common/i18n';
 import { configs } from '@/common/configs';
 import { catcher } from '@/common/catcher';
 import { suggestInfo } from '@/common/notifications';
-
-const enum CssParam {
-  Darkness = '0.28',
-  Brightness = '0.48',
-}
-
-const enum Css {
-  BackupSuffix = 'bak',
-  Token = '\u002F\u002A__COLORFUL_TITLEBAR_KASUKABETSUMUGI__\u002A\u002F',
-  Selector = '#workbench\u005C\u002Eparts\u005C\u002Etitlebar::after',
-  BrightCenter = `linear-gradient(to right, rgba(5, 5, 5, ${CssParam.Darkness}) 0%, rgba(255, 255, 255, ${CssParam.Brightness}) 50%, transparent 80%)`,
-  BrightLeft = `radial-gradient(circle at 15% 50%, rgba(255, 255, 255, ${CssParam.Brightness}) 0%, transparent 24%, rgba(5, 5, 5, ${CssParam.Darkness}) 50%, transparent 80%)`,
-}
+import { AfterStyle, Css } from './consts';
 
 const Enable = Msg.Commands.enableGradient;
 
@@ -33,9 +21,8 @@ const suggest = async () => {
     }
   }
 
-  const sugg = Msg.Commands.enableGradient.suggest;
-  const now = await suggestInfo(sugg.msg, sugg.button);
-  if (now !== sugg.button) {
+  const now = await suggestInfo(Enable.suggest.msg, Enable.suggest.button);
+  if (now !== Enable.suggest.button) {
     return;
   }
   await enable();
@@ -48,8 +35,9 @@ const enable = catcher(async () => {
   }
 
   const gradientStyle = await vscode.window.showQuickPick([
-    Msg.Commands.enableGradient.style.brightCenter,
-    Msg.Commands.enableGradient.style.brightLeft,
+    Enable.style.brightCenter,
+    Enable.style.brightLeft,
+    Enable.style.arcLeft,
   ]);
   if (!gradientStyle) {
     return;
@@ -100,32 +88,24 @@ const getMainCssPath = async (): Promise<string | null> => {
  * 会在command注册的地方就确认`cssPath`是否存在
  */
 const hackCss = async (cssPath: string, gradientStyle: string): Promise<void> => {
-  let bg = Css.BrightLeft;
+  let style = AfterStyle.BrightLeft;
   switch (gradientStyle) {
     case Enable.style.brightCenter:
-      bg = Css.BrightCenter;
+      style = AfterStyle.BrightCenter;
       break;
     case Enable.style.brightLeft:
-      bg = Css.BrightLeft;
+      style = AfterStyle.BrightLeft;
+      break;
+    case Enable.style.arcLeft:
+      style = AfterStyle.ArcLeft;
       break;
   }
 
-  const style = `${Css.Token}${Css.Selector} {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    transform: translate(-50%, -50%);
-    background: ${bg};
-    mix-blend-mode: overlay;
-    pointer-events: none;
-  }`.replace(/\n[\s]+/g, '');
+  const tokened = `${Css.Token}${style}`.replace(/\n[\s]+/g, '');
 
   let css = await readFile(cssPath, 'utf8');
   css = css.replace(new RegExp(`${Css.Token}[^\n]*\n`), '');
-  css = `${css}\n${style}\n`;
+  css = `${css}\n${tokened}\n`;
   await writeFile(cssPath, css, 'utf8');
   vscode.window.showInformationMessage(Enable.success);
 };

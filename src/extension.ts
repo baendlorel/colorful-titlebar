@@ -2,7 +2,7 @@ import vscode from 'vscode';
 
 import { catcher } from './common/catcher';
 import { applyTitleBarColor } from './core/style';
-import { gradient } from './core/gradient';
+import { gradient } from './features/gradient';
 import { registerCommands } from './commands';
 
 export const activate = catcher(async (context: vscode.ExtensionContext) => {

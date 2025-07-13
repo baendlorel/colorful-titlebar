@@ -22,6 +22,7 @@ export const Msg = (() => {
         style: {
           brightCenter: '中间较亮',
           brightLeft: '左侧较亮',
+          arcLeft: '左侧弧光',
         },
         invalidStyle: '无效的样式',
         success: '修改css文件成功！重启VS Code生效。若碰到提示VS Code损坏，可以直接点击“不再显示”',
@@ -81,6 +82,7 @@ export const Msg = (() => {
         style: {
           brightCenter: 'Bright Center',
           brightLeft: 'Bright Left',
+          arcLeft: 'Arc Left',
         },
         invalidStyle: 'Invalid style',
         success:

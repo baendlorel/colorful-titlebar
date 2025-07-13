@@ -1,6 +1,6 @@
 import vscode from 'vscode';
 import { Commands } from './common/consts';
-import { gradient } from './core/gradient';
+import { gradient } from './features/gradient';
 
 export const registerCommands = (context: vscode.ExtensionContext) => {
   const commands: vscode.Disposable[] = [
