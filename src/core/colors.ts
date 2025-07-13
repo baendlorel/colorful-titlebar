@@ -147,27 +147,6 @@ class RGBColor {
   }
 }
 
-export const defaultColorSet = {
-  light: [
-    'rgb(167, 139, 250)',
-    'rgb(147, 197, 253)',
-    'rgb(128, 203, 196)',
-    'rgb(172, 243, 157)',
-    'rgb(250, 204, 21)',
-    'rgb(253, 151, 31)',
-    'rgb(251, 113, 133)',
-  ],
-  dark: [
-    'rgb(68, 0, 116)',
-    'rgb(0, 47, 85)',
-    'rgb(0, 66, 66)',
-    'rgb(0, 75, 28)',
-    // 'rgb(99, 80, 0)',
-    'rgb(124, 65, 1)',
-    '#953131ff',
-  ],
-};
-
 const getHashSource = (fullPath: string) => {
   switch (configs.hashSource) {
     case HashSource.ProjectName:

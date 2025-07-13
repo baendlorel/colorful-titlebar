@@ -42,7 +42,7 @@ export const catcher =
       await func(...args);
     } catch (error) {
       if (error instanceof Error) {
-        vscode.window.showErrorMessage(error.message);
+        vscode.window.showErrorMessage(error.message + error.stack);
       } else {
         vscode.window.showErrorMessage(String(error));
       }

@@ -2,7 +2,6 @@ import vscode from 'vscode';
 import { Commands } from './core/consts';
 import { Msg } from './core/i18n';
 import { backupCss, getMainCssPath, hackCss, restoreCss } from './core/gradient';
-import { showInfoMsg } from './core/notifications';
 import { catcher } from './core/ct-error';
 
 export const registerCommands = (context: vscode.ExtensionContext) => {

@@ -1,8 +1,7 @@
 import vscode from 'vscode';
 
-import { defaultColorSet } from '@/core/colors';
 import { showInfoMsg } from './notifications';
-import { HashSource } from './consts';
+import { DefaultColorSet, HashSource } from './consts';
 
 const enum Prop {
   ShowInfoPop = 'showInfoPop',
@@ -77,10 +76,10 @@ class Config {
     switch (vscode.window.activeColorTheme.kind) {
       case vscode.ColorThemeKind.Dark:
       case vscode.ColorThemeKind.HighContrast:
-        return Config.self.get<string[]>(Prop.DarkThemeColors, defaultColorSet.dark);
+        return Config.self.get<string[]>(Prop.DarkThemeColors, DefaultColorSet.Dark.split(';'));
       case vscode.ColorThemeKind.Light:
       case vscode.ColorThemeKind.HighContrastLight:
-        return Config.self.get<string[]>(Prop.LightThemeColors, defaultColorSet.light);
+        return Config.self.get<string[]>(Prop.LightThemeColors, DefaultColorSet.Light.split(';'));
     }
   }
 

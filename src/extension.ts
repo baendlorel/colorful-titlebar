@@ -3,9 +3,8 @@ import vscode from 'vscode';
 import { configs } from './core/configs';
 import { registerCommands } from './commands';
 import { checkDirIsProject } from './core/indicate';
-import { checkGlobalStyle, clearTitleBarColor, updateTitleBarColor } from './core/style';
+import { isCustom, updateTitleBarColor } from './core/style';
 import { catcher } from './core/ct-error';
-import { Result } from './core/consts';
 
 export const activate = async (context: vscode.ExtensionContext) => {
   // 注册命令
@@ -15,7 +14,8 @@ export const activate = async (context: vscode.ExtensionContext) => {
   await applyTitleBarColor();
 };
 
-export const deactivate = catcher(clearTitleBarColor);
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export const deactivate = () => {};
 
 /**
  * 加载核心逻辑
@@ -25,8 +25,8 @@ const applyTitleBarColor = catcher(async () => {
     return;
   }
 
-  const checkResult = await checkGlobalStyle();
-  if (checkResult === Result.Cancel) {
+  const globalTitleBarStyleIsCustom = await isCustom();
+  if (!globalTitleBarStyleIsCustom) {
     return;
   }
 

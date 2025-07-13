@@ -5,7 +5,7 @@ import { readdir, readFile, rm } from 'node:fs/promises';
 import { Msg } from './i18n';
 import { configs } from './configs';
 import { getColor } from './colors';
-import { Result, SettingsJson, TitleBarStyle } from './consts';
+import { SettingsJson, TitleBarStyle } from './consts';
 import { showInfoMsg, showWarnMsg } from './notifications';
 
 interface StyleConfig {
@@ -16,12 +16,12 @@ interface StyleConfig {
 /**
  * 全局的`titleBarStyle`配置必须是`custom`，修改标题栏颜色的操作才能生效
  */
-export const checkGlobalStyle = async (): Promise<Result> => {
+export const isCustom = async (): Promise<boolean> => {
   // 检测当前标题栏样式设置
   const Global = vscode.ConfigurationTarget.Global;
   const value = configs.global.get<string>(TitleBarStyle.Section);
   if (value === TitleBarStyle.Expected) {
-    return Result.Succ;
+    return true;
   }
 
   const result = await showWarnMsg(
@@ -30,12 +30,12 @@ export const checkGlobalStyle = async (): Promise<Result> => {
     Msg.Cancel
   );
   if (result !== Msg.SetTitleBarStyleToCustom) {
-    throw Result.Cancel;
+    throw false;
   }
 
   await configs.global.update(TitleBarStyle.Section, TitleBarStyle.Expected, Global);
   showInfoMsg(Msg.SetTitleBarStyleToCustomSuccess);
-  return Result.Succ;
+  return true;
 };
 
 /**
