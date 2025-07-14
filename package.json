@@ -64,7 +64,7 @@
         },
         "colorful-titlebar.gradientBrightness": {
           "type": "number",
-          "default": 0.62,
+          "default": 0.72,
           "description": "%configuration.gradientBrightness.description%"
         },
         "colorful-titlebar.gradientDarkness": {

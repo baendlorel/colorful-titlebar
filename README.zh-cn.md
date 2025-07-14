@@ -45,6 +45,8 @@
 
   ![左侧弧光](assets/arc-left.png)
 
+- **配合配置项**: `colorful-titlebar.gradientBrightness`和`colorful-titlebar.gradientDarkness` 来控制明暗度
+
 ### 前置要求
 
 扩展需要将 VS Code 的标题栏样式设置为"自定义"。如果未配置，扩展会提示你自动更改。
@@ -98,6 +100,20 @@
 - **类型**: 字符串
 - **默认值**: `""`
 - **描述**: workbench.desktop.main.css 文件的自定义路径。
+
+### `colorful-titlebar.gradientBrightness`
+
+- **类型**: 数字
+- **默认值**: `0.72`
+- **范围**: `0.0` 到 `1.0`
+- **描述**: 控制渐变叠加中亮区域的亮度/不透明度。数值越高，亮效果越明显。
+
+### `colorful-titlebar.gradientDarkness`
+
+- **类型**: 数字
+- **默认值**: `0.26`
+- **范围**: `0.0` 到 `1.0`
+- **描述**: 控制渐变叠加中暗区域的暗度/不透明度。数值越高，阴影效果越明显。
 
 ### `colorful-titlebar.showInfoPop`
 

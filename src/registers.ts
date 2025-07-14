@@ -10,7 +10,7 @@ export const register = (context: vscode.ExtensionContext) => {
   const commands: vscode.Disposable[] = [
     vscode.commands.registerCommand(Commands.EnableGradient, gradient.enable),
     vscode.commands.registerCommand(Commands.DisableGradient, gradient.disable),
-    vscode.workspace.onDidChangeConfiguration(async (event) => {
+    void vscode.workspace.onDidChangeConfiguration(async (event) => {
       // 影响颜色相关的配置
       if (
         event.affectsConfiguration(ConfigSection.DarkThemeColors) ||
@@ -54,6 +54,6 @@ export const register = (context: vscode.ExtensionContext) => {
         }
       }
     }),
-  ];
+  ].filter((v) => v !== undefined);
   context.subscriptions.push(...commands);
 };

@@ -45,6 +45,8 @@ A VS Code extension that adds colorful background colors to the title bar based 
 
   ![Arc Left Effect](assets/arc-left.png)
 
+- **Related Configs**: Through `colorful-titlebar.gradientBrightness` and `colorful-titlebar.gradientDarkness`, we can control the brightness and darkness of the gradient overlays.
+
 ### Requirements
 
 The extension requires VS Code's title bar style to be set to "custom". If not configured, the extension will prompt you to change it automatically.
@@ -96,6 +98,20 @@ Open VS Code settings and configure the following options:
 - **Type**: string
 - **Default**: `""`
 - **Description**: Custom path to the workbench.desktop.main.css file.
+
+### `colorful-titlebar.gradientBrightness`
+
+- **Type**: number
+- **Default**: `0.72`
+- **Range**: `0.0` to `1.0`
+- **Description**: Controls the brightness/opacity of the bright areas in gradient overlays. Higher values create more prominent bright effects.
+
+### `colorful-titlebar.gradientDarkness`
+
+- **Type**: number
+- **Default**: `0.26`
+- **Range**: `0.0` to `1.0`
+- **Description**: Controls the darkness/opacity of the dark areas in gradient overlays. Higher values create more prominent shadow effects.
 
 ### `colorful-titlebar.showInfoPop`
 
