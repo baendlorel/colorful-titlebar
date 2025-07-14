@@ -1,3 +1,6 @@
+draft
+pnpm-lock.yaml
+eslint.config.*
 .vscode/**
 .vscode-test/**
 src/**
@@ -14,6 +17,9 @@ node_modules/**
 tests/**
 rollup.config.mjs
 tsconfig.build.json
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
 ICON_README.md
 .env
 .env.*

@@ -32,7 +32,7 @@ export default [
       typescript({
         tsconfig: tsconfigFile,
       }),
-      void babel({
+      babel({
         babelHelpers: 'bundled',
         extensions: ['.ts', '.tsx', '.js', '.jsx'],
         presets: [['@babel/preset-env', { targets: { node: '14' } }]],
@@ -45,7 +45,7 @@ export default [
           ],
         ],
       }),
-      void terser({
+      terser({
         format: {
           comments: false, // 移除所有注释
         },
