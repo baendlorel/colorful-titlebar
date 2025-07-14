@@ -50,6 +50,10 @@ export const Msg = (() => {
       [vscode.ConfigurationTarget.WorkspaceFolder]: '工作区文件夹',
       [vscode.ConfigurationTarget.Global]: '全局',
     },
+    Config: {
+      changed: '检测到配置变化，重启后生效',
+      gradientChangedButInvalidCssPath: `虽然修改了渐变配置但${Consts.MainCssFileName}文件路径不正确，修改将无法生效！`,
+    },
 
     // 设置标题栏颜色
     TitleBarColorSet: (settingsCreated: boolean) =>
@@ -110,6 +114,11 @@ export const Msg = (() => {
       [vscode.ConfigurationTarget.Workspace]: 'Workspace',
       [vscode.ConfigurationTarget.WorkspaceFolder]: 'Workspace Folder',
       [vscode.ConfigurationTarget.Global]: 'Global',
+    },
+
+    Config: {
+      changed: 'Detected color configuration change, restart to apply',
+      gradientChangedButInvalidCssPath: `Although gradient config has changed, the path to "${Consts.MainCssFileName}" is incorrect, changes will not take effect!`,
     },
 
     // 设置标题栏颜色

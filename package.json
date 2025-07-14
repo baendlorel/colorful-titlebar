@@ -111,7 +111,7 @@
             "rgb(0, 66, 66)",
             "rgb(0, 75, 28)",
             "rgb(124, 65, 1)",
-            "#721a1a"
+            "rgb(133, 33, 33)"
           ],
           "description": "%configuration.darkThemeColors.description%",
           "items": {
