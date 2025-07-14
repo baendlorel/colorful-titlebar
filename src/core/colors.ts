@@ -14,7 +14,8 @@ import { RGBA } from '@/common/rgb';
 export const getColor = (fullPath: string): RGBA => {
   const hashSource = getHashSource(fullPath);
   const hash = Array.from(createHash('md5').update(hashSource).digest());
-  const k = (hash[0] + hash[1] * 0xff) / 0xffff;
+  // const k = (hash[0] + hash[1] * 0xff) / 0xffff;
+  const k = ((hash[0] << 8) | hash[hash.length - 1]) / 0xffff;
   return getColorByK(k, configs.colorSet);
 };
 
