@@ -55,6 +55,8 @@ export const hackCss = async (cssPath: string, gradientStyle: string): Promise<v
     .replaceAll('{brightness}', configs.gradientBrightness.toString())
     .replace(/\n[\s]+/g, '');
 
+  // vscode.window.showInformationMessage(style);
+
   let css = await readFile(cssPath, 'utf8');
 
   // 消除旧的注入

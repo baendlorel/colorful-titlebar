@@ -25,7 +25,7 @@ export const enum AfterStyle {
       width: 100%;
       height: 100%;
       transform: translate(-50%, -50%);
-      background: radial-gradient(circle at 15% 50%, rgba(255, 255, 255, {darkness}) 0%, transparent 24%, rgba(5, 5, 5, {brightness}) 50%, transparent 80%);
+      background: radial-gradient(circle at 15% 50%, rgba(255, 255, 255, {brightness}) 0%, transparent 24%, rgba(5, 5, 5, {darkness}) 50%, transparent 80%);
       mix-blend-mode: overlay;
       pointer-events: none;
     }`,
