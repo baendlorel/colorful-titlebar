@@ -29,5 +29,9 @@
         ]
       }
     ]
+  },
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#2e0e6aff",
+    "titleBar.inactiveBackground": "#33254eff"
   }
 }
