@@ -62,6 +62,16 @@
           "default": true,
           "description": "%configuration.showSuggest.description%"
         },
+        "colorful-titlebar.gradientBrightness": {
+          "type": "number",
+          "default": 0.62,
+          "description": "%configuration.gradientBrightness.description%"
+        },
+        "colorful-titlebar.gradientDarkness": {
+          "type": "number",
+          "default": 0.26,
+          "description": "%configuration.gradientDarkness.description%"
+        },
         "colorful-titlebar.hashSource": {
           "type": "string",
           "enum": [

@@ -3,6 +3,8 @@
   "command.enableGradient.title": "Enable/Switch Titlebar Gradient",
   "command.disableGradient.title": "Disable Titlebar Gradient",
   "configuration.title": "Colorful Titlebar",
+  "configuration.gradientBrightness.description": "Indicates how bright the gradient effect is at bright positions, given as a decimal between 0 and 1",
+  "configuration.gradientDarkness.description": "Indicates how dark the gradient effect is at dark positions, given as a decimal between 0 and 1",
   "configuration.showInfoPop.description": "Whether to show information messages",
   "configuration.showSuggest.description": "Whether to show suggest messages",
   "configuration.hashSource.description": "Source for generating hash-based colors",

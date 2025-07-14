@@ -1,6 +1,6 @@
 import vscode from 'vscode';
 
-import { DefaultColorSet, HashSource } from './consts';
+import { Consts, HashSource } from './consts';
 
 const enum Prop {
   ShowInfoPop = 'showInfoPop',
@@ -10,10 +10,18 @@ const enum Prop {
   ProjectIndicators = 'projectIndicators',
   HashSource = 'hashSource',
   WorkbenchCssPath = 'workbenchCssPath',
+  GradientBrightness = 'gradientBrightness',
+  GradientDarkness = 'gradientDarkness',
 }
 
-const enum Consts {
-  Name = 'colorful-titlebar',
+const enum Defaults {
+  ShowInfoPop = 1,
+  ShowSuggest = 1,
+  LightThemeColors = 'rgb(167, 139, 250);rgb(147, 197, 253);rgb(128, 203, 196);rgb(172, 243, 157);rgb(250, 204, 21);rgb(253, 151, 31);rgb(251, 113, 133)',
+  DarkThemeColors = 'rgb(68, 0, 116);rgb(0, 47, 85);rgb(0, 66, 66);rgb(0, 75, 28);rgb(124, 65, 1);rgb(133, 33, 33)',
+  ProjectIndicators = '.git;package.json;pom.xml;Cargo.toml;go.mod;README.md;LICENSE;tsconfig.json;yarn.lock;pnpm-lock.yaml;package-lock.json;webpack.config.js;vite.config.js;vite.config.ts;next.config.js;pyproject.toml;setup.py;CMakeLists.txt;Makefile;build.gradle;composer.json;Gemfile;.nvmrc;.node-version;Deno.json;deno.jsonc',
+  GradientBrightness = 0.62,
+  GradientDarkness = 0.26,
 }
 
 class Config {
@@ -76,46 +84,24 @@ class Config {
   }
 
   get colorSet() {
+    let colors: string[];
     switch (vscode.window.activeColorTheme.kind) {
       case vscode.ColorThemeKind.Dark:
       case vscode.ColorThemeKind.HighContrast:
-        return Config.self.get<string[]>(Prop.DarkThemeColors, DefaultColorSet.Dark.split(';'));
+        colors = Defaults.DarkThemeColors.split(';');
+        break;
       case vscode.ColorThemeKind.Light:
       case vscode.ColorThemeKind.HighContrastLight:
-        return Config.self.get<string[]>(Prop.LightThemeColors, DefaultColorSet.Light.split(';'));
+        colors = Defaults.LightThemeColors.split(';');
+        break;
     }
+    return Config.self.get<string[]>(Prop.DarkThemeColors, colors);
   }
 
   get [Prop.ProjectIndicators]() {
-    // 此处配置和package.json保持一致
-    return Config.self.get<string[]>(Prop.ProjectIndicators, [
-      '.git',
-      'package.json',
-      'pom.xml',
-      'Cargo.toml',
-      'go.mod',
-      'README.md',
-      'LICENSE',
-      'tsconfig.json',
-      'yarn.lock',
-      'pnpm-lock.yaml',
-      'package-lock.json',
-      'webpack.config.js',
-      'vite.config.js',
-      'vite.config.ts',
-      'next.config.js',
-      'pyproject.toml',
-      'setup.py',
-      'CMakeLists.txt',
-      'Makefile',
-      'build.gradle',
-      'composer.json',
-      'Gemfile',
-      '.nvmrc',
-      '.node-version',
-      'Deno.json',
-      'deno.jsonc',
-    ]);
+    const indicators = Defaults.ProjectIndicators.split(';');
+    // * 此处配置和package.json保持一致
+    return Config.self.get<string[]>(Prop.ProjectIndicators, indicators);
   }
 
   get [Prop.HashSource]() {
@@ -126,18 +112,37 @@ class Config {
     return Config.self.get<string>(Prop.WorkbenchCssPath, '');
   }
 
+  get [Prop.GradientBrightness]() {
+    return Config.self.get<number>(Prop.GradientBrightness, Defaults.GradientBrightness);
+  }
+
+  get [Prop.GradientDarkness]() {
+    return Config.self.get<number>(Prop.GradientDarkness, Defaults.GradientDarkness);
+  }
+
   readonly set = {
     [Prop.ShowInfoPop](value: boolean) {
       return Config.self.update(Prop.ShowInfoPop, value, vscode.ConfigurationTarget.Global);
     },
+
     [Prop.ShowSuggest](value: boolean) {
       return Config.self.update(Prop.ShowSuggest, value, vscode.ConfigurationTarget.Global);
     },
+
     [Prop.HashSource](value: HashSource) {
       return Config.self.update(Prop.HashSource, value, vscode.ConfigurationTarget.Global);
     },
+
     [Prop.WorkbenchCssPath](value: string) {
       return Config.self.update(Prop.WorkbenchCssPath, value, vscode.ConfigurationTarget.Global);
+    },
+
+    [Prop.GradientBrightness](value: number) {
+      return Config.self.update(Prop.GradientBrightness, value, vscode.ConfigurationTarget.Global);
+    },
+
+    [Prop.GradientDarkness](value: number) {
+      return Config.self.update(Prop.GradientDarkness, value, vscode.ConfigurationTarget.Global);
     },
   };
 }

@@ -3,6 +3,8 @@
   "command.enableGradient.title": "启用/切换标题栏渐变",
   "command.disableGradient.title": "禁用标题栏渐变",
   "configuration.title": "彩色标题栏",
+  "configuration.gradientBrightness.description": "表示渐变特效在亮的位置具体有多亮，给出0~1之间的两位小数",
+  "configuration.gradientDarkness.description": "表示渐变特效在暗的位置具体有多暗，给出0~1之间的两位小数",
   "configuration.showInfoPop.description": "是否显示信息提示消息",
   "configuration.showSuggest.description": "是否显示建议消息",
   "configuration.hashSource.description": "生成基于哈希的颜色的源",

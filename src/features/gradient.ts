@@ -10,7 +10,7 @@ import { AfterStyle, Css } from './consts';
 
 const Enable = Msg.Commands.enableGradient;
 
-// # region Main
+// #region Main
 const suggest = async () => {
   // 如果已经记载了主css路径并嵌入了样式，则无需弹出建议
   const cssPath = configs.workbenchCssPath;
@@ -57,7 +57,7 @@ const disable = catcher(async () => {
 });
 
 export const gradient = { disable, enable, suggest };
-// # endregion
+// #endregion
 
 /**
  * 获取主css文件的路径
@@ -88,18 +88,22 @@ const getMainCssPath = async (): Promise<string | null> => {
  * 会在command注册的地方就确认`cssPath`是否存在
  */
 const hackCss = async (cssPath: string, gradientStyle: string): Promise<void> => {
-  let style = AfterStyle.BrightLeft;
+  let rawStyle = AfterStyle.BrightLeft;
   switch (gradientStyle) {
     case Enable.style.brightCenter:
-      style = AfterStyle.BrightCenter;
+      rawStyle = AfterStyle.BrightCenter;
       break;
     case Enable.style.brightLeft:
-      style = AfterStyle.BrightLeft;
+      rawStyle = AfterStyle.BrightLeft;
       break;
     case Enable.style.arcLeft:
-      style = AfterStyle.ArcLeft;
+      rawStyle = AfterStyle.ArcLeft;
       break;
   }
+
+  const style = rawStyle
+    .replaceAll('{darkness}', configs.gradientDarkness.toString())
+    .replaceAll('{brightness}', configs.gradientBrightness.toString());
 
   const tokened = `${Css.Token}${style}`.replace(/\n[\s]+/g, '');
 
