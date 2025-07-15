@@ -288,7 +288,8 @@ export default async () => {
       position: absolute;
       content: '%';
       right: 40px;
-      font-size: 1.2em;
+      margin-top: -1px;
+      font-size: 1em;
       color: var(--text-color-weak);
     }
 
