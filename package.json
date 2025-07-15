@@ -78,13 +78,13 @@
           "description": "%configuration.gradientDarkness.description%"
         },
         "colorful-titlebar.hashSource": {
-          "type": "string",
+          "type": "number",
           "enum": [
-            "projectName",
-            "fullPath",
-            "projectNameDate"
+            0,
+            1,
+            2
           ],
-          "default": "projectName",
+          "default": 0,
           "description": "%configuration.hashSource.description%",
           "enumDescriptions": [
             "%configuration.hashSource.projectName.description%",

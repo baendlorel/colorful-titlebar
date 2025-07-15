@@ -12,12 +12,6 @@ export const enum TitleBarStyle {
   InactiveBg = 'titleBar.inactiveBackground',
 }
 
-export const enum GradientStyle {
-  BrightLeft,
-  BrightCenter,
-  ArcLeft,
-}
-
 export const enum SettingsJson {
   FileName = 'settings.json',
   Dir = '.vscode',
@@ -31,8 +25,18 @@ export const enum Commands {
   Refresh = `${Consts.Name}.refresh`,
 }
 
-export const enum HashSource {
-  ProjectName = 'projectName',
-  FullPath = 'fullPath',
-  ProjectNameDate = 'projectNameDate',
+// #region 配置项相关
+
+export const enum GradientStyle {
+  BrightLeft,
+  BrightCenter,
+  ArcLeft,
 }
+
+export const enum HashSource {
+  ProjectName,
+  FullPath,
+  ProjectNameDate,
+}
+
+// #endregion

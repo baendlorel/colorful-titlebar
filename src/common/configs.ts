@@ -126,7 +126,7 @@ class Config {
   }
 
   get [Prop.HashSource]() {
-    return Config.self.get<string>(Prop.HashSource, HashSource.ProjectName);
+    return Config.self.get<number>(Prop.HashSource, HashSource.ProjectName);
   }
 
   get [Prop.WorkbenchCssPath]() {
