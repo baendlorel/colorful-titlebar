@@ -416,16 +416,18 @@
       const currentTheme = document.body.getAttribute('theme');
       document.body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
     }
-    const find = (name, isErrorDiv = false) => {
+    const find = (name, isControlError = false) => {
       const list = document.getElementsByName(name);
       for (let i = 0; i < list.length; i++) {
         const element = list[i];
-        if (isErrorDiv) {
-          if (element.tagName === 'DIV' && element.classList.contains('control-error')) {
+        if (isControlError) {
+          if (element.classList.contains('control-error')) {
             return element;
           }
         } else {
-          return element;
+          if (!element.classList.contains('control-error')) {
+            return element;
+          }
         }
 
       }
@@ -433,10 +435,10 @@
 
     const i18n = (() => {
       const zh = {
-        NumberLimit: (min, max, isInt = true) => `请输入${min}到${max}之间的${isInt ? '整数' : '数'}`
+        NumberLimit: (min, max, isInt = true) => ['请输入', min, '到', max, '之间的', isInt ? '整数' : '数'].join('')
       }
       const en = {
-        NumberLimit: (min, max, isInt = true) => `Please input ${isInt ? 'an integer' : 'a number'} between ${min} and ${max}`
+        NumberLimit: (min, max, isInt = true) => ['Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max].join(' ')
       }
       switch ('${configs.lang}') {
         case 'zh':
@@ -457,7 +459,7 @@
 
     const freeze = () => {
       Array.prototype.forEach.call(settings.elements, (el) => el.disabled = true)
-      setTimeout(() => settings.classList.add('freeze'), 850);
+      setTimeout(() => settings.classList.add('freeze'), 600);
       setTimeout(() => {
         settings.classList.remove('freeze');
         Array.prototype.forEach.call(settings.elements, (el) => el.disabled = false)
@@ -486,7 +488,7 @@
         min = Number.isNaN(min) ? Infinity : min;
 
         if (Number.isNaN(value) || value < min || value > max) {
-          find(input.name, true).innerText = '请输入0到100之间的整数';
+          find(input.name, true).innerText = i18n.NumberLimit(min, max, true);
           input.value = input.defaultValue; // 恢复默认值
           return;
         }

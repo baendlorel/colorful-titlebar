@@ -10,19 +10,24 @@ import style from './style';
  */
 export default async () => {
   const Panel = i18n.ControlPanel;
-  const Style = i18n.Commands.enableGradient.style;
-  const panel = vscode.window.createWebviewPanel(
+  const controlPanel = vscode.window.createWebviewPanel(
     'controllPanel',
     Panel.title,
     vscode.ViewColumn.One,
     { enableScripts: true }
   );
-  panel.webview.html = `<!DOCTYPE html>
+
+  // 准备一些数据
+  const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
+  const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
+
+  controlPanel.webview.html = `<!DOCTYPE html>
 <html lang="zh-CN" theme="${configs.theme}">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${Panel.title}</title>
   <style>
     :root {
       --vscode-button-background: #4285f4;
@@ -36,11 +41,11 @@ export default async () => {
       --panel-bg: #ffffff;
       --border-color: rgba(224, 224, 224, 0.5);
       --shadow-color: rgba(0, 0, 0, 0.1);
-      --loading-bg-color: rgba(71, 73, 78, 0.16);
+      --loading-bg-color: rgba(71, 73, 78, 0.12);
     }
 
     [theme="dark"] {
-      --vscode-button-background: #8ab4f8;
+      --vscode-button-background: #4285f4;
       --primary-color: #8ab4f8;
       --secondary-color: #81c995;
       --danger-color: #f28b82;
@@ -51,7 +56,7 @@ export default async () => {
       --panel-bg: #292a2d;
       --border-color: rgba(60, 64, 67, 0.5);
       --shadow-color: rgba(0, 0, 0, 0.3);
-      --loading-bg-color: rgba(241, 241, 241, 0.16);
+      --loading-bg-color: rgba(241, 241, 241, 0.12);
     }
 
     * {
@@ -77,7 +82,7 @@ export default async () => {
       position: relative;
       padding: 30px;
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
       background-color: var(--panel-bg);
       border-radius: 16px;
       box-shadow: 0 10px 30px var(--shadow-color);
@@ -130,7 +135,9 @@ export default async () => {
 
 
     .control-item {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
       margin-bottom: 10px;
       padding-bottom: 10px;
       align-items: center;
@@ -138,7 +145,6 @@ export default async () => {
     }
 
     .control-label-group {
-      flex: 1;
       display: grid;
       grid-template-rows: auto auto;
       color: var(--text-color);
@@ -151,6 +157,12 @@ export default async () => {
     .control-desc {
       font-size: 0.8em;
       color: var(--text-color-weak)
+    }
+
+    .control-error {
+      grid-column: 1 / span 2;
+      font-size: 0.8em;
+      color: var(--danger-color)
     }
 
     .control-input {
@@ -235,13 +247,38 @@ export default async () => {
 
     .select,
     .input-text {
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 8px 12px;
-      background-color: var(--panel-bg);
-      color: var(--text-color);
       width: 200px;
       min-width: 150px;
+    }
+
+    .select,
+    .input-text,
+    .input-percent input[type="number"] {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 30px 8px 12px;
+      background-color: var(--panel-bg);
+      color: var(--text-color);
+    }
+
+    .input-percent input[type="number"] {
+      position: relative;
+      width: 75px;
+      text-align: right;
+    }
+
+    .input-percent input[type="number"]::-webkit-inner-spin-button,
+    .input-percent input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .input-percent::after {
+      position: absolute;
+      content: '%';
+      right: 40px;
+      font-size: 1.2em;
+      color: var(--text-color-weak);
     }
 
     .select {
@@ -288,10 +325,23 @@ export default async () => {
       </div>
       <div class="control-input">
         <label class="toggle-switch">
-          <input type="checkbox" name="suggestSwitch">
+          <input type="checkbox" name="showSuggest">
           <span class="slider"></span>
         </label>
       </div>
+    </div>
+
+    <div class="control-item">
+      <div class="control-label-group">
+        <div class="control-label">${Panel.workbenchCssPath.label}</div>
+        <div class="control-desc">${Panel.workbenchCssPath.description}</div>
+      </div>
+      <div class="control-input">
+        <input type="text" class="input-text" name="workbenchCssPath" value="${
+          configs.workbenchCssPath
+        }" />
+      </div>
+      <div class="control-error" name="workbenchCssPath"></div>
     </div>
 
     <div class="control-item">
@@ -315,14 +365,24 @@ export default async () => {
 
     <div class="control-item">
       <div class="control-label-group">
-        <div class="control-label">${Panel.workbenchCssPath.label}</div>
-        <div class="control-desc">${Panel.workbenchCssPath.description}</div>
+        <div class="control-label">${Panel.gradientBrightness.label}</div>
+        <div class="control-desc">${Panel.gradientBrightness.description}</div>
       </div>
-      <div class="control-input">
-        <input type="text" class="input-text" name="workbenchCssPath" value="${
-          configs.workbenchCssPath
-        }" />
+      <div class="control-input input-percent">
+        <input type="number" min="0" max="100" step="5" class="" name="gradientBrightness" value="${gradientBrightness}" />
       </div>
+      <div class="control-error" name="gradientBrightness"></div>
+    </div>
+
+    <div class="control-item">
+      <div class="control-label-group">
+        <div class="control-label">${Panel.gradientDarkness.label}</div>
+        <div class="control-desc">${Panel.gradientDarkness.description}</div>
+      </div>
+      <div class="control-input input-percent">
+        <input type="number" min="0" max="100" step="5" class="" name="gradientDarkness" value="${gradientDarkness}" />
+      </div>
+      <div class="control-error" name="gradientDarkness"></div>
     </div>
 
     <div class="control-item">
@@ -349,7 +409,7 @@ export default async () => {
         <div class="control-desc">${Panel.refresh.description}</div>
       </div>
       <div class="control-input">
-        <button class="btn" name="refresh">
+        <button type="button" class="btn" name="refresh">
           <span>${Panel.refresh.button}</span>
         </button>
       </div>
@@ -370,57 +430,110 @@ export default async () => {
   </form>
 
   <script>
+    const vscode = typeof acquireVsCodeApi === 'function' ? acquireVsCodeApi() : { postMessage(a) { console.log('vscode.postMessage', a) } };
     const theme = () => {
       const currentTheme = document.body.getAttribute('theme');
       document.body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
     }
+    const find = (name, isControlError = false) => {
+      const list = document.getElementsByName(name);
+      for (let i = 0; i < list.length; i++) {
+        const element = list[i];
+        if (isControlError) {
+          if (element.classList.contains('control-error')) {
+            return element;
+          }
+        } else {
+          if (!element.classList.contains('control-error')) {
+            return element;
+          }
+        }
 
-    const find = (name) => document.getElementsByName(name)[0];
+      }
+    };
+
+    const i18n = (() => {
+      const zh = {
+        NumberLimit: (min, max, isInt = true) => ['请输入', min, '到', max, '之间的', isInt ? '整数' : '数'].join('')
+      }
+      const en = {
+        NumberLimit: (min, max, isInt = true) => ['Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max].join(' ')
+      }
+      switch ('${configs.lang}') {
+        case 'zh':
+          return zh;
+        case 'en':
+          return en;
+        default:
+          return zh;
+      }
+    })()
+
     /**
-     * @type {HTMLFormElement}
+     * @type {HTMLFormElement} 
      */
     const settings = find('settings');
-    const refresh = find('refresh');
     const picker = find('picker');
     const pickerBtn = find('pickerBtn');
 
-    let isGlobalEnabled = false;
+    const freeze = () => {
+      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = true)
+      setTimeout(() => settings.classList.add('freeze'), 600);
+      setTimeout(() => {
+        settings.classList.remove('freeze');
+        Array.prototype.forEach.call(settings.elements, (el) => el.disabled = false)
+      }, 1600);
+    }
 
     pickerBtn.onclick = picker.click.bind(picker);
-
     picker.addEventListener('input', function () {
-      const selectedColor = this.value;
-      pickerBtn.style.backgroundColor = selectedColor;
-
-      const [r, g, b] = this.value.replace('#', '').match(/.{2}/g).map(hex => parseInt(hex, 16));
+      const color = this.value;
+      const [r, g, b] = color.replace('#', '').match(/.{2}/g).map(hex => parseInt(hex, 16));
       const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
       pickerBtn.style.color = brightness > 128 ? '#000' : '#fff';
+      pickerBtn.style.backgroundColor = color;
     });
-
-
 
     settings.addEventListener('change', function (event) {
       event.preventDefault();
+      document.querySelectorAll('.control-error').forEach(el => el.innerText = '');
       const input = event.target;
-      console.log("字段变更", input.name, input.value, input.checked);
+      // 如果数字类不符合要求，则返回并提示
+      if (input.type === 'number') {
+        const value = parseInt(input.value, 10);
+        let max = parseInt(input.max, 10);
+        let min = parseInt(input.min, 10);
+        max = Number.isNaN(max) ? Infinity : max;
+        min = Number.isNaN(min) ? Infinity : min;
 
-      settings.classList.add('freeze');
-      setTimeout(() => {
-        settings.classList.remove('freeze');
-      }, 1200);
+        if (Number.isNaN(value) || value < min || value > max) {
+          find(input.name, true).innerText = i18n.NumberLimit(min, max, true);
+          input.value = input.defaultValue; // 恢复默认值
+          return;
+        }
+      }
+
+
+      freeze();
+      const isSwitch = input.tagName === 'INPUT' && input.type === 'checkbox';
+      vscode.postMessage({
+        command: input.name,
+        value: isSwitch ? input.checked : input.value
+      });
     });
+
   </script>
 </body>
 
 </html>`;
 
-  panel.webview.onDidReceiveMessage(async (message) => {
+  controlPanel.webview.onDidReceiveMessage(async (message) => {
     try {
       switch (message.command) {
         case 'reset':
           await style.refresh(true);
           vscode.window.showInformationMessage('');
-          panel.dispose();
+          controlPanel.dispose();
           break;
       }
     } catch (error) {
