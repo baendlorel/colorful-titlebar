@@ -14,16 +14,16 @@ const enum Prop {
   GradientDarkness = 'gradientDarkness',
 }
 
-export const enum ConfigSection {
-  ShowInfoPop = `${Consts.Name}.showInfoPop`,
-  ShowSuggest = `${Consts.Name}.showSuggest`,
-  LightThemeColors = `${Consts.Name}.lightThemeColors`,
-  DarkThemeColors = `${Consts.Name}.darkThemeColors`,
-  ProjectIndicators = `${Consts.Name}.projectIndicators`,
-  HashSource = `${Consts.Name}.hashSource`,
-  WorkbenchCssPath = `${Consts.Name}.workbenchCssPath`,
-  GradientBrightness = `${Consts.Name}.gradientBrightness`,
-  GradientDarkness = `${Consts.Name}.gradientDarkness`,
+const enum ConfigSection {
+  ShowInfoPop = `${Consts.Name}.${Prop.ShowInfoPop}`,
+  ShowSuggest = `${Consts.Name}.${Prop.ShowSuggest}`,
+  LightThemeColors = `${Consts.Name}.${Prop.LightThemeColors}`,
+  DarkThemeColors = `${Consts.Name}.${Prop.DarkThemeColors}`,
+  ProjectIndicators = `${Consts.Name}.${Prop.ProjectIndicators}`,
+  HashSource = `${Consts.Name}.${Prop.HashSource}`,
+  WorkbenchCssPath = `${Consts.Name}.${Prop.WorkbenchCssPath}`,
+  GradientBrightness = `${Consts.Name}.${Prop.GradientBrightness}`,
+  GradientDarkness = `${Consts.Name}.${Prop.GradientDarkness}`,
 }
 
 const enum Defaults {
@@ -168,4 +168,4 @@ class Config {
   };
 }
 
-export const configs = new Config();
+export default new Config();

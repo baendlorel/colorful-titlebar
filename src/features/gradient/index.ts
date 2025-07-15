@@ -1,16 +1,16 @@
 import vscode from 'vscode';
 import { readFile } from 'node:fs/promises';
 
-import { Msg } from '@/common/i18n';
-import { configs } from '@/common/configs';
-import { suggestInfo } from '@/common/notifications';
 import { GradientStyle } from '@/common/consts';
+import { suggestInfo } from '@/common/notifications';
+import i18n from '@/common/i18n';
+import configs from '@/common/configs';
 
 import { Css } from './consts';
 import hacker from './hackers';
 
 class Gradient {
-  private readonly Enable = Msg.Commands.enableGradient;
+  private readonly Enable = i18n.Commands.enableGradient;
 
   async suggest() {
     // 如果已经记载了主css路径并嵌入了样式，则无需弹出建议

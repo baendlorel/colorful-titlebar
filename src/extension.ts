@@ -1,6 +1,6 @@
 import vscode from 'vscode';
 
-import { alreadySetTitleBarColor, refreshTitleBar } from './core/style';
+import style from './core/style';
 import catcher from './common/catcher';
 import register from './registers';
 import gradient from './features/gradient';
@@ -10,9 +10,7 @@ export const activate = catcher(async (context: vscode.ExtensionContext) => {
   register(context);
 
   // 如果颜色没有设置过，那么应用标题栏颜色
-  if (!alreadySetTitleBarColor()) {
-    await refreshTitleBar();
-  }
+  await style.applyIfNotSet();
 
   // 建议开启渐变
   await gradient.suggest();

@@ -2,9 +2,9 @@ import vscode from 'vscode';
 
 import { RGBA } from '@/common/rgb';
 import { configs } from '@/common/configs';
-import { TitleBarStyle } from '@/common/consts';
-import { Msg } from '@/common/i18n';
-import { refreshTitleBar } from './style';
+import { TitleBarConsts } from '@/common/consts';
+import i18n from '@/common/i18n';
+import style from './style';
 
 const PickColor = Msg.Commands.pickColor;
 
@@ -13,8 +13,8 @@ const PickColor = Msg.Commands.pickColor;
  */
 export const pickColor = async () => {
   // Check if titleBarStyle is custom
-  const titleBarStyle = configs.global.get<string>(TitleBarStyle.Section);
-  if (titleBarStyle !== TitleBarStyle.Expected) {
+  const titleBarStyle = configs.global.get<string>(TitleBarConsts.Section);
+  if (titleBarStyle !== TitleBarConsts.Expected) {
     const result = await vscode.window.showWarningMessage(
       PickColor.titleBarStyleWarning,
       PickColor.setStyleButton,
@@ -22,8 +22,8 @@ export const pickColor = async () => {
     );
     if (result === PickColor.setStyleButton) {
       await configs.global.update(
-        TitleBarStyle.Section,
-        TitleBarStyle.Expected,
+        TitleBarConsts.Section,
+        TitleBarConsts.Expected,
         vscode.ConfigurationTarget.Global
       );
       vscode.window.showInformationMessage(PickColor.styleSetSuccess);
@@ -191,12 +191,12 @@ export const pickColor = async () => {
 const applyManualColor = async (colorHex: string) => {
   const color = new RGBA(colorHex);
   const newStyle = {
-    [TitleBarStyle.ActiveBg]: color.toString(),
-    [TitleBarStyle.InactiveBg]: color.toGreyDarkenString(),
+    [TitleBarConsts.ActiveBg]: color.toString(),
+    [TitleBarConsts.InactiveBg]: color.toGreyDarkenString(),
   };
 
   await configs.global.update(
-    TitleBarStyle.WorkbenchSection,
+    TitleBarConsts.WorkbenchSection,
     newStyle,
     vscode.ConfigurationTarget.Workspace
   );

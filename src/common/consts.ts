@@ -4,7 +4,7 @@ export const enum Consts {
   InvisibleSeparator = '\u2063',
 }
 
-export const enum TitleBarStyle {
+export const enum TitleBarConsts {
   Expected = 'custom',
   Section = 'window.titleBarStyle',
   WorkbenchSection = 'workbench.colorCustomizations',
@@ -15,7 +15,7 @@ export const enum TitleBarStyle {
 export const enum SettingsJson {
   FileName = 'settings.json',
   Dir = '.vscode',
-  MinimumContent = `{"${TitleBarStyle.WorkbenchSection}":{}}`,
+  MinimumContent = `{"${TitleBarConsts.WorkbenchSection}":{}}`,
 }
 
 export const enum Commands {

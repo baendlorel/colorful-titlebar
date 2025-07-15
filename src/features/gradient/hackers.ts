@@ -2,13 +2,14 @@ import vscode from 'vscode';
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 
-import { AfterStyle, Css } from './consts';
-import { Msg } from '@/common/i18n';
-import { configs } from '@/common/configs';
 import { GradientStyle } from '@/common/consts';
+import i18n from '@/common/i18n';
+import configs from '@/common/configs';
+
+import { AfterStyle, Css } from './consts';
 
 class Hacker {
-  private readonly Enable = Msg.Commands.enableGradient;
+  private readonly Enable = i18n.Commands.enableGradient;
 
   /**
    * 获取主css文件的路径

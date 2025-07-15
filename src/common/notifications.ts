@@ -1,7 +1,7 @@
 import vscode from 'vscode';
 
-import { configs } from './configs';
-import { Msg } from './i18n';
+import configs from './configs';
+import i18n from './i18n';
 
 export const suggestInfo = configs.showSuggest
   ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -9,9 +9,9 @@ export const suggestInfo = configs.showSuggest
       const result = await vscode.window.showInformationMessage(
         msg,
         ...items,
-        Msg.BlockAllSuggestion.button
+        i18n.BlockAllSuggestion.button
       );
-      if (result === Msg.BlockAllSuggestion) {
+      if (result === i18n.BlockAllSuggestion) {
         await configs.set.showSuggest(false);
       }
       return result;

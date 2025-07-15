@@ -1,17 +1,17 @@
 import vscode from 'vscode';
 
 import { RGBA } from '@/common/rgb';
-import { configs } from '@/common/configs';
-import { HashSource, TitleBarStyle } from '@/common/consts';
-import { Msg } from '@/common/i18n';
-import { refreshTitleBar } from './style';
+import configs from '@/common/configs';
+import { GradientStyle, HashSource, TitleBarConsts } from '@/common/consts';
+import i18n from '@/common/i18n';
+import style from './style';
 
 /**
  * Opens a color picker to manually select titlebar color
  */
-export const pickColor = async () => {
-  const Panel = Msg.ControlPanel;
-  const Style = Msg.Commands.enableGradient.style;
+export default async () => {
+  const Panel = i18n.ControlPanel;
+  const Style = i18n.Commands.enableGradient.style;
   const panel = vscode.window.createWebviewPanel(
     'controllPanel',
     Panel.title,
@@ -258,18 +258,6 @@ export const pickColor = async () => {
       </div>
     </div>
 
-    <div class="control-item">
-      <div class="control-label-group">
-        <div class="control-label">${Panel.gradientSwitch.label}</div>
-        <div class="control-desc">${Panel.gradientSwitch.description}</div>
-      </div>
-      <div class="control-input">
-        <label class="toggle-switch">
-          <input type="checkbox" id="gradientSwitch">
-          <span class="slider"></span>
-        </label>
-      </div>
-    </div>
 
     <div class="control-item">
       <div class="control-label-group">
@@ -371,14 +359,14 @@ export const pickColor = async () => {
     try {
       switch (message.command) {
         case 'reset':
-          await refreshTitleBar(true);
-          vscode.window.showInformationMessage(PickColor.colorReset);
+          await style.refresh(true);
+          vscode.window.showInformationMessage('');
           panel.dispose();
           break;
       }
     } catch (error) {
       if (error instanceof Error) {
-        vscode.window.showErrorMessage(PickColor.error(error.message));
+        vscode.window.showErrorMessage('');
       } else {
         vscode.window.showErrorMessage(String(error));
       }

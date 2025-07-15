@@ -1,7 +1,7 @@
 import vscode from 'vscode';
-import { Consts, GradientStyle, HashSource, TitleBarStyle } from './consts';
+import { Consts, GradientStyle, HashSource, TitleBarConsts } from './consts';
 
-export const Msg = (() => {
+export default (() => {
   const Zh = {
     Unknown: '未知',
 
@@ -17,10 +17,6 @@ export const Msg = (() => {
         label: '显示建议',
         description: `显示偶尔会弹出的建议`,
       },
-      // gradientSwitch: {
-      //   label: '使用渐变',
-      //   description: `需提供${Consts.MainCssFileName}路径，开启后将会给标题栏增加渐变特效。（会提示VS Code 损坏，这是正常的，选“不再显示即可”）`,
-      // },
       workbenchCssPath: {
         label: `${Consts.WorkbenchCssName}路径`,
         description:
@@ -128,10 +124,10 @@ export const Msg = (() => {
 
     // 设置全局标题栏样式
     NotCustomTitleBarStyle: (level: string) =>
-      `检测到"${level}"级别的标题栏样式设置不是"${TitleBarStyle.Expected}"，需要设置为"${TitleBarStyle.Expected}"本插件才能生效`,
+      `检测到"${level}"级别的标题栏样式设置不是"${TitleBarConsts.Expected}"，需要设置为"${TitleBarConsts.Expected}"本插件才能生效`,
     SetTitleBarStyleToCustom: '帮我设置好',
     Cancel: '还是算了',
-    SetTitleBarStyleToCustomSuccess: `标题栏样式已设置为${TitleBarStyle.Expected}，重启VS Code后生效`,
+    SetTitleBarStyleToCustomSuccess: `标题栏样式已设置为${TitleBarConsts.Expected}，重启VS Code后生效`,
   };
 
   const En = {
@@ -148,10 +144,6 @@ export const Msg = (() => {
         label: 'Show Suggestions',
         description: `Turning it off will block all suggestions`,
       },
-      // gradientSwitch: {
-      //   label: 'Use Gradient',
-      //   description: `Requires path to ${Consts.MainCssFileName}, enables gradient effect on title bar`,
-      // },
       workbenchCssPath: {
         label: `${Consts.WorkbenchCssName} Path`,
         description:
@@ -264,10 +256,10 @@ export const Msg = (() => {
 
     // 设置全局标题栏样式
     NotCustomTitleBarStyle: (level: string) =>
-      `Detected "${level}" level "titleBarStyle" setting is not "${TitleBarStyle.Expected}", it needs to be "${TitleBarStyle.Expected}" for this extension to take effect`,
+      `Detected "${level}" level "titleBarStyle" setting is not "${TitleBarConsts.Expected}", it needs to be "${TitleBarConsts.Expected}" for this extension to take effect`,
     SetTitleBarStyleToCustom: 'Set it for me',
     Cancel: 'Not now',
-    SetTitleBarStyleToCustomSuccess: `"titleBarStyle" has been set to ${TitleBarStyle.Expected}, Please restart VS Code to make it work`,
+    SetTitleBarStyleToCustomSuccess: `"titleBarStyle" has been set to ${TitleBarConsts.Expected}, Please restart VS Code to make it work`,
   } satisfies typeof Zh;
 
   const isChinese = vscode.env.language.toLowerCase().startsWith('zh');
