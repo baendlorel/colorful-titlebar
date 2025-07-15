@@ -62,11 +62,6 @@
     "configuration": {
       "title": "%configuration.title%",
       "properties": {
-        "colorful-titlebar.showInfoPop": {
-          "type": "boolean",
-          "default": true,
-          "description": "%configuration.showInfoPop.description%"
-        },
         "colorful-titlebar.showSuggest": {
           "type": "boolean",
           "default": true,

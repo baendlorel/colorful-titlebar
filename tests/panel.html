@@ -37,6 +37,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      font-size: 14px;
     }
 
     body {
@@ -78,7 +79,6 @@
     .header p {
       color: var(--text-color);
       opacity: 0.7;
-      font-size: 14px;
     }
 
 
@@ -93,7 +93,6 @@
       flex: 1;
       display: grid;
       grid-template-rows: auto auto;
-      font-size: 14px;
       color: var(--text-color);
       font-weight: 500;
       margin-right: 20px;
@@ -159,9 +158,7 @@
     .btn {
       border: none;
       border-radius: 8px;
-      padding: 10px 0px;
-      width: 40px;
-      font-size: 14px;
+      padding: 8px 12px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -176,7 +173,7 @@
       opacity: 0.9;
     }
 
-    .color-picker-container {
+    .picker-container {
       position: relative;
       width: 40px;
       height: 40px;
@@ -186,7 +183,9 @@
       cursor: pointer;
     }
 
-    .color-picker {
+    .picker {
+      width: 0;
+      height: 0;
       opacity: 0;
     }
 
@@ -196,8 +195,36 @@
       background-color: var(--vscode-button-background);
     }
 
-    .icon {
-      font-size: 18px;
+    select {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 12px;
+      background-color: var(--panel-bg);
+      color: var(--text-color);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 8px center;
+      background-repeat: no-repeat;
+      background-size: 16px;
+      padding-right: 32px;
+      min-width: 120px;
+    }
+
+    select:hover {
+      border-color: var(--vscode-button-background);
+      box-shadow: 0 0 0 1px var(--vscode-button-background);
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--vscode-button-background);
+      box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+    }
+
+    [theme="dark"] select {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%9ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
     }
   </style>
 </head>
@@ -226,17 +253,35 @@
 
     <div class="control-item">
       <div class="control-label-group">
-        <div class="control-label">${Panel.gradientSelection.label}</div>
+        <label class="control-label">${Panel.gradient.label}</label>
+        <div class="control-desc">${Panel.gradient.description}</div>
       </div>
       <div class="control-input">
-        <select id="gradientSelection">
-          <option value="${Style.brightCenter}">${Panel.gradientSelection.brightCenter}</option>
-          <option value="${Style.brightLeft}">${Panel.gradientSelection.brightLeft}</option>
-          <option value="${Style.arcLeft}">${Panel.gradientSelection.arcLeft}</option>
+        <select id="gradient">
+          <option value="${Style.brightCenter}">${Panel.gradient.brightCenter}</option>
+          <option value="${Style.brightLeft}">${Panel.gradient.brightLeft}</option>
+          <option value="${Style.arcLeft}">${Panel.gradient.arcLeft}</option>
         </select>
       </div>
     </div>
 
+    <div class="control-item">
+      <div class="control-label-group">
+        <div class="control-label">${Panel.hashSource.label}</div>
+        <div class="control-desc">${Panel.hashSource.description}</div>
+      </div>
+      <div class="control-input">
+        <select id="hashSource">
+          <option value="${HashSource.FullPath}">${Panel.hashSource[HashSource.FullPath]}</option>
+          <option value="${HashSource.ProjectName}">${
+            Panel.hashSource[HashSource.ProjectName]
+            }</option>
+          <option value="${HashSource.ProjectNameDate}">${
+            Panel.hashSource[HashSource.ProjectNameDate]
+            }</option>
+        </select>
+      </div>
+    </div>
 
     <div class="control-item">
       <div class="control-label-group">
@@ -245,7 +290,7 @@
       </div>
       <div class="control-input">
         <button class="btn" id="refresh">
-          <span class="icon">${Panel.refresh.button}</span>
+          <span>${Panel.refresh.button}</span>
         </button>
       </div>
     </div>
@@ -256,18 +301,19 @@
         <div class="control-desc">${Panel.pickColor.description}</div>
       </div>
       <div class="control-input">
-        <div id="colorPickerContainer" class="color-picker-container">
-          <input type="color" class="color-picker" id="colorPicker" value="#007ACC">
+        <div id="pickerContainer" class="picker-container" style="background-color: #007ACC;">
+          <input type="color" class="picker" id="picker" value="#007ACC">
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    const gradientSwitch = document.getElementById('gradientSwitch');
-    const refresh = document.getElementById('refresh');
-    const colorPicker = document.getElementById('colorPicker');
-    const colorPickerContainer = document.getElementById('colorPickerContainer');
+    const find = document.getElementById.bind(document);
+    const gradientSwitch = find('gradientSwitch');
+    const refresh = find('refresh');
+    const picker = find('picker');
+    const pickerContainer = find('pickerContainer');
 
     let isGlobalEnabled = false;
 
@@ -282,14 +328,14 @@
       alert('系统正在重新计算，请稍候...');
     });
 
-    colorPickerContainer.addEventListener('click', function () {
-      colorPicker.click();
+    pickerContainer.addEventListener('click', function () {
+      picker.click();
     });
 
-    colorPicker.addEventListener('input', function () {
+    picker.addEventListener('input', function () {
       const selectedColor = this.value;
       console.log('选择的颜色:', selectedColor);
-      colorPickerContainer.style.backgroundColor = selectedColor;
+      pickerContainer.style.backgroundColor = selectedColor;
     });
   </script>
 </body>

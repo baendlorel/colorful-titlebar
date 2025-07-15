@@ -1,5 +1,5 @@
 import vscode from 'vscode';
-import { Consts, TitleBarStyle } from './consts';
+import { Consts, HashSource, TitleBarStyle } from './consts';
 
 export const Msg = (() => {
   const Zh = {
@@ -16,11 +16,19 @@ export const Msg = (() => {
         label: '使用渐变',
         description: `需提供${Consts.MainCssFileName}路径，开启后将会给标题栏增加渐变特效。（会提示VS Code 损坏，这是正常的，选“不再显示即可”）`,
       },
-      gradientSelection: {
+      gradient: {
         label: '渐变样式',
+        description: '选择后需要重启生效',
         brightLeft: '左侧较亮',
         brightCenter: '中间较亮',
         arcLeft: '左侧弧光',
+      },
+      hashSource: {
+        label: 'Hash入参',
+        description: `将会以设定的内容作为计算Hash的依据`,
+        [HashSource.ProjectName]: '项目名',
+        [HashSource.FullPath]: '完整路径',
+        [HashSource.ProjectNameDate]: '项目名+日期',
       },
       pickColor: {
         label: '指定当前颜色',
@@ -127,11 +135,18 @@ export const Msg = (() => {
         label: 'Use Gradient',
         description: `Requires path to ${Consts.MainCssFileName}, enables gradient effect on title bar`,
       },
-      gradientSelection: {
+      gradient: {
         label: 'Gradient Style',
         brightLeft: 'Bright Left',
         brightCenter: 'Bright Center',
         arcLeft: 'Arc Left',
+      },
+      hashSource: {
+        label: 'Hash Source',
+        description: `Determines the basis for calculating the hash used for color`,
+        [HashSource.ProjectName]: 'Project Name',
+        [HashSource.FullPath]: 'Full Path',
+        [HashSource.ProjectNameDate]: 'Project Name + Date',
       },
       pickColor: {
         label: 'Specify Current Color',

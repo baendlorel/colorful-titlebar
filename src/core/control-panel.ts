@@ -2,7 +2,7 @@ import vscode from 'vscode';
 
 import { RGBA } from '@/common/rgb';
 import { configs } from '@/common/configs';
-import { TitleBarStyle } from '@/common/consts';
+import { HashSource, TitleBarStyle } from '@/common/consts';
 import { Msg } from '@/common/i18n';
 import { refreshTitleBar } from './style';
 
@@ -260,12 +260,27 @@ export const pickColor = async () => {
     </div>
 
     <div class="control-item">
-      <label class="control-label">${Panel.gradientSelection.label}</label>
+      <label class="control-label">${Panel.gradient.label}</label>
       <div class="control-input">
-        <select id="gradientSelection">
-          <option value="${Style.brightCenter}">${Panel.gradientSelection.brightCenter}</option>
-          <option value="${Style.brightLeft}">${Panel.gradientSelection.brightLeft}</option>
-          <option value="${Style.arcLeft}">${Panel.gradientSelection.arcLeft}</option>
+        <select id="gradient">
+          <option value="${Style.brightCenter}">${Panel.gradient.brightCenter}</option>
+          <option value="${Style.brightLeft}">${Panel.gradient.brightLeft}</option>
+          <option value="${Style.arcLeft}">${Panel.gradient.arcLeft}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="control-item">
+      <label class="control-label">${Panel.hashSource.label}</label>
+      <div class="control-input">
+        <select id="hashSource">
+          <option value="${HashSource.FullPath}">${Panel.hashSource[HashSource.FullPath]}</option>
+          <option value="${HashSource.ProjectName}">${
+    Panel.hashSource[HashSource.ProjectName]
+  }</option>
+          <option value="${HashSource.ProjectNameDate}">${
+    Panel.hashSource[HashSource.ProjectNameDate]
+  }</option>
         </select>
       </div>
     </div>
@@ -294,10 +309,12 @@ export const pickColor = async () => {
   </div>
 
   <script>
-    const html = document.documentElement;
-    const gradientSwitch = document.getElementById('gradientSwitch');
-    const refresh = document.getElementById('refresh');
-    const colorPicker = document.getElementById('colorPicker');
+    const find = document.getElementById.bind(document);
+    const gradientSwitch = find('gradientSwitch');
+    const gradient = find('gradient');
+    const hashSource = find('hashSource');
+    const refresh = find('refresh');
+    const colorPicker = find('colorPicker');
     const colorPreview = document.querySelector('.color-preview');
 
     let isGlobalEnabled = false;
@@ -314,7 +331,6 @@ export const pickColor = async () => {
 
     refresh.addEventListener('click', function () {
       console.log('正在重新计算...');
-      // 这里可以添加实际的重新计算逻辑
       alert('系统正在重新计算，请稍候...');
     });
 
@@ -349,8 +365,3 @@ export const pickColor = async () => {
     }
   });
 };
-
-/**
- * Apply manually selected color to titlebar
- */
-const applyManualColor = async (colorHex: string) => {};

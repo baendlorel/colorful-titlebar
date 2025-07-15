@@ -6,7 +6,7 @@ import { Msg } from '@/common/i18n';
 import { configs } from '@/common/configs';
 import { Commands, SettingsJson, TitleBarStyle } from '@/common/consts';
 import { getColor } from './colors';
-import { popInfo } from '@/common/notifications';
+import { suggestInfo } from '@/common/notifications';
 
 interface StyleConfig {
   [TitleBarStyle.ActiveBg]: string;
@@ -56,7 +56,7 @@ export const refreshTitleBar = async (satisfied = false) => {
     const suggest = Msg.Commands.pickColor.suggest;
 
     // 询问用户是否要手动选择颜色
-    const result = await popInfo(suggest.msg, suggest.yes, suggest.no);
+    const result = await suggestInfo(suggest.msg, suggest.yes, suggest.no);
 
     if (result === suggest.yes) {
       // 通过命令ID拉起颜色选择器，避免循环引用
