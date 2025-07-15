@@ -8,8 +8,7 @@ import vscode from 'vscode';
  * @param func
  * @returns
  */
-export const catcher =
-  <T extends (...args: any[]) => void>(func: T) =>
+export default <T extends (...args: any[]) => void>(func: T) =>
   async (...args: Parameters<T>): Promise<void> => {
     try {
       await func(...args);

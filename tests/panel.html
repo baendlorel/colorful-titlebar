@@ -275,7 +275,7 @@
       </div>
     </div>
 
-    <div class="control-item">
+    <!-- <div class="control-item">
       <div class="control-label-group">
         <div class="control-label">${Panel.gradientSwitch.label}</div>
         <div class="control-desc">${Panel.gradientSwitch.description}</div>
@@ -286,7 +286,7 @@
           <span class="slider"></span>
         </label>
       </div>
-    </div>
+    </div> -->
 
     <div class="control-item">
       <div class="control-label-group">
@@ -295,6 +295,7 @@
       </div>
       <div class="control-input">
         <select name="gradient" class="select">
+          <option value="" selected>${Panel.gradient.empty}</option>
           <option value="${GradientStyle.BrightCenter}">${Panel.gradient[GradientStyle.BrightCenter]}</option>
           <option value="${GradientStyle.BrightLeft}">${Panel.gradient[GradientStyle.BrightLeft]}</option>
           <option value="${GradientStyle.ArcLeft}">${Panel.gradient[GradientStyle.ArcLeft]}</option>
@@ -304,11 +305,11 @@
 
     <div class="control-item">
       <div class="control-label-group">
-        <div class="control-label">${Panel.mainCssPath.label}</div>
-        <div class="control-desc">${Panel.mainCssPath.description}</div>
+        <div class="control-label">${Panel.workbenchCssPath.label}</div>
+        <div class="control-desc">${Panel.workbenchCssPath.description}</div>
       </div>
       <div class="control-input">
-        <input type="text" class="input-text" name="mainCssPath" />
+        <input type="text" class="input-text" name="workbenchCssPath" value="${configs.}" />
       </div>
     </div>
 
@@ -367,7 +368,6 @@
      * @type {HTMLFormElement}
      */
     const settings = find('settings');
-    const gradientSwitch = find('gradientSwitch');
     const refresh = find('refresh');
     const picker = find('picker');
     const pickerBtn = find('pickerBtn');

@@ -17,20 +17,22 @@ export const Msg = (() => {
         label: '显示建议',
         description: `显示偶尔会弹出的建议`,
       },
-      gradientSwitch: {
-        label: '使用渐变',
-        description: `需提供${Consts.MainCssFileName}路径，开启后将会给标题栏增加渐变特效。（会提示VS Code 损坏，这是正常的，选“不再显示即可”）`,
+      // gradientSwitch: {
+      //   label: '使用渐变',
+      //   description: `需提供${Consts.MainCssFileName}路径，开启后将会给标题栏增加渐变特效。（会提示VS Code 损坏，这是正常的，选“不再显示即可”）`,
+      // },
+      workbenchCssPath: {
+        label: `${Consts.WorkbenchCssName}路径`,
+        description:
+          '本插件将会修改这个文件来实现渐变特效（提示VS Code 损坏是正常现象，选“不再显示”即可）',
       },
       gradient: {
         label: '渐变样式',
         description: '选择后需要重启生效',
+        empty: '',
         [GradientStyle.BrightCenter]: '中间较亮',
         [GradientStyle.BrightLeft]: '左侧较亮',
         [GradientStyle.ArcLeft]: '左侧弧光',
-      },
-      mainCssPath: {
-        label: `${Consts.MainCssFileName}路径`,
-        description: '本插件将会修改这个文件来实现渐变特效',
       },
       hashSource: {
         label: 'Hash入参',
@@ -57,10 +59,10 @@ export const Msg = (() => {
           msg: '已支持美丽的标题栏渐变色！需要开启吗？',
           yes: '好的！',
         },
-        title: `${Consts.MainCssFileName}文件地址`,
-        prompt: `启用渐变色标题栏需要修改${Consts.MainCssFileName}，请提供该文件地址（WSl 需要映射到子系统内部的地址）`,
-        placeHolder: `例如：../../${Consts.MainCssFileName}`,
-        workbenchCssPathInvalid: `${Consts.MainCssFileName}路径无效，请检查`,
+        title: `${Consts.WorkbenchCssName}文件地址`,
+        prompt: `启用渐变色标题栏需要修改${Consts.WorkbenchCssName}，请提供该文件地址（WSl 需要映射到子系统内部的地址）`,
+        placeHolder: `例如：../../${Consts.WorkbenchCssName}`,
+        workbenchCssPathInvalid: `${Consts.WorkbenchCssName}路径无效，请检查`,
         style: {
           [GradientStyle.BrightCenter]: '中间较亮',
           [GradientStyle.BrightLeft]: '左侧较亮',
@@ -117,7 +119,7 @@ export const Msg = (() => {
     },
     Config: {
       changed: '检测到配置变化，重启后生效',
-      gradientChangedButInvalidCssPath: `虽然修改了渐变配置但${Consts.MainCssFileName}文件路径不正确，修改将无法生效！`,
+      gradientChangedButInvalidCssPath: `虽然修改了渐变配置但${Consts.WorkbenchCssName}文件路径不正确，修改将无法生效！`,
     },
 
     // 设置标题栏颜色
@@ -146,20 +148,22 @@ export const Msg = (() => {
         label: 'Show Suggestions',
         description: `Turning it off will block all suggestions`,
       },
-      gradientSwitch: {
-        label: 'Use Gradient',
-        description: `Requires path to ${Consts.MainCssFileName}, enables gradient effect on title bar`,
+      // gradientSwitch: {
+      //   label: 'Use Gradient',
+      //   description: `Requires path to ${Consts.MainCssFileName}, enables gradient effect on title bar`,
+      // },
+      workbenchCssPath: {
+        label: `${Consts.WorkbenchCssName} Path`,
+        description:
+          'This extension will modify it to implement the gradient effect. Might show VS Code is corrupted, just select "Never show again"',
       },
       gradient: {
         label: 'Gradient Style',
         description: 'Needs restart to take effect',
+        empty: '',
         [GradientStyle.BrightCenter]: 'Bright Center',
         [GradientStyle.BrightLeft]: 'Bright Left',
         [GradientStyle.ArcLeft]: 'Arc Left',
-      },
-      mainCssPath: {
-        label: `${Consts.MainCssFileName} Path`,
-        description: 'This extension will modify it to implement the gradient effect',
       },
       hashSource: {
         label: 'Hash Source',
@@ -186,10 +190,10 @@ export const Msg = (() => {
           msg: 'Gradient titlebar is supported! Do you want to enable it now?',
           yes: 'YES! Enable it now!',
         },
-        title: `${Consts.MainCssFileName} Path`,
-        prompt: `To enable gradient titlebar, please provide the path to "${Consts.MainCssFileName}". WSL paths should map to the internal path of the subsystem`,
-        placeHolder: `Example: ../../${Consts.MainCssFileName}`,
-        workbenchCssPathInvalid: `The path to "${Consts.MainCssFileName}" is invalid, please check`,
+        title: `${Consts.WorkbenchCssName} Path`,
+        prompt: `To enable gradient titlebar, please provide the path to "${Consts.WorkbenchCssName}". WSL paths should map to the internal path of the subsystem`,
+        placeHolder: `Example: ../../${Consts.WorkbenchCssName}`,
+        workbenchCssPathInvalid: `The path to "${Consts.WorkbenchCssName}" is invalid, please check`,
         style: {
           [GradientStyle.BrightCenter]: 'Bright Center',
           [GradientStyle.BrightLeft]: 'Bright Left',
@@ -249,7 +253,7 @@ export const Msg = (() => {
 
     Config: {
       changed: 'Detected color configuration change, restart to apply',
-      gradientChangedButInvalidCssPath: `Although gradient config has changed, the path to "${Consts.MainCssFileName}" is incorrect, changes will not take effect!`,
+      gradientChangedButInvalidCssPath: `Although gradient config has changed, the path to "${Consts.WorkbenchCssName}" is incorrect, changes will not take effect!`,
     },
 
     // 设置标题栏颜色

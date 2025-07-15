@@ -1,9 +1,9 @@
 import vscode from 'vscode';
 
-import { catcher } from './common/catcher';
 import { alreadySetTitleBarColor, refreshTitleBar } from './core/style';
-import { gradient } from './features/gradient';
-import { register } from './registers';
+import catcher from './common/catcher';
+import register from './registers';
+import gradient from './features/gradient';
 
 export const activate = catcher(async (context: vscode.ExtensionContext) => {
   // 注册命令
