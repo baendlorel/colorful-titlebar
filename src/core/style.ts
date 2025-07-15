@@ -62,7 +62,7 @@ class TitleBarStyle {
 
       if (result === suggest.yes) {
         // 通过命令ID拉起颜色选择器，避免循环引用
-        await vscode.commands.executeCommand(Commands.PickColor);
+        await vscode.commands.executeCommand(Commands.ControlPanel);
       }
     }
   }

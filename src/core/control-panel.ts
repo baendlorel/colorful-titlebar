@@ -45,7 +45,6 @@ export default async () => {
   <title>${Panel.title}</title>
   <style>
     :root {
-      --vscode-button-background: #4285f4;
       --primary-color: #4285f4;
       --secondary-color: #34a853;
       --danger-color: #ea4335;
@@ -60,11 +59,10 @@ export default async () => {
     }
 
     [theme="dark"] {
-      --vscode-button-background: #4285f4;
-      --primary-color: #8ab4f8;
-      --secondary-color: #81c995;
-      --danger-color: #f28b82;
-      --warning-color: #fde293;
+      --primary-color: #4285f4;
+      --secondary-color: #34a853;
+      --danger-color: #ea4335;
+      --warning-color: #fbbc05;
       --text-color: #e8eaed;
       --text-color-weak: rgba(232, 234, 237, 0.7);
       --bg-color: #202124;
@@ -223,7 +221,7 @@ export default async () => {
     }
 
     input:checked+.slider {
-      background-color: var(--vscode-button-background);
+      background-color: var(--primary-color);
     }
 
     input:checked+.slider:before {
@@ -240,7 +238,7 @@ export default async () => {
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: var(--vscode-button-background);
+      background-color: var(--primary-color);
       color: white;
     }
 
@@ -254,13 +252,11 @@ export default async () => {
       opacity: 0;
     }
 
-    .color-preview {
-      width: 100%;
-      height: 100%;
-      background-color: var(--vscode-button-background);
+    .select {
+      width: 120px;
+      min-width: 80px;
     }
 
-    .select,
     .input-text {
       width: 200px;
       min-width: 150px;
@@ -308,13 +304,13 @@ export default async () => {
     }
 
     .select:hover {
-      border-color: var(--vscode-button-background);
-      box-shadow: 0 0 0 1px var(--vscode-button-background);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 1px var(--primary-color);
     }
 
     .select:focus {
       outline: none;
-      border-color: var(--vscode-button-background);
+      border-color: var(--primary-color);
       box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
     }
 
@@ -326,7 +322,7 @@ export default async () => {
 
 <body>
   <form name="settings" class="control-panel">
-    <div class="header">
+    <div class="header" onclick="theme()">
       <div>
         <h1>${Panel.title}</h1>
         <p>${Panel.description}</p>
@@ -490,6 +486,7 @@ export default async () => {
     const settings = find('settings');
     const pickColor = find('pickColor');
     const pickerBtn = find('pickerBtn');
+    const refresh = find('refresh');
 
     const freeze = () => {
       Array.prototype.forEach.call(settings.elements, (el) => el.disabled = true)
@@ -498,6 +495,11 @@ export default async () => {
         settings.classList.remove('freeze');
         Array.prototype.forEach.call(settings.elements, (el) => el.disabled = false)
       }, 1600);
+    }
+
+    refresh.onclick = () => {
+      freeze();
+      vscode.postMessage({ command: 'refresh', value: null });
     }
 
     pickerBtn.onclick = pickColor.click.bind(pickColor);
@@ -526,6 +528,7 @@ export default async () => {
           input.value = input.defaultValue; // 恢复默认值
           return;
         }
+
       }
 
 
@@ -537,6 +540,12 @@ export default async () => {
       });
     });
 
+    window.addEventListener('message', (event) => {
+      const msg = event.data;
+      if (msg.command === 'fromExtension') {
+        alert('插件说：' + msg.text);
+      }
+    });
   </script>
 </body>
 
@@ -635,7 +644,8 @@ export default async () => {
         vscode.window.showErrorMessage(String(error));
       }
     } finally {
-      controlPanel.dispose();
+      // controlPanel.dispose();
+      controlPanel.webview.postMessage({ command: 'fromExtension', text: '你好，Webview！' });
     }
   });
 };
