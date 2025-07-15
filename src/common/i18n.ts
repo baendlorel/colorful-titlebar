@@ -15,6 +15,7 @@ export default (() => {
       loading: '更新中...',
       typeError: (value: string | number | boolean, shouldBe?: string) =>
         `值或值类型无效，得到的是${value}(${typeof value})${shouldBe ? '，应该是' + shouldBe : ''}`,
+      success: '保存成功',
       showSuggest: {
         label: '显示建议',
         description: `显示偶尔会弹出的建议`,
@@ -31,6 +32,7 @@ export default (() => {
         [GradientStyle.BrightCenter]: '中间较亮',
         [GradientStyle.BrightLeft]: '左侧较亮',
         [GradientStyle.ArcLeft]: '左侧弧光',
+        success: '注入成功，重启后生效',
       },
       gradientBrightness: {
         label: '渐变亮度',
@@ -46,6 +48,7 @@ export default (() => {
         [HashSource.ProjectName]: '项目名',
         [HashSource.FullPath]: '完整路径',
         [HashSource.ProjectNameDate]: '项目名+日期',
+        success: '保存成功，点击"重新计算颜色"可以生效',
       },
       pickColor: {
         label: '指定当前颜色',
@@ -150,6 +153,7 @@ export default (() => {
       title: 'Colorful Titlebar Control Panel',
       description: 'Control titlebar color and style here',
       loading: 'Updating...',
+      success: 'Saved successfully',
       typeError: (value: string | number | boolean, shouldBe?: string) =>
         `Invalid value or value type, got ${value}(${typeof value})${
           shouldBe ? '. Should be ' + shouldBe : ''
@@ -171,6 +175,7 @@ export default (() => {
         [GradientStyle.BrightCenter]: 'Bright Center',
         [GradientStyle.BrightLeft]: 'Bright Left',
         [GradientStyle.ArcLeft]: 'Arc Left',
+        success: 'Injected successfully, restart to take effect',
       },
       gradientBrightness: {
         label: 'Gradient Brightness',
@@ -186,6 +191,7 @@ export default (() => {
         [HashSource.ProjectName]: 'Project Name',
         [HashSource.FullPath]: 'Full Path',
         [HashSource.ProjectNameDate]: 'Project Name + Date',
+        success: 'Saved successfully, click "Recalculate Color" to apply changes',
       },
       pickColor: {
         label: 'Specify Current Color',

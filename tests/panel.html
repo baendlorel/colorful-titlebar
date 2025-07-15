@@ -530,7 +530,9 @@
         return;
       }
       if (resp.succ) {
-        find(resp.name, 'succ').textContent = resp.msg;
+        if (resp.msg) {
+          find(resp.name, 'succ').textContent = resp.msg;
+        }
       } else {
         find(resp.name, 'error').textContent = resp.msg;
       }

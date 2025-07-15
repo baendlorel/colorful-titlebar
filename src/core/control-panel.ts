@@ -564,7 +564,9 @@ export default async () => {
         return;
       }
       if (resp.succ) {
-        find(resp.name, 'succ').textContent = resp.msg;
+        if (resp.msg) {
+          find(resp.name, 'succ').textContent = resp.msg;
+        }
       } else {
         find(resp.name, 'error').textContent = resp.msg;
       }
@@ -578,7 +580,7 @@ export default async () => {
     const result = {
       from: 'colorful-titlebar',
       name: message.command,
-      msg: '',
+      msg: Panel.success,
       succ: true,
     };
     try {
@@ -640,6 +642,7 @@ export default async () => {
             return;
           }
           await hacker.inject(cssPath, gradientStyle);
+          result.msg = Panel.gradient.success;
           break;
         }
 
@@ -651,6 +654,7 @@ export default async () => {
             throw null;
           }
           await configs.set.gradientBrightness(d);
+          result.msg = Panel.gradient.success;
           break;
         }
         case ControlCommand.GradientDarkness: {
@@ -661,6 +665,7 @@ export default async () => {
             throw null;
           }
           await configs.set.gradientDarkness(d);
+          result.msg = Panel.gradient.success;
           break;
         }
 
@@ -673,6 +678,7 @@ export default async () => {
             throw null;
           }
           await configs.set.hashSource(d);
+          result.msg = Panel.hashSource.success;
           break;
         }
 
