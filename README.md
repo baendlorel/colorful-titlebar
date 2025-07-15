@@ -35,15 +35,15 @@ A VS Code extension that adds colorful background colors to the title bar based 
 
 - **Bright Center**: Linear gradient with a bright center effect
 
-  ![Bright Center Effect](assets/light-center.png)
+  ![Bright Center Effect](https://raw.githubusercontent.com/baendlorel/colorful-titlebar/refs/heads/main/draft/light-center.png)
 
 - **Bright Left**: Radial gradient with a bright effect from the left side
 
-  ![Bright Left Effect](assets/light-left.png)
+  ![Bright Left Effect](https://raw.githubusercontent.com/baendlorel/colorful-titlebar/refs/heads/main/draft/light-left.png)
 
 - **Arc Left**: Radial gradient with a bright effect from the left side 2
 
-  ![Arc Left Effect](assets/arc-left.png)
+  ![Arc Left Effect](https://raw.githubusercontent.com/baendlorel/colorful-titlebar/refs/heads/main/draft/arc-left.png)
 
 - **Related Configs**: Through `colorful-titlebar.gradientBrightness` and `colorful-titlebar.gradientDarkness`, we can control the brightness and darkness of the gradient overlays.
 

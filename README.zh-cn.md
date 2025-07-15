@@ -35,15 +35,15 @@
 
 - **亮中心**: 带有亮中心效果的线性渐变
 
-  ![亮中心](assets/light-center.png)
+  ![Bright Center Effect](https://raw.githubusercontent.com/baendlorel/colorful-titlebar/refs/heads/main/draft/light-center.png)
 
 - **亮左侧**: 从左侧产生亮效果的径向渐变
 
-  ![亮左侧](assets/light-left.png)
+  ![Bright Left Effect](https://raw.githubusercontent.com/baendlorel/colorful-titlebar/refs/heads/main/draft/light-left.png)
 
 - **左侧弧光**: 从左侧产生亮效果的径向渐变 2
 
-  ![左侧弧光](assets/arc-left.png)
+  ![Arc Left Effect](https://raw.githubusercontent.com/baendlorel/colorful-titlebar/refs/heads/main/draft/arc-left.png)
 
 - **配合配置项**: `colorful-titlebar.gradientBrightness`和`colorful-titlebar.gradientDarkness` 来控制明暗度
 
