@@ -1,9 +1,24 @@
 import vscode from 'vscode';
+import { existsSync } from 'node:fs';
 
-import { GradientStyle, HashSource } from '@/common/consts';
+import { GradientStyle, HashSource, TitleBarConsts } from '@/common/consts';
 import configs from '@/common/configs';
 import i18n from '@/common/i18n';
+import hacker from '@/features/gradient/hacker';
+import { AfterStyle } from '@/features/gradient/consts';
+import RGBA from '@/common/rgba';
 import style from './style';
+
+const enum ControlCommand {
+  ShowSuggest = 'showSuggest',
+  WorkbenchCssPath = 'workbenchCssPath',
+  Gradient = 'gradient',
+  GradientBrightness = 'gradientBrightness',
+  GradientDarkness = 'gradientDarkness',
+  HashSource = 'hashSource',
+  Refresh = 'refresh',
+  PickColor = 'pickColor',
+}
 
 /**
  * Opens a color picker to manually select titlebar color
@@ -424,7 +439,7 @@ export default async () => {
         <button type="button" class="btn" name="pickerBtn" style="background-color: #007ACC;">
           asdf
         </button>
-        <input type="color" class="picker" name="picker" value="#007ACC">
+        <input type="color" class="picker" name="pickColor" value="#007ACC">
       </div>
     </div>
   </form>
@@ -473,7 +488,7 @@ export default async () => {
      * @type {HTMLFormElement} 
      */
     const settings = find('settings');
-    const picker = find('picker');
+    const pickColor = find('pickColor');
     const pickerBtn = find('pickerBtn');
 
     const freeze = () => {
@@ -485,8 +500,8 @@ export default async () => {
       }, 1600);
     }
 
-    pickerBtn.onclick = picker.click.bind(picker);
-    picker.addEventListener('input', function () {
+    pickerBtn.onclick = pickColor.click.bind(pickColor);
+    pickColor.addEventListener('input', function () {
       const color = this.value;
       const [r, g, b] = color.replace('#', '').match(/.{2}/g).map(hex => parseInt(hex, 16));
       const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
@@ -529,12 +544,89 @@ export default async () => {
 
   controlPanel.webview.onDidReceiveMessage(async (message) => {
     try {
-      switch (message.command) {
-        case 'reset':
-          await style.refresh(true);
-          vscode.window.showInformationMessage('');
-          controlPanel.dispose();
+      const command = message.command as ControlCommand;
+      const value = message.value;
+      switch (command) {
+        case ControlCommand.ShowSuggest:
+          if (typeof value !== 'boolean') {
+            throw new Error('Invalid value type for showSuggest, got' + typeof value);
+          }
+          await configs.set.showSuggest(value);
           break;
+
+        case ControlCommand.WorkbenchCssPath: {
+          if (typeof value !== 'string') {
+            throw new Error('Invalid value type for WorkbenchCssPath, got' + typeof value);
+          }
+          const cssPath = value.trim();
+          if (!existsSync(cssPath)) {
+            throw new Error('Invalid path');
+          }
+          await configs.set.workbenchCssPath(cssPath);
+          break;
+        }
+
+        case ControlCommand.Gradient: {
+          let gradientStyle: AfterStyle;
+          switch (Number(value)) {
+            case GradientStyle.BrightCenter:
+              gradientStyle = AfterStyle.BrightCenter;
+              break;
+            case GradientStyle.BrightLeft:
+              gradientStyle = AfterStyle.BrightLeft;
+              break;
+            case GradientStyle.ArcLeft:
+              gradientStyle = AfterStyle.ArcLeft;
+              break;
+            default:
+              throw new Error('Invalid value type for gradient, got' + value);
+          }
+          const cssPath = await hacker.getWorkbenchCssPath();
+          if (!cssPath) {
+            return;
+          }
+          await hacker.inject(cssPath, value);
+          break;
+        }
+
+        case ControlCommand.GradientBrightness: {
+          const d = parseInt(value, 10) / 100;
+          if (Number.isNaN(d) || d < 0 || d > 1) {
+            throw new Error('Invalid value for GradientBrightness, must be between 0 and 1');
+          }
+          await configs.set.gradientBrightness(d);
+          break;
+        }
+        case ControlCommand.GradientDarkness: {
+          const d = parseInt(value, 10) / 100;
+          if (Number.isNaN(d) || d < 0 || d > 1) {
+            throw new Error('Invalid value for GradientDarkness, must be between 0 and 1');
+          }
+          await configs.set.gradientDarkness(d);
+          break;
+        }
+
+        case ControlCommand.HashSource: {
+          const d = parseInt(value, 10) as HashSource;
+          const arr = [HashSource.FullPath, HashSource.ProjectName, HashSource.ProjectNameDate];
+          if (!arr.includes(d)) {
+            throw new Error(
+              `Invalid value for HashSource, must be one of ${arr.join(', ')}, got ${value}`
+            );
+          }
+          await configs.set.hashSource(d);
+          break;
+        }
+
+        case ControlCommand.Refresh: {
+          await style.refresh(true);
+          break;
+        }
+
+        case ControlCommand.PickColor: {
+          await applyManualColor(value);
+          break;
+        }
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -542,6 +634,25 @@ export default async () => {
       } else {
         vscode.window.showErrorMessage(String(error));
       }
+    } finally {
+      controlPanel.dispose();
     }
   });
+};
+
+/**
+ * Apply manually selected color to titlebar
+ */
+const applyManualColor = async (colorHex: string) => {
+  const color = new RGBA(colorHex);
+  const newStyle = {
+    [TitleBarConsts.ActiveBg]: color.toString(),
+    [TitleBarConsts.InactiveBg]: color.toGreyDarkenString(),
+  };
+
+  await configs.global.update(
+    TitleBarConsts.WorkbenchSection,
+    newStyle,
+    vscode.ConfigurationTarget.Workspace
+  );
 };

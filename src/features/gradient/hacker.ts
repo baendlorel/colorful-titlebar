@@ -37,9 +37,17 @@ class Hacker {
   }
 
   /**
+   * 已包含backup
+   *
    * 会在command注册的地方就确认`cssPath`是否存在
    */
   async inject(cssPath: string, gradientStyle: string): Promise<void> {
+    const backupPath = `${cssPath}.${Css.BackupSuffix}`;
+    if (!existsSync(backupPath)) {
+      const buffer = await readFile(cssPath);
+      await writeFile(`${cssPath}.${Css.BackupSuffix}`, buffer);
+    }
+
     let rawStyle = AfterStyle.BrightLeft;
     switch (gradientStyle) {
       case this.Enable.style[GradientStyle.BrightCenter]:
@@ -75,7 +83,7 @@ class Hacker {
   /**
    * 会在command注册的地方就确认`cssPath`是否存在
    */
-  async backup(cssPath: string): Promise<void> {
+  private async backup(cssPath: string): Promise<void> {
     const buffer = await readFile(cssPath);
     await writeFile(`${cssPath}.${Css.BackupSuffix}`, buffer);
   }

@@ -7,7 +7,7 @@ import configs from '@/common/configs';
 import popSuggest from '@/common/pop-suggest';
 
 import { Css } from './consts';
-import hacker from './hackers';
+import hacker from './hacker';
 
 class Gradient {
   private readonly Enable = i18n.Commands.enableGradient;
@@ -49,7 +49,6 @@ class Gradient {
     }
 
     // & 已确保cssPath是能用的
-    await hacker.backup(cssPath);
     await hacker.inject(cssPath, gradientStyle);
   }
 

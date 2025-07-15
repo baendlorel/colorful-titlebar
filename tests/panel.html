@@ -405,7 +405,7 @@
         <button type="button" class="btn" name="pickerBtn" style="background-color: #007ACC;">
           asdf
         </button>
-        <input type="color" class="picker" name="picker" value="#007ACC">
+        <input type="color" class="picker" name="pickColor" value="#007ACC">
       </div>
     </div>
   </form>
@@ -454,7 +454,7 @@
      * @type {HTMLFormElement} 
      */
     const settings = find('settings');
-    const picker = find('picker');
+    const pickColor = find('pickColor');
     const pickerBtn = find('pickerBtn');
 
     const freeze = () => {
@@ -466,8 +466,8 @@
       }, 1600);
     }
 
-    pickerBtn.onclick = picker.click.bind(picker);
-    picker.addEventListener('input', function () {
+    pickerBtn.onclick = pickColor.click.bind(pickColor);
+    pickColor.addEventListener('input', function () {
       const color = this.value;
       const [r, g, b] = color.replace('#', '').match(/.{2}/g).map(hex => parseInt(hex, 16));
       const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
@@ -492,6 +492,7 @@
           input.value = input.defaultValue; // 恢复默认值
           return;
         }
+
       }
 
 
