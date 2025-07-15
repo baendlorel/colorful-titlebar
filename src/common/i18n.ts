@@ -13,14 +13,13 @@ export default (() => {
       title: 'Colorful Titlebar 控制面板',
       description: '在这里可以控制标题栏颜色和样式',
       loading: '更新中...',
-      suggestSwitch: {
+      showSuggest: {
         label: '显示建议',
         description: `显示偶尔会弹出的建议`,
       },
       workbenchCssPath: {
         label: `${Consts.WorkbenchCssName}路径`,
-        description:
-          '本插件将会修改这个文件来实现渐变特效（提示VS Code 损坏是正常现象，选“不再显示”即可）',
+        description: '用于注入渐变样式。提示VS Code损坏是意料之内的，选“不再显示”即可',
       },
       gradient: {
         label: '渐变样式',
@@ -29,6 +28,14 @@ export default (() => {
         [GradientStyle.BrightCenter]: '中间较亮',
         [GradientStyle.BrightLeft]: '左侧较亮',
         [GradientStyle.ArcLeft]: '左侧弧光',
+      },
+      gradientBrightness: {
+        label: '渐变亮度',
+        description: '表示渐变较亮的地方有多亮',
+      },
+      gradientDarkness: {
+        label: '渐变暗度',
+        description: '表示渐变较暗的地方有多暗',
       },
       hashSource: {
         label: 'Hash入参',
@@ -39,7 +46,7 @@ export default (() => {
       },
       pickColor: {
         label: '指定当前颜色',
-        description: `直接指定当前打开的项目的标题栏颜色，若不满意可以手动选择`,
+        description: `直接指定当前打开的项目的标题栏颜色`,
         button: '选择颜色',
       },
       refresh: {
@@ -140,14 +147,14 @@ export default (() => {
       title: 'Colorful Titlebar Control Panel',
       description: 'Control titlebar color and style here',
       loading: 'Updating...',
-      suggestSwitch: {
+      showSuggest: {
         label: 'Show Suggestions',
         description: `Turning it off will block all suggestions`,
       },
       workbenchCssPath: {
         label: `${Consts.WorkbenchCssName} Path`,
         description:
-          'This extension will modify it to implement the gradient effect. Might show VS Code is corrupted, just select "Never show again"',
+          'After injection, VS Code might show "corrupted", just select "Never show again"',
       },
       gradient: {
         label: 'Gradient Style',
@@ -156,6 +163,14 @@ export default (() => {
         [GradientStyle.BrightCenter]: 'Bright Center',
         [GradientStyle.BrightLeft]: 'Bright Left',
         [GradientStyle.ArcLeft]: 'Arc Left',
+      },
+      gradientBrightness: {
+        label: 'Gradient Brightness',
+        description: 'Indicates how bright the brighter part of the gradient is',
+      },
+      gradientDarkness: {
+        label: 'Gradient Darkness',
+        description: 'Indicates how dark the darker part of the gradient is',
       },
       hashSource: {
         label: 'Hash Source',
@@ -166,7 +181,7 @@ export default (() => {
       },
       pickColor: {
         label: 'Specify Current Color',
-        description: `Directly specify the titlebar color for the current project manually`,
+        description: `Specify the titlebar color for current project manually`,
         button: 'Pick Color',
       },
       refresh: {

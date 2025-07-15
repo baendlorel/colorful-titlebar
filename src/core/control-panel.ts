@@ -283,8 +283,8 @@ export default async () => {
 
     <div class="control-item">
       <div class="control-label-group">
-        <div class="control-label">${Panel.suggestSwitch.label}</div>
-        <div class="control-desc">${Panel.suggestSwitch.description}</div>
+        <div class="control-label">${Panel.showSuggest.label}</div>
+        <div class="control-desc">${Panel.showSuggest.description}</div>
       </div>
       <div class="control-input">
         <label class="toggle-switch">

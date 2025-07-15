@@ -21,7 +21,7 @@
     }
 
     [theme="dark"] {
-      --vscode-button-background: #8ab4f8;
+      --vscode-button-background: #4285f4;
       --primary-color: #8ab4f8;
       --secondary-color: #81c995;
       --danger-color: #f28b82;
@@ -54,11 +54,18 @@
       transition: background-color 0.3s, color 0.3s;
     }
 
+    percent::after {
+      content: '%';
+      margin-left: 12px;
+      font-size: 1.2em;
+      color: var(--text-color);
+    }
+
     .control-panel {
       position: relative;
       padding: 30px;
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
       background-color: var(--panel-bg);
       border-radius: 16px;
       box-shadow: 0 10px 30px var(--shadow-color);
@@ -216,13 +223,23 @@
 
     .select,
     .input-text {
+      width: 200px;
+      min-width: 150px;
+    }
+
+    .select,
+    .input-text,
+    .input-number {
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 8px 12px;
       background-color: var(--panel-bg);
       color: var(--text-color);
-      width: 200px;
-      min-width: 150px;
+    }
+
+    .input-number {
+      width: 75px;
+      text-align: right;
     }
 
     .select {
@@ -264,14 +281,26 @@
 
     <div class="control-item">
       <div class="control-label-group">
-        <div class="control-label">${Panel.suggestSwitch.label}</div>
-        <div class="control-desc">${Panel.suggestSwitch.description}</div>
+        <div class="control-label">${Panel.showSuggest.label}</div>
+        <div class="control-desc">${Panel.showSuggest.description}</div>
       </div>
       <div class="control-input">
         <label class="toggle-switch">
-          <input type="checkbox" name="suggestSwitch">
+          <input type="checkbox" name="showSuggest">
           <span class="slider"></span>
         </label>
+      </div>
+    </div>
+
+    <div class="control-item">
+      <div class="control-label-group">
+        <div class="control-label">${Panel.workbenchCssPath.label}</div>
+        <div class="control-desc">${Panel.workbenchCssPath.description}</div>
+      </div>
+      <div class="control-input">
+        <input type="text" class="input-text" name="workbenchCssPath" value="${
+              configs.workbenchCssPath
+            }" />
       </div>
     </div>
 
@@ -296,13 +325,27 @@
 
     <div class="control-item">
       <div class="control-label-group">
-        <div class="control-label">${Panel.workbenchCssPath.label}</div>
-        <div class="control-desc">${Panel.workbenchCssPath.description}</div>
+        <div class="control-label">${Panel.gradientBrightness.label}</div>
+        <div class="control-desc">${Panel.gradientBrightness.description}</div>
       </div>
       <div class="control-input">
-        <input type="text" class="input-text" name="workbenchCssPath" value="${
-          configs.workbenchCssPath
-        }" />
+        <input type="text" min="0" max="100" step="1" class="input-number" name="gradientBrightness" value="${
+              configs.gradientBrightness
+            }" />
+        <percent />
+      </div>
+    </div>
+
+    <div class="control-item">
+      <div class="control-label-group">
+        <div class="control-label">${Panel.gradientDarkness.label}</div>
+        <div class="control-desc">${Panel.gradientDarkness.description}</div>
+      </div>
+      <div class="control-input">
+        <input type="number" min="0" max="100" step="1" class="input-number" name="gradientDarkness" value="${
+              configs.gradientDarkness
+            }" />
+        <percent />
       </div>
     </div>
 
@@ -330,7 +373,7 @@
         <div class="control-desc">${Panel.refresh.description}</div>
       </div>
       <div class="control-input">
-        <button class="btn" name="refresh">
+        <button type="button" class="btn" name="refresh">
           <span>${Panel.refresh.button}</span>
         </button>
       </div>
@@ -351,6 +394,7 @@
   </form>
 
   <script>
+    const vscode = typeof acquireVsCodeApi === 'function' ? acquireVsCodeApi() : null;
     const theme = () => {
       const currentTheme = document.body.getAttribute('theme');
       document.body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
@@ -365,10 +409,7 @@
     const picker = find('picker');
     const pickerBtn = find('pickerBtn');
 
-    let isGlobalEnabled = false;
-
     pickerBtn.onclick = picker.click.bind(picker);
-
     picker.addEventListener('input', function () {
       const selectedColor = this.value;
       pickerBtn.style.backgroundColor = selectedColor;
@@ -378,17 +419,18 @@
       pickerBtn.style.color = brightness > 128 ? '#000' : '#fff';
     });
 
-
+    const freeze = () => {
+      settings.classList.add('freeze');
+      setTimeout(() => {
+        settings.classList.remove('freeze');
+      }, 1200);
+    }
 
     settings.addEventListener('change', function (event) {
       event.preventDefault();
       const input = event.target;
       console.log("字段变更", input.name, input.value, input.checked);
-
-      settings.classList.add('freeze');
-      setTimeout(() => {
-        settings.classList.remove('freeze');
-      }, 1200);
+      freeze();
     });
   </script>
 </body>
