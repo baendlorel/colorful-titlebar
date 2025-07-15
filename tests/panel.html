@@ -6,11 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
+      --vscode-button-background: #4285f4;
       --primary-color: #4285f4;
       --secondary-color: #34a853;
       --danger-color: #ea4335;
       --warning-color: #fbbc05;
       --text-color: #202124;
+      --text-color-weak: rgba(32, 33, 36, 0.7);
       --bg-color: #f8f9fa;
       --panel-bg: #ffffff;
       --border-color: #e0e0e0;
@@ -18,11 +20,13 @@
     }
 
     [theme="dark"] {
+      --vscode-button-background: #8ab4f8;
       --primary-color: #8ab4f8;
       --secondary-color: #81c995;
       --danger-color: #f28b82;
       --warning-color: #fde293;
       --text-color: #e8eaed;
+      --text-color-weak: rgba(32, 33, 36, 0.7);
       --bg-color: #202124;
       --panel-bg: #292a2d;
       --border-color: #3c4043;
@@ -68,7 +72,7 @@
     .header h1 {
       color: var(--text-color);
       font-weight: 500;
-      font-size: 24px;
+      font-size: 20px;
     }
 
     .header p {
@@ -77,29 +81,6 @@
       font-size: 14px;
     }
 
-    .theme-toggle {
-      background: none;
-      border: none;
-      color: var(--text-color);
-      cursor: pointer;
-      font-size: 20px;
-      padding: 5px;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.2s;
-    }
-
-    .theme-toggle:hover {
-      background-color: rgba(0, 0, 0, 0.1);
-    }
-
-    [theme="dark"] .theme-toggle:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
 
     .control-item {
       display: flex;
@@ -108,12 +89,21 @@
       margin-bottom: 20px;
     }
 
-    .control-label {
-      font-size: 16px;
+    .control-label-group {
+      flex: 1;
+      display: grid;
+      grid-template-rows: auto auto;
+      font-size: 14px;
       color: var(--text-color);
       font-weight: 500;
       margin-right: 20px;
-      flex: 1;
+    }
+
+    .control-label {}
+
+    .control-desc {
+      font-size: 0.8em;
+      color: var(--text-color-weak)
     }
 
     .control-input {
@@ -124,8 +114,8 @@
     .toggle-switch {
       position: relative;
       display: inline-block;
-      width: 60px;
-      height: 34px;
+      width: 44px;
+      height: 24px;
     }
 
     .toggle-switch input {
@@ -149,27 +139,28 @@
     .slider:before {
       position: absolute;
       content: "";
-      height: 26px;
-      width: 26px;
-      left: 4px;
-      bottom: 4px;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
       background-color: white;
       transition: .4s;
       border-radius: 50%;
     }
 
     input:checked+.slider {
-      background-color: var(--primary-color);
+      background-color: var(--vscode-button-background);
     }
 
     input:checked+.slider:before {
-      transform: translateX(26px);
+      transform: translateX(20px);
     }
 
     .btn {
       border: none;
       border-radius: 8px;
-      padding: 10px 16px;
+      padding: 10px 0px;
+      width: 40px;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
@@ -177,7 +168,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: var(--primary-color);
+      background-color: var(--vscode-button-background);
       color: white;
     }
 
@@ -192,28 +183,21 @@
       border-radius: 8px;
       overflow: hidden;
       border: 1px solid var(--border-color);
+      cursor: pointer;
     }
 
     .color-picker {
-      position: absolute;
-      top: -5px;
-      left: -5px;
-      width: 50px;
-      height: 50px;
-      border: none;
-      cursor: pointer;
       opacity: 0;
     }
 
     .color-preview {
       width: 100%;
       height: 100%;
-      background-color: var(--primary-color);
+      background-color: var(--vscode-button-background);
     }
 
     .icon {
-      margin-right: 8px;
-      font-size: 16px;
+      font-size: 18px;
     }
   </style>
 </head>
@@ -228,8 +212,10 @@
     </div>
 
     <div class="control-item">
-      <label class="control-label">${Panel.gradientSwitch.label}</label>
-      <label class="control-label">${Panel.gradientSwitch.description}</label>
+      <div class="control-label-group">
+        <div class="control-label">${Panel.gradientSwitch.label}</div>
+        <div class="control-desc">${Panel.gradientSwitch.description}</div>
+      </div>
       <div class="control-input">
         <label class="toggle-switch">
           <input type="checkbox" id="gradientSwitch">
@@ -239,7 +225,9 @@
     </div>
 
     <div class="control-item">
-      <label class="control-label">${Panel.gradientSelection.label}</label>
+      <div class="control-label-group">
+        <div class="control-label">${Panel.gradientSelection.label}</div>
+      </div>
       <div class="control-input">
         <select id="gradientSelection">
           <option value="${Style.brightCenter}">${Panel.gradientSelection.brightCenter}</option>
@@ -251,44 +239,41 @@
 
 
     <div class="control-item">
-      <label class="control-label">${Panel.refresh.label}</label>
-      <label class="control-label">${Panel.refresh.description}</label>
+      <div class="control-label-group">
+        <div class="control-label">${Panel.refresh.label}</div>
+        <div class="control-desc">${Panel.refresh.description}</div>
+      </div>
       <div class="control-input">
         <button class="btn" id="refresh">
-          <span class="icon">↻</span>
+          <span class="icon">${Panel.refresh.button}</span>
         </button>
       </div>
     </div>
 
     <div class="control-item">
-      <label class="control-label">${Panel.pickColor.label}</label>
-      <label class="control-label">${Panel.pickColor.description}</label>
+      <div class="control-label-group">
+        <div class="control-label">${Panel.pickColor.label}</div>
+        <div class="control-desc">${Panel.pickColor.description}</div>
+      </div>
       <div class="control-input">
-        <div class="color-picker-container">
+        <div id="colorPickerContainer" class="color-picker-container">
           <input type="color" class="color-picker" id="colorPicker" value="#007ACC">
-          <div class="color-preview"></div>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    const html = document.documentElement;
     const gradientSwitch = document.getElementById('gradientSwitch');
     const refresh = document.getElementById('refresh');
     const colorPicker = document.getElementById('colorPicker');
-    const colorPreview = document.querySelector('.color-preview');
+    const colorPickerContainer = document.getElementById('colorPickerContainer');
 
     let isGlobalEnabled = false;
 
     gradientSwitch.addEventListener('change', function () {
       isGlobalEnabled = this.checked;
       console.log('全局状态:', isGlobalEnabled ? '已开启' : '已关闭');
-
-      document.documentElement.style.setProperty(
-        '--primary-color',
-        isGlobalEnabled ? '#34a853' : '#4285f4'
-      );
     });
 
     refresh.addEventListener('click', function () {
@@ -297,14 +282,15 @@
       alert('系统正在重新计算，请稍候...');
     });
 
+    colorPickerContainer.addEventListener('click', function () {
+      colorPicker.click();
+    });
+
     colorPicker.addEventListener('input', function () {
       const selectedColor = this.value;
       console.log('选择的颜色:', selectedColor);
-      document.documentElement.style.setProperty('--primary-color', selectedColor);
-      colorPreview.style.backgroundColor = selectedColor;
+      colorPickerContainer.style.backgroundColor = selectedColor;
     });
-
-    colorPreview.style.backgroundColor = colorPicker.value;
   </script>
 </body>
 

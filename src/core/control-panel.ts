@@ -276,7 +276,7 @@ export const pickColor = async () => {
       <label class="control-label">${Panel.refresh.description}</label>
       <div class="control-input">
         <button class="btn" id="refresh">
-          <span class="icon">↻</span>
+          <span class="icon">${Panel.refresh.button}</span>
         </button>
       </div>
     </div>

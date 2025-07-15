@@ -29,6 +29,7 @@ export const Msg = (() => {
       refresh: {
         label: '重新计算颜色',
         description: `再次让本插件自动计算颜色`,
+        button: '开始计算',
       },
     },
 
@@ -139,6 +140,7 @@ export const Msg = (() => {
       refresh: {
         label: 'Recalculate Color',
         description: `Recalculate the titlebar color automatically`,
+        button: 'Calculate',
       },
     },
 
