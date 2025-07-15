@@ -1,8 +1,7 @@
 import vscode from 'vscode';
 
-import { RGBA } from '@/common/rgb';
+import { GradientStyle, HashSource } from '@/common/consts';
 import configs from '@/common/configs';
-import { GradientStyle, HashSource, TitleBarConsts } from '@/common/consts';
 import i18n from '@/common/i18n';
 import style from './style';
 
@@ -35,8 +34,9 @@ export default async () => {
       --text-color-weak: rgba(32, 33, 36, 0.7);
       --bg-color: #f8f9fa;
       --panel-bg: #ffffff;
-      --border-color: #e0e0e0;
+      --border-color: rgba(224, 224, 224, 0.5);
       --shadow-color: rgba(0, 0, 0, 0.1);
+      --loading-bg-color: rgba(71, 73, 78, 0.16);
     }
 
     [theme="dark"] {
@@ -46,11 +46,12 @@ export default async () => {
       --danger-color: #f28b82;
       --warning-color: #fde293;
       --text-color: #e8eaed;
-      --text-color-weak: rgba(32, 33, 36, 0.7);
+      --text-color-weak: rgba(232, 234, 237, 0.7);
       --bg-color: #202124;
       --panel-bg: #292a2d;
-      --border-color: #3c4043;
+      --border-color: rgba(60, 64, 67, 0.5);
       --shadow-color: rgba(0, 0, 0, 0.3);
+      --loading-bg-color: rgba(241, 241, 241, 0.16);
     }
 
     * {
@@ -73,18 +74,44 @@ export default async () => {
     }
 
     .control-panel {
+      position: relative;
+      padding: 30px;
+      width: 100%;
+      max-width: 480px;
       background-color: var(--panel-bg);
       border-radius: 16px;
       box-shadow: 0 10px 30px var(--shadow-color);
-      width: 100%;
-      max-width: 500px;
-      padding: 30px;
       transition: background-color 0.3s;
       border: 1px solid var(--border-color);
     }
 
+    .control-panel::after {
+      content: "${Panel.loading}";
+      font-size: 60px;
+      text-align: center;
+      line-height: 382px;
+      color: rgb(237, 237, 237);
+      text-shadow: 1px 3px 6px rgb(107, 107, 107);
+
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0;
+      border-radius: 16px;
+      pointer-events: none;
+      background-color: var(--loading-bg-color);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .freeze::after {
+      opacity: 1;
+      pointer-events: all;
+    }
+
     .header {
-      margin-bottom: 30px;
+      margin-bottom: 40px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -104,9 +131,10 @@ export default async () => {
 
     .control-item {
       display: flex;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
     }
 
     .control-label-group {
@@ -193,16 +221,6 @@ export default async () => {
       opacity: 0.9;
     }
 
-    .picker-container {
-      position: relative;
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-      cursor: pointer;
-    }
-
     .picker {
       width: 0;
       height: 0;
@@ -215,42 +233,47 @@ export default async () => {
       background-color: var(--vscode-button-background);
     }
 
-    select {
+    .select,
+    .input-text {
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 8px 12px;
       background-color: var(--panel-bg);
       color: var(--text-color);
-      cursor: pointer;
+      width: 200px;
+      min-width: 150px;
+    }
+
+    .select {
       transition: all 0.3s ease;
       appearance: none;
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
       background-position: right 8px center;
       background-repeat: no-repeat;
       background-size: 16px;
-      padding-right: 32px;
-      min-width: 120px;
+      padding-right: 26px;
+      cursor: pointer;
     }
 
-    select:hover {
+    .select:hover {
       border-color: var(--vscode-button-background);
       box-shadow: 0 0 0 1px var(--vscode-button-background);
     }
 
-    select:focus {
+    .select:focus {
       outline: none;
       border-color: var(--vscode-button-background);
       box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
     }
 
-    [theme="dark"] select {
+    [theme="dark"] .select {
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%9ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
     }
   </style>
 </head>
 
 <body>
-  <div class="control-panel">
+  <form name="settings" class="control-panel">
     <div class="header">
       <div>
         <h1>${Panel.title}</h1>
@@ -258,6 +281,18 @@ export default async () => {
       </div>
     </div>
 
+    <div class="control-item">
+      <div class="control-label-group">
+        <div class="control-label">${Panel.suggestSwitch.label}</div>
+        <div class="control-desc">${Panel.suggestSwitch.description}</div>
+      </div>
+      <div class="control-input">
+        <label class="toggle-switch">
+          <input type="checkbox" name="suggestSwitch">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
 
     <div class="control-item">
       <div class="control-label-group">
@@ -265,7 +300,8 @@ export default async () => {
         <div class="control-desc">${Panel.gradient.description}</div>
       </div>
       <div class="control-input">
-        <select id="gradient">
+        <select name="gradient" class="select">
+          <option value="" selected>${Panel.gradient.empty}</option>
           <option value="${GradientStyle.BrightCenter}">${
     Panel.gradient[GradientStyle.BrightCenter]
   }</option>
@@ -279,11 +315,23 @@ export default async () => {
 
     <div class="control-item">
       <div class="control-label-group">
+        <div class="control-label">${Panel.workbenchCssPath.label}</div>
+        <div class="control-desc">${Panel.workbenchCssPath.description}</div>
+      </div>
+      <div class="control-input">
+        <input type="text" class="input-text" name="workbenchCssPath" value="${
+          configs.workbenchCssPath
+        }" />
+      </div>
+    </div>
+
+    <div class="control-item">
+      <div class="control-label-group">
         <div class="control-label">${Panel.hashSource.label}</div>
         <div class="control-desc">${Panel.hashSource.description}</div>
       </div>
       <div class="control-input">
-        <select id="hashSource">
+        <select name="hashSource" class="select">
           <option value="${HashSource.FullPath}">${Panel.hashSource[HashSource.FullPath]}</option>
           <option value="${HashSource.ProjectName}">${
     Panel.hashSource[HashSource.ProjectName]
@@ -301,7 +349,7 @@ export default async () => {
         <div class="control-desc">${Panel.refresh.description}</div>
       </div>
       <div class="control-input">
-        <button class="btn" id="refresh">
+        <button class="btn" name="refresh">
           <span>${Panel.refresh.button}</span>
         </button>
       </div>
@@ -313,47 +361,58 @@ export default async () => {
         <div class="control-desc">${Panel.pickColor.description}</div>
       </div>
       <div class="control-input">
-        <div id="pickerContainer" class="picker-container" style="background-color: #007ACC;">
-          <input type="color" class="picker" id="picker" value="#007ACC">
-        </div>
+        <button type="button" class="btn" name="pickerBtn" style="background-color: #007ACC;">
+          asdf
+        </button>
+        <input type="color" class="picker" name="picker" value="#007ACC">
       </div>
     </div>
-  </div>
+  </form>
 
   <script>
-    const find = document.getElementById.bind(document);
-    const gradientSwitch = find('gradientSwitch');
+    const theme = () => {
+      const currentTheme = document.body.getAttribute('theme');
+      document.body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
+    }
+
+    const find = (name) => document.getElementsByName(name)[0];
+    /**
+     * @type {HTMLFormElement}
+     */
+    const settings = find('settings');
     const refresh = find('refresh');
     const picker = find('picker');
-    const pickerContainer = find('pickerContainer');
+    const pickerBtn = find('pickerBtn');
 
     let isGlobalEnabled = false;
 
-    gradientSwitch.addEventListener('change', function () {
-      isGlobalEnabled = this.checked;
-      console.log('全局状态:', isGlobalEnabled ? '已开启' : '已关闭');
-    });
-
-    refresh.addEventListener('click', function () {
-      console.log('正在重新计算...');
-      // 这里可以添加实际的重新计算逻辑
-      alert('系统正在重新计算，请稍候...');
-    });
-
-    pickerContainer.addEventListener('click', function () {
-      picker.click();
-    });
+    pickerBtn.onclick = picker.click.bind(picker);
 
     picker.addEventListener('input', function () {
       const selectedColor = this.value;
-      console.log('选择的颜色:', selectedColor);
-      pickerContainer.style.backgroundColor = selectedColor;
+      pickerBtn.style.backgroundColor = selectedColor;
+
+      const [r, g, b] = this.value.replace('#', '').match(/.{2}/g).map(hex => parseInt(hex, 16));
+      const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
+      pickerBtn.style.color = brightness > 128 ? '#000' : '#fff';
+    });
+
+
+
+    settings.addEventListener('change', function (event) {
+      event.preventDefault();
+      const input = event.target;
+      console.log("字段变更", input.name, input.value, input.checked);
+
+      settings.classList.add('freeze');
+      setTimeout(() => {
+        settings.classList.remove('freeze');
+      }, 1200);
     });
   </script>
 </body>
 
-</html>
-`;
+</html>`;
 
   panel.webview.onDidReceiveMessage(async (message) => {
     try {

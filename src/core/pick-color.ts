@@ -1,12 +1,12 @@
 import vscode from 'vscode';
 
-import { RGBA } from '@/common/rgb';
-import { configs } from '@/common/configs';
 import { TitleBarConsts } from '@/common/consts';
+import RGBA from '@/common/rgba';
+import configs from '@/common/configs';
 import i18n from '@/common/i18n';
 import style from './style';
 
-const PickColor = Msg.Commands.pickColor;
+const PickColor = i18n.Commands.pickColor;
 
 /**
  * Opens a color picker to manually select titlebar color
@@ -170,7 +170,7 @@ export const pickColor = async () => {
           panel.dispose();
           break;
         case 'reset':
-          await refreshTitleBar(true);
+          await style.applyIfNotSet();
           vscode.window.showInformationMessage(PickColor.colorReset);
           panel.dispose();
           break;

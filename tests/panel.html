@@ -283,8 +283,12 @@
       <div class="control-input">
         <select name="gradient" class="select">
           <option value="" selected>${Panel.gradient.empty}</option>
-          <option value="${GradientStyle.BrightCenter}">${Panel.gradient[GradientStyle.BrightCenter]}</option>
-          <option value="${GradientStyle.BrightLeft}">${Panel.gradient[GradientStyle.BrightLeft]}</option>
+          <option value="${GradientStyle.BrightCenter}">${
+            Panel.gradient[GradientStyle.BrightCenter]
+            }</option>
+          <option value="${GradientStyle.BrightLeft}">${
+            Panel.gradient[GradientStyle.BrightLeft]
+            }</option>
           <option value="${GradientStyle.ArcLeft}">${Panel.gradient[GradientStyle.ArcLeft]}</option>
         </select>
       </div>
@@ -296,7 +300,9 @@
         <div class="control-desc">${Panel.workbenchCssPath.description}</div>
       </div>
       <div class="control-input">
-        <input type="text" class="input-text" name="workbenchCssPath" value="${configs.}" />
+        <input type="text" class="input-text" name="workbenchCssPath" value="${
+          configs.workbenchCssPath
+        }" />
       </div>
     </div>
 

@@ -2,10 +2,10 @@ import vscode from 'vscode';
 import { join } from 'node:path';
 import { readdir, readFile, rm } from 'node:fs/promises';
 
+import { Commands, SettingsJson, TitleBarConsts } from '@/common/consts';
 import i18n from '@/common/i18n';
 import configs from '@/common/configs';
-import { Commands, SettingsJson, TitleBarConsts } from '@/common/consts';
-import { suggestInfo } from '@/common/notifications';
+import popSuggest from '@/common/pop-suggest';
 
 import { getColor } from './colors';
 
@@ -58,7 +58,7 @@ class TitleBarStyle {
       const suggest = i18n.Commands.pickColor.suggest;
 
       // 询问用户是否要手动选择颜色
-      const result = await suggestInfo(suggest.msg, suggest.yes, suggest.no);
+      const result = await popSuggest(suggest.msg, suggest.yes, suggest.no);
 
       if (result === suggest.yes) {
         // 通过命令ID拉起颜色选择器，避免循环引用

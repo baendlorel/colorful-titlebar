@@ -3,7 +3,7 @@ import vscode from 'vscode';
 import configs from './configs';
 import i18n from './i18n';
 
-export const suggestInfo = configs.showSuggest
+export default configs.showSuggest
   ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async (msg: string, ...items: any[]) => {
       const result = await vscode.window.showInformationMessage(

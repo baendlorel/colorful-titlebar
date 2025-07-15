@@ -2,8 +2,8 @@ import { basename } from 'node:path';
 import { createHash } from 'node:crypto';
 
 import { HashSource } from '@/common/consts';
-import { configs } from '@/common/configs';
-import { RGBA } from '@/common/rgb';
+import configs from '@/common/configs';
+import RGBA from '@/common/rgba';
 
 /**
  * 根据项目名称获取颜色套组

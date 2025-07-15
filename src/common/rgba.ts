@@ -66,7 +66,7 @@ const toHex = (n: number) => Math.round(n).toString(16).padStart(2, '0');
  * RGBColor 类用于处理 RGB 颜色。
  * 支持从字符串解析颜色，混合颜色，转换为 hex 字符串等功能。
  */
-export class RGBA {
+export default class RGBA {
   private r = 0;
   private g = 0;
   private b = 0;

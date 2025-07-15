@@ -2,9 +2,9 @@ import vscode from 'vscode';
 import { readFile } from 'node:fs/promises';
 
 import { GradientStyle } from '@/common/consts';
-import { suggestInfo } from '@/common/notifications';
 import i18n from '@/common/i18n';
 import configs from '@/common/configs';
+import popSuggest from '@/common/pop-suggest';
 
 import { Css } from './consts';
 import hacker from './hackers';
@@ -26,7 +26,7 @@ class Gradient {
     if (!configs.showSuggest) {
       return;
     }
-    const now = await suggestInfo(this.Enable.suggest.msg, this.Enable.suggest.yes);
+    const now = await popSuggest(this.Enable.suggest.msg, this.Enable.suggest.yes);
     if (now !== this.Enable.suggest.yes) {
       return;
     }
