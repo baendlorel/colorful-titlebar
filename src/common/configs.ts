@@ -47,6 +47,8 @@ class Config {
 
   readonly cwd: string;
 
+  readonly lang = vscode.env.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+
   constructor() {
     const cwd = vscode.workspace.workspaceFolders?.[0];
     this.cwd = cwd?.uri.fsPath ?? '';

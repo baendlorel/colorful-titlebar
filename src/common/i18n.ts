@@ -2,7 +2,7 @@ import vscode from 'vscode';
 import { Consts, GradientStyle, HashSource, TitleBarConsts } from './consts';
 
 export default (() => {
-  const Zh = {
+  const zh = {
     Unknown: '未知',
 
     BlockAllSuggestion: { button: '屏蔽所有建议' },
@@ -137,7 +137,7 @@ export default (() => {
     SetTitleBarStyleToCustomSuccess: `标题栏样式已设置为${TitleBarConsts.Expected}，重启VS Code后生效`,
   };
 
-  const En = {
+  const en = {
     Unknown: 'unknown',
     BlockAllSuggestion: { button: 'Block Suggestions' },
     NotWorkspace: 'No workspace folder opened, titlebar color remains unchanged',
@@ -275,8 +275,8 @@ export default (() => {
     SetTitleBarStyleToCustom: 'Set it for me',
     Cancel: 'Not now',
     SetTitleBarStyleToCustomSuccess: `"titleBarStyle" has been set to ${TitleBarConsts.Expected}, Please restart VS Code to make it work`,
-  } satisfies typeof Zh;
+  } satisfies typeof zh;
 
   const isChinese = vscode.env.language.toLowerCase().startsWith('zh');
-  return isChinese ? Zh : En;
+  return isChinese ? zh : en;
 })();

@@ -84,7 +84,7 @@
       pointer-events: none;
       background-color: var(--loading-bg-color);
       opacity: 0;
-      transition: opacity 0.3s cubic-bezier(1, 0.00, 0.88, 1);
+      transition: opacity 0.3s;
     }
 
     .freeze::after {
@@ -318,6 +318,7 @@
               configs.workbenchCssPath
             }" />
       </div>
+      <div class="control-error" name="workbenchCssPath"></div>
     </div>
 
     <div class="control-item">
@@ -349,6 +350,7 @@
               gradientBrightness
             }" />
       </div>
+      <div class="control-error" name="gradientBrightness"></div>
     </div>
 
     <div class="control-item">
@@ -361,7 +363,7 @@
               gradientDarkness
             }" />
       </div>
-      <div class="control-error"></div>
+      <div class="control-error" name="gradientDarkness"></div>
     </div>
 
     <div class="control-item">
@@ -414,17 +416,52 @@
       const currentTheme = document.body.getAttribute('theme');
       document.body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
     }
-    const find = (name) => document.getElementsByName(name)[0];
+    const find = (name, isErrorDiv = false) => {
+      const list = document.getElementsByName(name);
+      for (let i = 0; i < list.length; i++) {
+        const element = list[i];
+        if (isErrorDiv) {
+          if (element.tagName === 'DIV' && element.classList.contains('control-error')) {
+            return element;
+          }
+        } else {
+          return element;
+        }
 
+      }
+    };
+
+    const i18n = (() => {
+      const zh = {
+        NumberLimit: (min, max, isInt = true) => `请输入${min}到${max}之间的${isInt ? '整数' : '数'}`
+      }
+      const en = {
+        NumberLimit: (min, max, isInt = true) => `Please input ${isInt ? 'an integer' : 'a number'} between ${min} and ${max}`
+      }
+      switch ('${configs.lang}') {
+        case 'zh':
+          return zh;
+        case 'en':
+          return en;
+        default:
+          return zh;
+      }
+    })()
+
+    /**
+     * @type {HTMLFormElement} 
+     */
     const settings = find('settings');
     const picker = find('picker');
     const pickerBtn = find('pickerBtn');
 
     const freeze = () => {
-      settings.classList.add('freeze');
+      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = true)
+      setTimeout(() => settings.classList.add('freeze'), 850);
       setTimeout(() => {
         settings.classList.remove('freeze');
-      }, 1200);
+        Array.prototype.forEach.call(settings.elements, (el) => el.disabled = false)
+      }, 1600);
     }
 
     pickerBtn.onclick = picker.click.bind(picker);
@@ -438,6 +475,7 @@
 
     settings.addEventListener('change', function (event) {
       event.preventDefault();
+      document.querySelectorAll('.control-error').forEach(el => el.innerText = '');
       const input = event.target;
       // 如果数字类不符合要求，则返回并提示
       if (input.type === 'number') {
@@ -448,11 +486,12 @@
         min = Number.isNaN(min) ? Infinity : min;
 
         if (Number.isNaN(value) || value < min || value > max) {
-          alert('请输入0到100之间的数字');
+          find(input.name, true).innerText = '请输入0到100之间的整数';
           input.value = input.defaultValue; // 恢复默认值
           return;
         }
       }
+
 
       freeze();
       const isSwitch = input.tagName === 'INPUT' && input.type === 'checkbox';
