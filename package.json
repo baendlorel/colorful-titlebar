@@ -52,6 +52,11 @@
         "command": "colorful-titlebar.pickColor",
         "title": "%command.pickColor.title%",
         "category": "%extension.category%"
+      },
+      {
+        "command": "colorful-titlebar.refresh",
+        "title": "%command.refresh.title%",
+        "category": "%extension.category%"
       }
     ],
     "configuration": {

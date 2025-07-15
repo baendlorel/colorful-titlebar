@@ -21,6 +21,10 @@ const suggest = async () => {
     }
   }
 
+  // 不建议的话只会阻止suggestInfo弹窗，要手动返回
+  if (!configs.showSuggest) {
+    return;
+  }
   const now = await suggestInfo(Enable.suggest.msg, Enable.suggest.button);
   if (now !== Enable.suggest.button) {
     return;

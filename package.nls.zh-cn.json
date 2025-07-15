@@ -3,6 +3,7 @@
   "command.enableGradient.title": "启用/切换标题栏渐变",
   "command.disableGradient.title": "禁用标题栏渐变",
   "command.pickColor.title": "选择标题栏颜色",
+  "command.refresh.title": "刷新标题栏颜色",
   "configuration.title": "彩色标题栏",
   "configuration.gradientBrightness.description": "表示渐变特效在亮的位置具体有多亮，给出0~1之间的两位小数",
   "configuration.gradientDarkness.description": "表示渐变特效在暗的位置具体有多暗，给出0~1之间的两位小数",

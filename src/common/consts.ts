@@ -22,6 +22,7 @@ export const enum Commands {
   EnableGradient = `${Consts.Name}.enableGradient`,
   DisableGradient = `${Consts.Name}.disableGradient`,
   PickColor = `${Consts.Name}.pickColor`,
+  Refresh = `${Consts.Name}.refresh`,
 }
 
 export const enum HashSource {

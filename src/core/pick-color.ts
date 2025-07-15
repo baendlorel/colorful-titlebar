@@ -4,7 +4,9 @@ import { RGBA } from '@/common/rgb';
 import { configs } from '@/common/configs';
 import { TitleBarStyle } from '@/common/consts';
 import { Msg } from '@/common/i18n';
-import { clearTitleBarColor } from './style';
+import { refreshTitleBar } from './style';
+
+const PickColor = Msg.Commands.pickColor;
 
 /**
  * Opens a color picker to manually select titlebar color
@@ -14,17 +16,17 @@ export const pickColor = async () => {
   const titleBarStyle = configs.global.get<string>(TitleBarStyle.Section);
   if (titleBarStyle !== TitleBarStyle.Expected) {
     const result = await vscode.window.showWarningMessage(
-      Msg.Commands.pickColor.titleBarStyleWarning,
-      Msg.Commands.pickColor.setStyleButton,
-      Msg.Commands.pickColor.cancelButton
+      PickColor.titleBarStyleWarning,
+      PickColor.setStyleButton,
+      PickColor.cancelButton
     );
-    if (result === Msg.Commands.pickColor.setStyleButton) {
+    if (result === PickColor.setStyleButton) {
       await configs.global.update(
         TitleBarStyle.Section,
         TitleBarStyle.Expected,
         vscode.ConfigurationTarget.Global
       );
-      vscode.window.showInformationMessage(Msg.Commands.pickColor.styleSetSuccess);
+      vscode.window.showInformationMessage(PickColor.styleSetSuccess);
     } else {
       return;
     }
@@ -32,7 +34,7 @@ export const pickColor = async () => {
 
   const panel = vscode.window.createWebviewPanel(
     'colorPicker',
-    Msg.Commands.pickColor.title,
+    PickColor.title,
     vscode.ViewColumn.One,
     { enableScripts: true }
   );
@@ -115,8 +117,6 @@ export const pickColor = async () => {
           const color = e.target.value;
           preview.style.backgroundColor = color;
           colorValue.textContent = color;
-          
-          // Calculate text color for better contrast
           const rgb = hexToRgb(color);
           const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
           preview.style.color = brightness > 128 ? '#000000' : '#ffffff';
@@ -153,12 +153,12 @@ export const pickColor = async () => {
       switch (message.command) {
         case 'applyColor':
           await applyManualColor(message.color);
-          vscode.window.showInformationMessage(`Titlebar color applied: ${message.color}`);
+          vscode.window.showInformationMessage(PickColor.colorApplied(message.color));
           panel.dispose();
           break;
         case 'resetColor':
-          await clearTitleBarColor();
-          vscode.window.showInformationMessage('Titlebar color reset to auto-generated');
+          await refreshTitleBar();
+          vscode.window.showInformationMessage(PickColor.colorReset);
           panel.dispose();
           break;
       }

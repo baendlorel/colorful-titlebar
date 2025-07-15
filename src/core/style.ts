@@ -15,7 +15,7 @@ interface StyleConfig {
 /**
  * 设置标题栏颜色
  */
-export const applyTitleBarColor = async () => {
+export const refreshTitleBar = async () => {
   if (!configs.cwd) {
     return;
   }
@@ -75,6 +75,24 @@ export const clearTitleBarColor = async () => {
 };
 
 // # region Checking
+
+/**
+ * 看看是不是已经设置了颜色，已经设置了就不要重复了
+ */
+export const alreadySetTitleBarColor = (): boolean => {
+  const workspaceConfig = configs.global.inspect(TitleBarStyle.WorkbenchSection);
+  const workspaceValue = workspaceConfig?.workspaceValue as StyleConfig | undefined;
+
+  if (!workspaceValue) {
+    return false;
+  }
+
+  return (
+    workspaceValue[TitleBarStyle.ActiveBg] !== undefined &&
+    workspaceValue[TitleBarStyle.InactiveBg] !== undefined
+  );
+};
+
 const checkDirIsProject = async () => {
   const list = await readdir(configs.cwd);
   const indicators = configs.projectIndicators;
