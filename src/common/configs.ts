@@ -93,6 +93,17 @@ class Config {
     return Config.self.get<boolean>(Prop.ShowSuggest, true);
   }
 
+  get theme(): 'dark' | 'light' {
+    switch (vscode.window.activeColorTheme.kind) {
+      case vscode.ColorThemeKind.Dark:
+      case vscode.ColorThemeKind.HighContrast:
+        return 'dark';
+      case vscode.ColorThemeKind.Light:
+      case vscode.ColorThemeKind.HighContrastLight:
+        return 'light';
+    }
+  }
+
   get colorSet() {
     let colors: string[];
     switch (vscode.window.activeColorTheme.kind) {

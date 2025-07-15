@@ -9,6 +9,29 @@ export const Msg = (() => {
     NotWorkspace: '没有打开工作区文件夹，不改变标题栏颜色',
     NotProject: '当前不是项目目录，不改变标题栏颜色',
 
+    ControlPanel: {
+      title: 'Colorful Titlebar 控制面板',
+      description: '在这里可以控制标题栏颜色和样式',
+      gradientSwitch: {
+        label: '使用渐变',
+        description: `需提供${Consts.MainCssFileName}路径，开启后将会给标题栏增加渐变特效。（会提示VS Code 损坏，这是正常的，选“不再显示即可”）`,
+      },
+      gradientSelection: {
+        label: '渐变样式',
+        brightLeft: '左侧较亮',
+        brightCenter: '中间较亮',
+        arcLeft: '左侧弧光',
+      },
+      pickColor: {
+        label: '指定当前颜色',
+        description: `直接指定当前打开的项目的标题栏颜色，若不满意可以手动选择`,
+      },
+      refresh: {
+        label: '重新计算颜色',
+        description: `再次让本插件自动计算颜色`,
+      },
+    },
+
     Commands: {
       enableGradient: {
         suggest: {
@@ -95,6 +118,29 @@ export const Msg = (() => {
     DontShowAgain: { button: 'Do not show again' },
     NotWorkspace: 'No workspace folder opened, titlebar color remains unchanged',
     NotProject: 'Current folder is not a project directory, titlebar color remains unchanged',
+
+    ControlPanel: {
+      title: 'Colorful Titlebar Control Panel',
+      description: 'Control titlebar color and style here',
+      gradientSwitch: {
+        label: 'Use Gradient',
+        description: `Requires path to ${Consts.MainCssFileName}, enables gradient effect on title bar`,
+      },
+      gradientSelection: {
+        label: 'Gradient Style',
+        brightLeft: 'Bright Left',
+        brightCenter: 'Bright Center',
+        arcLeft: 'Arc Left',
+      },
+      pickColor: {
+        label: 'Specify Current Color',
+        description: `Directly specify the titlebar color for the current project manually`,
+      },
+      refresh: {
+        label: 'Recalculate Color',
+        description: `Recalculate the titlebar color automatically`,
+      },
+    },
 
     Commands: {
       enableGradient: {

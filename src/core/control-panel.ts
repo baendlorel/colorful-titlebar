@@ -1,3 +1,24 @@
+import vscode from 'vscode';
+
+import { RGBA } from '@/common/rgb';
+import { configs } from '@/common/configs';
+import { TitleBarStyle } from '@/common/consts';
+import { Msg } from '@/common/i18n';
+import { refreshTitleBar } from './style';
+
+/**
+ * Opens a color picker to manually select titlebar color
+ */
+export const pickColor = async () => {
+  const Panel = Msg.ControlPanel;
+  const Style = Msg.Commands.enableGradient.style;
+  const panel = vscode.window.createWebviewPanel(
+    'controllPanel',
+    Panel.title,
+    vscode.ViewColumn.One,
+    { enableScripts: true }
+  );
+  panel.webview.html = `
 <!DOCTYPE html>
 <html lang="zh-CN" theme="${configs.theme}">
 
@@ -308,4 +329,28 @@
   </script>
 </body>
 
-</html>
+</html>`;
+
+  panel.webview.onDidReceiveMessage(async (message) => {
+    try {
+      switch (message.command) {
+        case 'reset':
+          await refreshTitleBar(true);
+          vscode.window.showInformationMessage(PickColor.colorReset);
+          panel.dispose();
+          break;
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        vscode.window.showErrorMessage(PickColor.error(error.message));
+      } else {
+        vscode.window.showErrorMessage(String(error));
+      }
+    }
+  });
+};
+
+/**
+ * Apply manually selected color to titlebar
+ */
+const applyManualColor = async (colorHex: string) => {};
