@@ -39,23 +39,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "colorful-titlebar.enableGradient",
-        "title": "%command.enableGradient.title%",
-        "category": "%extension.category%"
-      },
-      {
-        "command": "colorful-titlebar.disableGradient",
-        "title": "%command.disableGradient.title%",
-        "category": "%extension.category%"
-      },
-      {
-        "command": "colorful-titlebar.pickColor",
-        "title": "%command.pickColor.title%",
-        "category": "%extension.category%"
-      },
-      {
-        "command": "colorful-titlebar.refresh",
-        "title": "%command.refresh.title%",
+        "command": "colorful-titlebar.controlPanel",
+        "title": "%command.controlPanel.title%",
         "category": "%extension.category%"
       }
     ],

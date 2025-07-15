@@ -1,18 +1,15 @@
 import vscode from 'vscode';
 
 import { Commands } from '@/common/consts';
-import { pickColor } from '@/core/pick-color';
-
-import catcher from '@/common/catcher';
-import gradient from '@/features/gradient';
-import style from './core/style';
+import controlPanel from '@/core/control-panel';
 
 export default (context: vscode.ExtensionContext) => {
   const commands: vscode.Disposable[] = [
-    vscode.commands.registerCommand(Commands.EnableGradient, catcher(gradient.enable)),
-    vscode.commands.registerCommand(Commands.DisableGradient, catcher(gradient.disable)),
-    vscode.commands.registerCommand(Commands.Refresh, style.refresh.bind(style)),
-    vscode.commands.registerCommand(Commands.PickColor, pickColor),
+    // vscode.commands.registerCommand(Commands.EnableGradient, catcher(gradient.enable)),
+    // vscode.commands.registerCommand(Commands.DisableGradient, catcher(gradient.disable)),
+    // vscode.commands.registerCommand(Commands.Refresh, style.refresh.bind(style)),
+    // vscode.commands.registerCommand(Commands.PickColor, pickColor),
+    vscode.commands.registerCommand(Commands.ControlPanel, controlPanel),
   ].filter((v) => v !== undefined);
   context.subscriptions.push(...commands);
 };
