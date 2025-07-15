@@ -46,7 +46,7 @@ export default async () => {
   <style>
     :root {
       --primary-color: #4285f4;
-      --secondary-color: #34a853;
+      --success-color: #34a853;
       --danger-color: #ea4335;
       --warning-color: #fbbc05;
       --text-color: #202124;
@@ -60,7 +60,7 @@ export default async () => {
 
     [theme="dark"] {
       --primary-color: #4285f4;
-      --secondary-color: #34a853;
+      --success-color: #34a853;
       --danger-color: #ea4335;
       --warning-color: #fbbc05;
       --text-color: #e8eaed;
@@ -150,7 +150,7 @@ export default async () => {
     .control-item {
       display: grid;
       grid-template-columns: 1fr auto;
-      grid-template-rows: auto auto;
+      grid-template-rows: auto auto auto;
       margin-bottom: 10px;
       padding-bottom: 10px;
       align-items: center;
@@ -169,13 +169,19 @@ export default async () => {
 
     .control-desc {
       font-size: 0.8em;
-      color: var(--text-color-weak)
+      color: var(--text-color-weak);
     }
 
     .control-error {
       grid-column: 1 / span 2;
       font-size: 0.8em;
-      color: var(--danger-color)
+      color: var(--danger-color);
+    }
+
+    .control-succ {
+      grid-column: 1 / span 2;
+      font-size: 0.8em;
+      color: var(--success-color);
     }
 
     .control-input {
@@ -342,6 +348,7 @@ export default async () => {
         </label>
       </div>
       <div class="control-error" name="showSuggest"></div>
+      <div class="control-succ" name="showSuggest"></div>
     </div>
 
     <div class="control-item">
@@ -355,6 +362,7 @@ export default async () => {
         }" />
       </div>
       <div class="control-error" name="workbenchCssPath"></div>
+      <div class="control-succ" name="workbenchCssPath"></div>
     </div>
 
     <div class="control-item">
@@ -375,6 +383,7 @@ export default async () => {
         </select>
       </div>
       <div class="control-error" name="gradient"></div>
+      <div class="control-succ" name="gradient"></div>
     </div>
 
     <div class="control-item">
@@ -386,6 +395,7 @@ export default async () => {
         <input type="number" min="0" max="100" step="5" class="" name="gradientBrightness" value="${gradientBrightness}" />
       </div>
       <div class="control-error" name="gradientBrightness"></div>
+      <div class="control-succ" name="gradientBrightness"></div>
     </div>
 
     <div class="control-item">
@@ -397,6 +407,7 @@ export default async () => {
         <input type="number" min="0" max="100" step="5" class="" name="gradientDarkness" value="${gradientDarkness}" />
       </div>
       <div class="control-error" name="gradientDarkness"></div>
+      <div class="control-succ" name="gradientDarkness"></div>
     </div>
 
     <div class="control-item">
@@ -416,6 +427,7 @@ export default async () => {
         </select>
       </div>
       <div class="control-error" name="hashSource"></div>
+      <div class="control-succ" name="hashSource"></div>
     </div>
 
     <div class="control-item">
@@ -429,6 +441,7 @@ export default async () => {
         </button>
       </div>
       <div class="control-error" name="refresh"></div>
+      <div class="control-succ" name="refresh"></div>
     </div>
 
     <div class="control-item">
@@ -443,6 +456,7 @@ export default async () => {
         <input type="color" class="picker" name="pickColor" value="#007ACC">
       </div>
       <div class="control-error" name="pickColor"></div>
+      <div class="control-succ" name="pickColor"></div>
     </div>
   </form>
 
@@ -452,20 +466,17 @@ export default async () => {
       const currentTheme = document.body.getAttribute('theme');
       document.body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
     }
-    const find = (name, isControlError = false) => {
-      const list = document.getElementsByName(name);
-      for (let i = 0; i < list.length; i++) {
-        const element = list[i];
-        if (isControlError) {
-          if (element.classList.contains('control-error')) {
-            return element;
-          }
-        } else {
-          if (!element.classList.contains('control-error')) {
-            return element;
-          }
-        }
 
+    // tp = form | error | succ
+    const find = (name, tp = 'form') => {
+      switch (tp) {
+        case 'succ':
+          return document.querySelector(['.control-succ[name=', name, ']'].join(''));
+        case 'error':
+          return document.querySelector(['.control-error[name=', name, ']'].join(''));
+        case 'form':
+        default:
+          return document.querySelector(['[name=', name, ']:not(.control-error):not(.control-succ)'].join(''))
       }
     };
 
@@ -519,7 +530,11 @@ export default async () => {
 
     settings.addEventListener('change', function (event) {
       event.preventDefault();
-      document.querySelectorAll('.control-error').forEach(el => el.innerText = '');
+      document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
+      const data = {
+        name: input.name,
+        value: input.value
+      }
       const input = event.target;
       // 如果数字类不符合要求，则返回并提示
       if (input.type === 'number') {
@@ -530,33 +545,28 @@ export default async () => {
         min = Number.isNaN(min) ? Infinity : min;
 
         if (Number.isNaN(value) || value < min || value > max) {
-          find(input.name, true).innerText = i18n.NumberLimit(min, max, true);
+          find(input.name, 'error').innerText = i18n.NumberLimit(min, max, true);
           input.value = input.defaultValue; // 恢复默认值
           return;
         }
-
+        data.value = value;
+      } else if (input.type === 'checkbox') {
+        data.value = input.checked;
       }
 
-
       freeze();
-      const isSwitch = input.tagName === 'INPUT' && input.type === 'checkbox';
-      vscode.postMessage({
-        command: input.name,
-        value: isSwitch ? input.checked : input.value
-      });
+      vscode.postMessage(data);
     });
 
     window.addEventListener('message', (event) => {
       const resp = event.data;
-      // const text = document.createElement('div');
-      // text.innerText = 'asd' + msg.text + ', command:' + msg.command;
-      // text.style.fontSize = '15px';
-      // document.body.append(text);
-      // alert在插件里的webview中无效
-      if (resp.from === 'colorful-titlebar') {
-        if (!resp.succ) {
-          find(resp.name, true).textContent = resp.msg;
-        }
+      if (resp.from !== 'colorful-titlebar') {
+        return;
+      }
+      if (resp.succ) {
+        find(resp.name, 'succ').textContent = resp.msg;
+      } else {
+        find(resp.name, 'error').textContent = resp.msg;
       }
     });
   </script>
