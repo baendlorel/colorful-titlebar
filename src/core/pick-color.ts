@@ -90,21 +90,21 @@ export const pickColor = async () => {
     </head>
     <body>
       <div class="container">
-        <h2>Pick Titlebar Color</h2>
-        <p>Select a color for your titlebar:</p>
+        <h2>${PickColor.title}</h2>
+        <p>${PickColor.html.description}</p>
         
         <input type="color" id="colorPicker" class="color-input" value="#6366f1" />
         
         <div class="current-color">
-          Current color: <span id="colorValue">#6366f1</span>
+          ${PickColor.html.colorValue} <span id="colorValue">#6366f1</span>
         </div>
         
         <div id="preview" class="preview" style="background-color: #6366f1; color: white;">
-          Titlebar Preview
+          ${PickColor.html.preview}
         </div>
         
-        <button class="button" onclick="applyColor()">Apply Color</button>
-        <button class="button" onclick="resetColor()">Reset to Auto</button>
+        <button class="button" onclick="applyColor()">${PickColor.html.apply}</button>
+        <button class="button" onclick="resetColor()">${PickColor.html.reset}</button>
       </div>
 
       <script>

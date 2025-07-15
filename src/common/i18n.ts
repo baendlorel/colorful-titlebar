@@ -45,6 +45,14 @@ export const Msg = (() => {
       },
       pickColor: {
         title: '选择标题栏颜色',
+        html: {
+          description: '选择一个颜色来设置标题栏的背景色',
+          input: '选择颜色',
+          preview: '预览',
+          colorValue: '颜色值',
+          apply: '应用',
+          reset: '重置',
+        },
         titleBarStyleWarning: '标题栏样式必须设置为"custom"才能应用颜色。您想现在设置吗？',
         setStyleButton: '是的',
         cancelButton: '不了',
@@ -120,6 +128,14 @@ export const Msg = (() => {
       },
       pickColor: {
         title: 'Pick Titlebar Color',
+        html: {
+          description: 'Select a color to set the titlebar background',
+          input: 'Pick Color',
+          preview: 'Preview',
+          colorValue: 'Color Value',
+          apply: 'Apply',
+          reset: 'Reset',
+        },
         titleBarStyleWarning:
           'Title bar style must be set to "custom" to apply colors. Would you like to set it now?',
         setStyleButton: 'Yes',
