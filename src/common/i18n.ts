@@ -12,6 +12,11 @@ export const Msg = (() => {
     ControlPanel: {
       title: 'Colorful Titlebar 控制面板',
       description: '在这里可以控制标题栏颜色和样式',
+      loading: '更新中...',
+      suggestSwitch: {
+        label: '显示建议',
+        description: `显示偶尔会弹出的建议`,
+      },
       gradientSwitch: {
         label: '使用渐变',
         description: `需提供${Consts.MainCssFileName}路径，开启后将会给标题栏增加渐变特效。（会提示VS Code 损坏，这是正常的，选“不再显示即可”）`,
@@ -23,6 +28,10 @@ export const Msg = (() => {
         [GradientStyle.BrightLeft]: '左侧较亮',
         [GradientStyle.ArcLeft]: '左侧弧光',
       },
+      mainCssPath: {
+        label: `${Consts.MainCssFileName}路径`,
+        description: '本插件将会修改这个文件来实现渐变特效',
+      },
       hashSource: {
         label: 'Hash入参',
         description: `将会以设定的内容作为计算Hash的依据`,
@@ -33,6 +42,7 @@ export const Msg = (() => {
       pickColor: {
         label: '指定当前颜色',
         description: `直接指定当前打开的项目的标题栏颜色，若不满意可以手动选择`,
+        button: '选择颜色',
       },
       refresh: {
         label: '重新计算颜色',
@@ -131,6 +141,11 @@ export const Msg = (() => {
     ControlPanel: {
       title: 'Colorful Titlebar Control Panel',
       description: 'Control titlebar color and style here',
+      loading: 'Updating...',
+      suggestSwitch: {
+        label: 'Show Suggestions',
+        description: `Turning it off will block all suggestions`,
+      },
       gradientSwitch: {
         label: 'Use Gradient',
         description: `Requires path to ${Consts.MainCssFileName}, enables gradient effect on title bar`,
@@ -142,6 +157,10 @@ export const Msg = (() => {
         [GradientStyle.BrightLeft]: 'Bright Left',
         [GradientStyle.ArcLeft]: 'Arc Left',
       },
+      mainCssPath: {
+        label: `${Consts.MainCssFileName} Path`,
+        description: 'This extension will modify it to implement the gradient effect',
+      },
       hashSource: {
         label: 'Hash Source',
         description: `Determines the basis for calculating the hash used for color`,
@@ -152,6 +171,7 @@ export const Msg = (() => {
       pickColor: {
         label: 'Specify Current Color',
         description: `Directly specify the titlebar color for the current project manually`,
+        button: 'Pick Color',
       },
       refresh: {
         label: 'Recalculate Color',
