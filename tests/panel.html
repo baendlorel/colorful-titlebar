@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${Panel.title}</title>
   <style>
     :root {
       --vscode-button-background: #4285f4;
@@ -329,8 +330,8 @@
         <div class="control-desc">${Panel.gradientBrightness.description}</div>
       </div>
       <div class="control-input">
-        <input type="text" min="0" max="100" step="1" class="input-number" name="gradientBrightness" value="${
-              configs.gradientBrightness
+        <input type="number" min="0" max="100" step="5" class="input-number" name="gradientBrightness" value="${
+              gradientBrightness
             }" />
         <percent />
       </div>
@@ -342,8 +343,8 @@
         <div class="control-desc">${Panel.gradientDarkness.description}</div>
       </div>
       <div class="control-input">
-        <input type="number" min="0" max="100" step="1" class="input-number" name="gradientDarkness" value="${
-              configs.gradientDarkness
+        <input type="number" min="0" max="100" step="5" class="input-number" name="gradientDarkness" value="${
+              gradientDarkness
             }" />
         <percent />
       </div>
@@ -394,30 +395,26 @@
   </form>
 
   <script>
-    const vscode = typeof acquireVsCodeApi === 'function' ? acquireVsCodeApi() : null;
+    const vscode = typeof acquireVsCodeApi === 'function' ? acquireVsCodeApi() : { postMessage(...args) { console.log('vscode.postMessage', args) } };
     const theme = () => {
       const currentTheme = document.body.getAttribute('theme');
       document.body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
     }
-
     const find = (name) => document.getElementsByName(name)[0];
-    /**
-     * @type {HTMLFormElement}
-     */
+    function debounce(fn, delay) {
+      let timer = null;
+      return () => {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(fn, delay);
+      };
+    }
+
     const settings = find('settings');
+    const gradientBrightness = find('gradientBrightness');
+    const gradientDarkness = find('gradientDarkness');
     const refresh = find('refresh');
     const picker = find('picker');
     const pickerBtn = find('pickerBtn');
-
-    pickerBtn.onclick = picker.click.bind(picker);
-    picker.addEventListener('input', function () {
-      const selectedColor = this.value;
-      pickerBtn.style.backgroundColor = selectedColor;
-
-      const [r, g, b] = this.value.replace('#', '').match(/.{2}/g).map(hex => parseInt(hex, 16));
-      const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
-      pickerBtn.style.color = brightness > 128 ? '#000' : '#fff';
-    });
 
     const freeze = () => {
       settings.classList.add('freeze');
@@ -426,12 +423,66 @@
       }, 1200);
     }
 
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+    gradientBrightness.addEventListener('input', function () {
+      const value = clamp(parseInt(this.value, 10), 0, 100);
+      this.value = value;
+      vscode.postMessage({
+        command: 'gradientBrightness',
+        value
+      });
+    });
+    gradientDarkness.addEventListener('input', function () {
+      const value = clamp(parseInt(this.value, 10), 0, 100);
+      this.value = value;
+      vscode.postMessage({
+        command: 'gradientDarkness',
+        value
+      });
+    });
+
+    pickerBtn.onclick = picker.click.bind(picker);
+    picker.addEventListener('input', function () {
+      const color = this.value;
+      const [r, g, b] = color.replace('#', '').match(/.{2}/g).map(hex => parseInt(hex, 16));
+      const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
+      pickerBtn.style.color = brightness > 128 ? '#000' : '#fff';
+      pickerBtn.style.backgroundColor = color;
+    });
+
+    // 开关类、颜色选择器、下拉选框要即时change生效
+    // input数字文字类要防抖;
+    let timer = null;
+    const post = (input) => {
+      const isSwitch = input.tagName === 'INPUT' && input.type === 'checkbox';
+      console.log(input.name, input.value, input.checked);
+      vscode.postMessage({
+        command: input.name,
+        value: isSwitch ? input.checked : input.value
+      });
+    }
+
+    // change发生时，取消正在等待的input并直接生效
     settings.addEventListener('change', function (event) {
       event.preventDefault();
-      const input = event.target;
-      console.log("字段变更", input.name, input.value, input.checked);
       freeze();
+      if (timer) { clearTimeout(timer); }
+      post(event.target);
     });
+
+    settings.addEventListener('input', function (event) {
+      event.preventDefault();
+      freeze();
+      const input = event.target;
+      const isInputText = input.tagName === 'INPUT' && input.type === 'text';
+      const isInputNumber = input.tagName === 'INPUT' && input.type === 'number';
+      if (isInputText || isInputNumber) {
+        if (timer) { clearTimeout(timer); }
+        timer = setTimeout(() => post(input), 1500);
+      }
+    });
+
+
   </script>
 </body>
 
