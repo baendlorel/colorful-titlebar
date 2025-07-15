@@ -341,6 +341,7 @@ export default async () => {
           <span class="slider"></span>
         </label>
       </div>
+      <div class="control-error" name="showSuggest"></div>
     </div>
 
     <div class="control-item">
@@ -373,6 +374,7 @@ export default async () => {
           <option value="${GradientStyle.ArcLeft}">${Panel.gradient[GradientStyle.ArcLeft]}</option>
         </select>
       </div>
+      <div class="control-error" name="gradient"></div>
     </div>
 
     <div class="control-item">
@@ -413,6 +415,7 @@ export default async () => {
   }</option>
         </select>
       </div>
+      <div class="control-error" name="hashSource"></div>
     </div>
 
     <div class="control-item">
@@ -425,6 +428,7 @@ export default async () => {
           <span>${Panel.refresh.button}</span>
         </button>
       </div>
+      <div class="control-error" name="refresh"></div>
     </div>
 
     <div class="control-item">
@@ -438,6 +442,7 @@ export default async () => {
         </button>
         <input type="color" class="picker" name="pickColor" value="#007ACC">
       </div>
+      <div class="control-error" name="pickColor"></div>
     </div>
   </form>
 
@@ -542,9 +547,16 @@ export default async () => {
     });
 
     window.addEventListener('message', (event) => {
-      const msg = event.data;
-      if (msg.command === 'fromExtension') {
-        alert('插件说：' + msg.text);
+      const resp = event.data;
+      // const text = document.createElement('div');
+      // text.innerText = 'asd' + msg.text + ', command:' + msg.command;
+      // text.style.fontSize = '15px';
+      // document.body.append(text);
+      // alert在插件里的webview中无效
+      if (resp.from === 'colorful-titlebar') {
+        if (!resp.succ) {
+          find(resp.name, true).textContent = resp.msg;
+        }
       }
     });
   </script>
@@ -553,24 +565,36 @@ export default async () => {
 </html>`;
 
   controlPanel.webview.onDidReceiveMessage(async (message) => {
+    const result = {
+      from: 'colorful-titlebar',
+      name: message.command,
+      msg: '',
+      succ: true,
+    };
     try {
       const command = message.command as ControlCommand;
       const value = message.value;
       switch (command) {
         case ControlCommand.ShowSuggest:
           if (typeof value !== 'boolean') {
-            throw new Error('Invalid value type for showSuggest, got' + typeof value);
+            result.succ = false;
+            result.msg = Panel.typeError(value, 'a boolean');
+            throw null;
           }
           await configs.set.showSuggest(value);
           break;
 
         case ControlCommand.WorkbenchCssPath: {
           if (typeof value !== 'string') {
-            throw new Error('Invalid value type for WorkbenchCssPath, got' + typeof value);
+            result.succ = false;
+            result.msg = Panel.typeError(value, 'a string');
+            throw null;
           }
           const cssPath = value.trim();
           if (!existsSync(cssPath)) {
-            throw new Error('Invalid path');
+            result.succ = false;
+            result.msg = Panel.workbenchCssPath.notExist;
+            throw null;
           }
           await configs.set.workbenchCssPath(cssPath);
           break;
@@ -589,20 +613,32 @@ export default async () => {
               gradientStyle = AfterStyle.ArcLeft;
               break;
             default:
-              throw new Error('Invalid value type for gradient, got' + value);
+              result.succ = false;
+              result.msg = Panel.typeError(
+                value,
+                [
+                  'one of ',
+                  GradientStyle.BrightCenter,
+                  GradientStyle.BrightLeft,
+                  GradientStyle.ArcLeft,
+                ].join()
+              );
+              throw null;
           }
           const cssPath = await hacker.getWorkbenchCssPath();
           if (!cssPath) {
             return;
           }
-          await hacker.inject(cssPath, value);
+          await hacker.inject(cssPath, gradientStyle);
           break;
         }
 
         case ControlCommand.GradientBrightness: {
           const d = parseInt(value, 10) / 100;
           if (Number.isNaN(d) || d < 0 || d > 1) {
-            throw new Error('Invalid value for GradientBrightness, must be between 0 and 1');
+            result.succ = false;
+            result.msg = Panel.typeError(value);
+            throw null;
           }
           await configs.set.gradientBrightness(d);
           break;
@@ -610,7 +646,9 @@ export default async () => {
         case ControlCommand.GradientDarkness: {
           const d = parseInt(value, 10) / 100;
           if (Number.isNaN(d) || d < 0 || d > 1) {
-            throw new Error('Invalid value for GradientDarkness, must be between 0 and 1');
+            result.succ = false;
+            result.msg = Panel.typeError(value);
+            throw null;
           }
           await configs.set.gradientDarkness(d);
           break;
@@ -620,9 +658,9 @@ export default async () => {
           const d = parseInt(value, 10) as HashSource;
           const arr = [HashSource.FullPath, HashSource.ProjectName, HashSource.ProjectNameDate];
           if (!arr.includes(d)) {
-            throw new Error(
-              `Invalid value for HashSource, must be one of ${arr.join(', ')}, got ${value}`
-            );
+            result.succ = false;
+            result.msg = Panel.typeError(value, `one of ${arr.join(', ')}`);
+            throw null;
           }
           await configs.set.hashSource(d);
           break;
@@ -640,15 +678,18 @@ export default async () => {
       }
     } catch (error) {
       if (error instanceof Error) {
-        vscode.window.showErrorMessage('');
-      } else {
-        vscode.window.showErrorMessage(String(error));
+        vscode.window.showErrorMessage(error.message);
       }
     } finally {
       // controlPanel.dispose();
-      controlPanel.webview.postMessage({ command: 'fromExtension', text: '你好，Webview！' });
+      await controlPanel.webview.postMessage(result);
     }
   });
+
+  // 发送测试消息到webview
+  setTimeout(() => {
+    controlPanel.webview.postMessage({ command: 'fromExtension', text: '开局消息！' });
+  }, 1000);
 };
 
 /**

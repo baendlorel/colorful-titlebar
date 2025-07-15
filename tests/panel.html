@@ -303,6 +303,7 @@
           <span class="slider"></span>
         </label>
       </div>
+      <div class="control-error" name="showSuggest"></div>
     </div>
 
     <div class="control-item">
@@ -335,6 +336,7 @@
           <option value="${GradientStyle.ArcLeft}">${Panel.gradient[GradientStyle.ArcLeft]}</option>
         </select>
       </div>
+      <div class="control-error" name="gradient"></div>
     </div>
 
     <div class="control-item">
@@ -379,6 +381,7 @@
             }</option>
         </select>
       </div>
+      <div class="control-error" name="hashSource"></div>
     </div>
 
     <div class="control-item">
@@ -391,6 +394,7 @@
           <span>${Panel.refresh.button}</span>
         </button>
       </div>
+      <div class="control-error" name="refresh"></div>
     </div>
 
     <div class="control-item">
@@ -404,6 +408,7 @@
         </button>
         <input type="color" class="picker" name="pickColor" value="#007ACC">
       </div>
+      <div class="control-error" name="pickColor"></div>
     </div>
   </form>
 
@@ -508,9 +513,16 @@
     });
 
     window.addEventListener('message', (event) => {
-      const msg = event.data;
-      if (msg.command === 'fromExtension') {
-        alert('插件说：' + msg.text);
+      const resp = event.data;
+      // const text = document.createElement('div');
+      // text.innerText = 'asd' + msg.text + ', command:' + msg.command;
+      // text.style.fontSize = '15px';
+      // document.body.append(text);
+      // alert在插件里的webview中无效
+      if (resp.from === 'colorful-titlebar') {
+        if (!resp.succ) {
+          find(resp.name, true).textContent = resp.msg;
+        }
       }
     });
   </script>

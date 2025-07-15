@@ -13,6 +13,8 @@ export default (() => {
       title: 'Colorful Titlebar 控制面板',
       description: '在这里可以控制标题栏颜色和样式',
       loading: '更新中...',
+      typeError: (value: string | number | boolean, shouldBe?: string) =>
+        `值或值类型无效，得到的是${value}(${typeof value})${shouldBe ? '，应该是' + shouldBe : ''}`,
       showSuggest: {
         label: '显示建议',
         description: `显示偶尔会弹出的建议`,
@@ -20,6 +22,7 @@ export default (() => {
       workbenchCssPath: {
         label: `${Consts.WorkbenchCssName}路径`,
         description: '用于注入渐变样式。提示VS Code损坏是意料之内的，选“不再显示”即可',
+        notExist: '路径不存在',
       },
       gradient: {
         label: '渐变样式',
@@ -147,6 +150,10 @@ export default (() => {
       title: 'Colorful Titlebar Control Panel',
       description: 'Control titlebar color and style here',
       loading: 'Updating...',
+      typeError: (value: string | number | boolean, shouldBe?: string) =>
+        `Invalid value or value type, got ${value}(${typeof value})${
+          shouldBe ? '. Should be ' + shouldBe : ''
+        }`,
       showSuggest: {
         label: 'Show Suggestions',
         description: `Turning it off will block all suggestions`,
@@ -155,6 +162,7 @@ export default (() => {
         label: `${Consts.WorkbenchCssName} Path`,
         description:
           'After injection, VS Code might show "corrupted", just select "Never show again"',
+        notExist: 'Path does not exist',
       },
       gradient: {
         label: 'Gradient Style',
