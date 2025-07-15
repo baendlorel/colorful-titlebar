@@ -47,6 +47,11 @@
         "command": "colorful-titlebar.disableGradient",
         "title": "%command.disableGradient.title%",
         "category": "%extension.category%"
+      },
+      {
+        "command": "colorful-titlebar.pickColor",
+        "title": "%command.pickColor.title%",
+        "category": "%extension.category%"
       }
     ],
     "configuration": {

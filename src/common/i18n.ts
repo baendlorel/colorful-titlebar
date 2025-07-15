@@ -43,6 +43,16 @@ export const Msg = (() => {
       disableGradient: {
         fail: '关闭渐变色标题栏失败！',
       },
+      pickColor: {
+        title: '选择标题栏颜色',
+        titleBarStyleWarning: '标题栏样式必须设置为"custom"才能应用颜色。您想现在设置吗？',
+        setStyleButton: '是的',
+        cancelButton: '不了',
+        styleSetSuccess: '标题栏样式设置为custom成功！',
+        colorApplied: (color: string) => `标题栏颜色已应用：${color}`,
+        colorReset: '标题栏颜色已重置为自动生成',
+        error: (error: string) => `错误：${error}`,
+      },
     },
 
     ConfigLevel: {
@@ -107,6 +117,17 @@ export const Msg = (() => {
       },
       disableGradient: {
         fail: 'Disabling gradient titlebar failed!',
+      },
+      pickColor: {
+        title: 'Pick Titlebar Color',
+        titleBarStyleWarning:
+          'Title bar style must be set to "custom" to apply colors. Would you like to set it now?',
+        setStyleButton: 'Yes',
+        cancelButton: 'No',
+        styleSetSuccess: 'Title bar style set to custom successfully!',
+        colorApplied: (color: string) => `Titlebar color applied: ${color}`,
+        colorReset: 'Titlebar color reset to auto-generated',
+        error: (error: string) => `Error: ${error}`,
       },
     },
 

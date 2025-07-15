@@ -21,6 +21,7 @@ export const enum SettingsJson {
 export const enum Commands {
   EnableGradient = `${Consts.Name}.enableGradient`,
   DisableGradient = `${Consts.Name}.disableGradient`,
+  PickColor = `${Consts.Name}.pickColor`,
 }
 
 export const enum HashSource {
