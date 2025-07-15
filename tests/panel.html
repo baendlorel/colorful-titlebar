@@ -18,7 +18,7 @@
       --panel-bg: #ffffff;
       --border-color: rgba(224, 224, 224, 0.5);
       --shadow-color: rgba(0, 0, 0, 0.1);
-      --loading-bg-color: rgba(71, 73, 78, 0.16);
+      --loading-bg-color: rgba(71, 73, 78, 0.12);
     }
 
     [theme="dark"] {
@@ -33,7 +33,7 @@
       --panel-bg: #292a2d;
       --border-color: rgba(60, 64, 67, 0.5);
       --shadow-color: rgba(0, 0, 0, 0.3);
-      --loading-bg-color: rgba(241, 241, 241, 0.16);
+      --loading-bg-color: rgba(241, 241, 241, 0.12);
     }
 
     * {
@@ -53,13 +53,6 @@
       align-items: center;
       padding: 20px;
       transition: background-color 0.3s, color 0.3s;
-    }
-
-    percent::after {
-      content: '%';
-      margin-left: 12px;
-      font-size: 1.2em;
-      color: var(--text-color);
     }
 
     .control-panel {
@@ -91,7 +84,7 @@
       pointer-events: none;
       background-color: var(--loading-bg-color);
       opacity: 0;
-      transition: opacity 0.3s;
+      transition: opacity 0.3s cubic-bezier(1, 0.00, 0.88, 1);
     }
 
     .freeze::after {
@@ -119,7 +112,9 @@
 
 
     .control-item {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
       margin-bottom: 10px;
       padding-bottom: 10px;
       align-items: center;
@@ -127,7 +122,6 @@
     }
 
     .control-label-group {
-      flex: 1;
       display: grid;
       grid-template-rows: auto auto;
       color: var(--text-color);
@@ -140,6 +134,12 @@
     .control-desc {
       font-size: 0.8em;
       color: var(--text-color-weak)
+    }
+
+    .control-error {
+      grid-column: 1 / span 2;
+      font-size: 0.8em;
+      color: var(--danger-color)
     }
 
     .control-input {
@@ -230,17 +230,32 @@
 
     .select,
     .input-text,
-    .input-number {
+    .input-percent input[type="number"] {
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 8px 12px;
+      padding: 8px 30px 8px 12px;
       background-color: var(--panel-bg);
       color: var(--text-color);
     }
 
-    .input-number {
+    .input-percent input[type="number"] {
+      position: relative;
       width: 75px;
       text-align: right;
+    }
+
+    .input-percent input[type="number"]::-webkit-inner-spin-button,
+    .input-percent input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .input-percent::after {
+      position: absolute;
+      content: '%';
+      right: 40px;
+      font-size: 1.2em;
+      color: var(--text-color-weak);
     }
 
     .select {
@@ -329,11 +344,10 @@
         <div class="control-label">${Panel.gradientBrightness.label}</div>
         <div class="control-desc">${Panel.gradientBrightness.description}</div>
       </div>
-      <div class="control-input">
-        <input type="number" min="0" max="100" step="5" class="input-number" name="gradientBrightness" value="${
+      <div class="control-input input-percent">
+        <input type="number" min="0" max="100" step="5" class="" name="gradientBrightness" value="${
               gradientBrightness
             }" />
-        <percent />
       </div>
     </div>
 
@@ -342,12 +356,12 @@
         <div class="control-label">${Panel.gradientDarkness.label}</div>
         <div class="control-desc">${Panel.gradientDarkness.description}</div>
       </div>
-      <div class="control-input">
-        <input type="number" min="0" max="100" step="5" class="input-number" name="gradientDarkness" value="${
+      <div class="control-input input-percent">
+        <input type="number" min="0" max="100" step="5" class="" name="gradientDarkness" value="${
               gradientDarkness
             }" />
-        <percent />
       </div>
+      <div class="control-error"></div>
     </div>
 
     <div class="control-item">
@@ -395,24 +409,14 @@
   </form>
 
   <script>
-    const vscode = typeof acquireVsCodeApi === 'function' ? acquireVsCodeApi() : { postMessage(...args) { console.log('vscode.postMessage', args) } };
+    const vscode = typeof acquireVsCodeApi === 'function' ? acquireVsCodeApi() : { postMessage(a) { console.log('vscode.postMessage', a) } };
     const theme = () => {
       const currentTheme = document.body.getAttribute('theme');
       document.body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
     }
     const find = (name) => document.getElementsByName(name)[0];
-    function debounce(fn, delay) {
-      let timer = null;
-      return () => {
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(fn, delay);
-      };
-    }
 
     const settings = find('settings');
-    const gradientBrightness = find('gradientBrightness');
-    const gradientDarkness = find('gradientDarkness');
-    const refresh = find('refresh');
     const picker = find('picker');
     const pickerBtn = find('pickerBtn');
 
@@ -423,24 +427,6 @@
       }, 1200);
     }
 
-    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-    gradientBrightness.addEventListener('input', function () {
-      const value = clamp(parseInt(this.value, 10), 0, 100);
-      this.value = value;
-      vscode.postMessage({
-        command: 'gradientBrightness',
-        value
-      });
-    });
-    gradientDarkness.addEventListener('input', function () {
-      const value = clamp(parseInt(this.value, 10), 0, 100);
-      this.value = value;
-      vscode.postMessage({
-        command: 'gradientDarkness',
-        value
-      });
-    });
-
     pickerBtn.onclick = picker.click.bind(picker);
     picker.addEventListener('input', function () {
       const color = this.value;
@@ -450,38 +436,31 @@
       pickerBtn.style.backgroundColor = color;
     });
 
-    // 开关类、颜色选择器、下拉选框要即时change生效
-    // input数字文字类要防抖;
-    let timer = null;
-    const post = (input) => {
+    settings.addEventListener('change', function (event) {
+      event.preventDefault();
+      const input = event.target;
+      // 如果数字类不符合要求，则返回并提示
+      if (input.type === 'number') {
+        const value = parseInt(input.value, 10);
+        let max = parseInt(input.max, 10);
+        let min = parseInt(input.min, 10);
+        max = Number.isNaN(max) ? Infinity : max;
+        min = Number.isNaN(min) ? Infinity : min;
+
+        if (Number.isNaN(value) || value < min || value > max) {
+          alert('请输入0到100之间的数字');
+          input.value = input.defaultValue; // 恢复默认值
+          return;
+        }
+      }
+
+      freeze();
       const isSwitch = input.tagName === 'INPUT' && input.type === 'checkbox';
-      console.log(input.name, input.value, input.checked);
       vscode.postMessage({
         command: input.name,
         value: isSwitch ? input.checked : input.value
       });
-    }
-
-    // change发生时，取消正在等待的input并直接生效
-    settings.addEventListener('change', function (event) {
-      event.preventDefault();
-      freeze();
-      if (timer) { clearTimeout(timer); }
-      post(event.target);
     });
-
-    settings.addEventListener('input', function (event) {
-      event.preventDefault();
-      freeze();
-      const input = event.target;
-      const isInputText = input.tagName === 'INPUT' && input.type === 'text';
-      const isInputNumber = input.tagName === 'INPUT' && input.type === 'number';
-      if (isInputText || isInputNumber) {
-        if (timer) { clearTimeout(timer); }
-        timer = setTimeout(() => post(input), 1500);
-      }
-    });
-
 
   </script>
 </body>
