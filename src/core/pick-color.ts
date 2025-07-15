@@ -58,12 +58,13 @@ export const pickColor = async () => {
     }
 
     #picker {
+      margin: 10px 0;
       width: 100%;
       height: 60px;
       border: none;
       border-radius: 4px;
+      border-color: #8080804d;
       cursor: pointer;
-      margin: 10px 0;
     }
 
     .picker-wrapper {
@@ -169,13 +170,17 @@ export const pickColor = async () => {
           panel.dispose();
           break;
         case 'reset':
-          await refreshTitleBar();
+          await refreshTitleBar(true);
           vscode.window.showInformationMessage(PickColor.colorReset);
           panel.dispose();
           break;
       }
     } catch (error) {
-      vscode.window.showErrorMessage(`Error: ${error}`);
+      if (error instanceof Error) {
+        vscode.window.showErrorMessage(PickColor.error(error.message));
+      } else {
+        vscode.window.showErrorMessage(String(error));
+      }
     }
   });
 };

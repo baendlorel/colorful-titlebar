@@ -13,7 +13,7 @@ export const Msg = (() => {
       enableGradient: {
         suggest: {
           msg: '已支持美丽的标题栏渐变色！需要开启吗？',
-          button: '来，立刻开启！',
+          yes: '好的！',
         },
         title: `${Consts.MainCssFileName}文件地址`,
         prompt: `启用渐变色标题栏需要修改${Consts.MainCssFileName}，请提供该文件地址（WSl 需要映射到子系统内部的地址）`,
@@ -44,6 +44,11 @@ export const Msg = (() => {
         fail: '关闭渐变色标题栏失败！',
       },
       pickColor: {
+        suggest: {
+          msg: '对自动计算的颜色不满意？可以手动选择！',
+          yes: '我要手选！',
+          no: '现在这个蛮好',
+        },
         title: '选择标题栏颜色',
         html: {
           description: '选择一个颜色来设置标题栏的背景色',
@@ -95,7 +100,7 @@ export const Msg = (() => {
       enableGradient: {
         suggest: {
           msg: 'Gradient titlebar is supported! Do you want to enable it now?',
-          button: 'YES! Enable it now!',
+          yes: 'YES! Enable it now!',
         },
         title: `${Consts.MainCssFileName} Path`,
         prompt: `To enable gradient titlebar, please provide the path to "${Consts.MainCssFileName}". WSL paths should map to the internal path of the subsystem`,
@@ -127,6 +132,11 @@ export const Msg = (() => {
         fail: 'Disabling gradient titlebar failed!',
       },
       pickColor: {
+        suggest: {
+          msg: 'Not satisfied with the auto-calculated color? You can choose manually!',
+          yes: 'I want to pick a color',
+          no: 'This one is fine',
+        },
         title: 'Pick Titlebar Color',
         html: {
           description: 'Select a color to set the titlebar background',

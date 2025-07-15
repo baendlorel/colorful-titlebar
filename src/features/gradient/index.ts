@@ -25,8 +25,8 @@ const suggest = async () => {
   if (!configs.showSuggest) {
     return;
   }
-  const now = await suggestInfo(Enable.suggest.msg, Enable.suggest.button);
-  if (now !== Enable.suggest.button) {
+  const now = await suggestInfo(Enable.suggest.msg, Enable.suggest.yes);
+  if (now !== Enable.suggest.yes) {
     return;
   }
   await enable();

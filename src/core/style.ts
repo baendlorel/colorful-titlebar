@@ -4,8 +4,9 @@ import { readdir, readFile, rm } from 'node:fs/promises';
 
 import { Msg } from '@/common/i18n';
 import { configs } from '@/common/configs';
-import { SettingsJson, TitleBarStyle } from '@/common/consts';
+import { Commands, SettingsJson, TitleBarStyle } from '@/common/consts';
 import { getColor } from './colors';
+import { popInfo } from '@/common/notifications';
 
 interface StyleConfig {
   [TitleBarStyle.ActiveBg]: string;
@@ -14,8 +15,9 @@ interface StyleConfig {
 
 /**
  * 设置标题栏颜色
+ * @param satisfied 是否是满意的情况下调用，如果不满意那么会弹窗提示是否要手选颜色
  */
-export const refreshTitleBar = async () => {
+export const refreshTitleBar = async (satisfied = false) => {
   if (!configs.cwd) {
     return;
   }
@@ -49,6 +51,18 @@ export const refreshTitleBar = async () => {
     newStyle,
     vscode.ConfigurationTarget.Workspace
   );
+
+  if (!satisfied) {
+    const suggest = Msg.Commands.pickColor.suggest;
+
+    // 询问用户是否要手动选择颜色
+    const result = await popInfo(suggest.msg, suggest.yes, suggest.no);
+
+    if (result === suggest.yes) {
+      // 通过命令ID拉起颜色选择器，避免循环引用
+      await vscode.commands.executeCommand(Commands.PickColor);
+    }
+  }
 };
 
 /**

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN" theme="${theme}">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4285f4;
+      --secondary-color: #34a853;
+      --danger-color: #ea4335;
+      --warning-color: #fbbc05;
+      --text-color: #202124;
+      --bg-color: #f8f9fa;
+      --panel-bg: #ffffff;
+      --border-color: #e0e0e0;
+      --shadow-color: rgba(0, 0, 0, 0.1);
+    }
+
+    [theme="dark"] {
+      --primary-color: #8ab4f8;
+      --secondary-color: #81c995;
+      --danger-color: #f28b82;
+      --warning-color: #fde293;
+      --text-color: #e8eaed;
+      --bg-color: #202124;
+      --panel-bg: #292a2d;
+      --border-color: #3c4043;
+      --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .control-panel {
+      background-color: var(--panel-bg);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px var(--shadow-color);
+      width: 100%;
+      max-width: 500px;
+      padding: 30px;
+      transition: background-color 0.3s;
+      border: 1px solid var(--border-color);
+    }
+
+    .header {
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      color: var(--text-color);
+      font-weight: 500;
+      font-size: 24px;
+    }
+
+    .header p {
+      color: var(--text-color);
+      opacity: 0.7;
+      font-size: 14px;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-color);
+      cursor: pointer;
+      font-size: 20px;
+      padding: 5px;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+
+    .theme-toggle:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    [theme="dark"] .theme-toggle:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .control-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .control-label {
+      font-size: 16px;
+      color: var(--text-color);
+      font-weight: 500;
+      margin-right: 20px;
+      flex: 1;
+    }
+
+    .control-input {
+      display: flex;
+      align-items: center;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked+.slider {
+      background-color: var(--primary-color);
+    }
+
+    input:checked+.slider:before {
+      transform: translateX(26px);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .color-picker-container {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .color-picker {
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      width: 50px;
+      height: 50px;
+      border: none;
+      cursor: pointer;
+      opacity: 0;
+    }
+
+    .color-preview {
+      width: 100%;
+      height: 100%;
+      background-color: var(--primary-color);
+    }
+
+    .icon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="control-panel">
+    <div class="header">
+      <div>
+        <h1>智能控制中心</h1>
+        <p>管理系统全局设置</p>
+      </div>
+      <button class="theme-toggle" id="themeToggle">
+        <span id="themeIcon">🌙</span>
+      </button>
+    </div>
+
+    <div class="control-item">
+      <label class="control-label">全局开关</label>
+      <div class="control-input">
+        <label class="toggle-switch">
+          <input type="checkbox" id="globalToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="control-item">
+      <label class="control-label">重新计算</label>
+      <div class="control-input">
+        <button class="btn" id="recalculateBtn">
+          <span class="icon">↻</span>
+          <span>重新计算</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="control-item">
+      <label class="control-label">选择颜色</label>
+      <div class="control-input">
+        <div class="color-picker-container">
+          <input type="color" class="color-picker" id="colorPicker" value="#4285f4">
+          <div class="color-preview"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 获取DOM元素
+    const globalToggle = document.getElementById('globalToggle');
+    const recalculateBtn = document.getElementById('recalculateBtn');
+    const colorPicker = document.getElementById('colorPicker');
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+    const colorPreview = document.querySelector('.color-preview');
+
+    // 全局开关状态
+    let isGlobalEnabled = false;
+
+    // 更新主题图标
+    function updateThemeIcon(theme) {
+      themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+
+    // 切换主题
+    function toggleTheme() {
+      const currentTheme = html.getAttribute('theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+    }
+
+    // 全局开关事件监听
+    globalToggle.addEventListener('change', function () {
+      isGlobalEnabled = this.checked;
+      console.log('全局状态:', isGlobalEnabled ? '已开启' : '已关闭');
+
+      // 根据状态改变页面主题色
+      document.documentElement.style.setProperty(
+        '--primary-color',
+        isGlobalEnabled ? '#34a853' : '#4285f4'
+      );
+    });
+
+    // 重新计算按钮事件
+    recalculateBtn.addEventListener('click', function () {
+      console.log('正在重新计算...');
+      // 这里可以添加实际的重新计算逻辑
+      alert('系统正在重新计算，请稍候...');
+    });
+
+    // 颜色选择器事件
+    colorPicker.addEventListener('input', function () {
+      const selectedColor = this.value;
+      console.log('选择的颜色:', selectedColor);
+      document.documentElement.style.setProperty('--primary-color', selectedColor);
+      colorPreview.style.backgroundColor = selectedColor;
+    });
+
+    colorPreview.style.backgroundColor = colorPicker.value;
+  </script>
+</body>
+
+</html>

@@ -80,6 +80,10 @@ export class RGBA {
     this.a = parsed[3];
   }
 
+  get brightness() {
+    return Math.floor((this.r * 299 + this.g * 587 + this.b * 114) / 1000);
+  }
+
   plain() {
     return {
       r: this.r,
