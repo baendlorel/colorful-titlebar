@@ -41,122 +41,134 @@ export const pickColor = async () => {
 
   panel.webview.html = `
     <!DOCTYPE html>
-    <html>
-    <head>
-      <style>
-        body {
-          font-family: var(--vscode-font-family);
-          padding: 20px;
-          background: var(--vscode-editor-background);
-          color: var(--vscode-editor-foreground);
-        }
-        .container {
-          max-width: 400px;
-          margin: 0 auto;
-        }
-        .color-input {
-          width: 100%;
-          height: 60px;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          margin: 10px 0;
-        }
-        .preview {
-          padding: 15px;
-          border-radius: 4px;
-          margin: 10px 0;
-          text-align: center;
-          font-weight: bold;
-        }
-        .button {
-          background: var(--vscode-button-background);
-          color: var(--vscode-button-foreground);
-          border: none;
-          padding: 10px 20px;
-          border-radius: 4px;
-          cursor: pointer;
-          margin: 5px;
-        }
-        .button:hover {
-          background: var(--vscode-button-hoverBackground);
-        }
-        .current-color {
-          font-family: monospace;
-          font-size: 14px;
-          margin: 10px 0;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <h2>${PickColor.title}</h2>
-        <p>${PickColor.html.description}</p>
-        
-        <input type="color" id="colorPicker" class="color-input" value="#6366f1" />
-        
-        <div class="current-color">
-          ${PickColor.html.colorValue} <span id="colorValue">#6366f1</span>
-        </div>
-        
-        <div id="preview" class="preview" style="background-color: #6366f1; color: white;">
-          ${PickColor.html.preview}
-        </div>
-        
-        <button class="button" onclick="applyColor()">${PickColor.html.apply}</button>
-        <button class="button" onclick="resetColor()">${PickColor.html.reset}</button>
+<html>
+
+<head>
+  <style>
+    body {
+      font-family: var(--vscode-font-family);
+      padding: 20px;
+      background: var(--vscode-editor-background);
+      color: var(--vscode-editor-foreground);
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    #picker {
+      width: 100%;
+      height: 60px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+
+    .picker-wrapper {
+      position: relative;
+    }
+
+    .current-color {
+      position: absolute;
+      left: 0;
+      top: 27px;
+      width: 100%;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    #color-value {
+      margin-left: 6px;
+      font-family: 'Consolas';
+    }
+
+    .footer {
+      margin: 20px 0;
+      display: grid;
+      grid-template-columns: auto auto;
+      column-gap: 20px;
+    }
+
+    .button {
+      background: var(--vscode-button-background);
+      color: var(--vscode-button-foreground);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      background: var(--vscode-button-hoverBackground);
+    }
+
+    .button.secondary {
+      background: var(--vscode-button-secondaryBackground);
+      color: var(--vscode-button-secondaryForeground);
+    }
+
+    .button.secondary:hover {
+      background: var(--vscode-button-secondaryHoverBackground);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>${PickColor.title}</h2>
+    <p>${PickColor.html.description}</p>
+
+    <div class="picker-wrapper">
+      <input type="color" id="picker" value="#007acc" />
+      <div id="current-color" class="current-color" style="color: white;">
+        ${PickColor.html.colorValue}<span id="color-value">#007acc</span>
       </div>
+    </div>
 
-      <script>
-        const vscode = acquireVsCodeApi();
-        const picker = document.getElementById('colorPicker');
-        const preview = document.getElementById('preview');
-        const colorValue = document.getElementById('colorValue');
+    <div class="footer">
+      <button class="button secondary" onclick="reset()">${PickColor.html.reset}</button>
+      <button class="button" onclick="apply()">${PickColor.html.apply}</button>
+    </div>
+  </div>
 
-        picker.addEventListener('input', (e) => {
-          const color = e.target.value;
-          preview.style.backgroundColor = color;
-          colorValue.textContent = color;
-          const rgb = hexToRgb(color);
-          const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-          preview.style.color = brightness > 128 ? '#000000' : '#ffffff';
-        });
+  <script>
+    const vscode = typeof acquireVsCodeApi === 'function' ? acquireVsCodeApi() : null;
+    const picker = document.getElementById('picker');
+    const currentColor = document.getElementById('current-color');
+    const colorValue = document.getElementById('color-value');
 
-        function hexToRgb(hex) {
-          const result = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(hex);
-          return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-          } : null;
-        }
+    picker.addEventListener('input', (e) => {
+      const color = e.target.value;
+      const hex = Number(color.replace('#', '0x'));
+      const rgb = {
+        r: (hex >> 16) & 255,
+        g: (hex >> 8) & 255,
+        b: hex & 255
+      };
+      const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+      currentColor.style.color = brightness > 128 ? '#000000' : '#ffffff';
+      colorValue.textContent = color.toUpperCase();
+    });
 
-        function applyColor() {
-          vscode.postMessage({ 
-            command: 'applyColor', 
-            color: picker.value 
-          });
-        }
+    const apply = () => vscode.postMessage({ command: 'apply', color: picker.value });
+    const reset = () => vscode.postMessage({ command: 'reset' });
+  </script>
+</body>
 
-        function resetColor() {
-          vscode.postMessage({ 
-            command: 'resetColor' 
-          });
-        }
-      </script>
-    </body>
-    </html>
+</html>
   `;
 
   panel.webview.onDidReceiveMessage(async (message) => {
     try {
       switch (message.command) {
-        case 'applyColor':
+        case 'apply':
           await applyManualColor(message.color);
           vscode.window.showInformationMessage(PickColor.colorApplied(message.color));
           panel.dispose();
           break;
-        case 'resetColor':
+        case 'reset':
           await refreshTitleBar();
           vscode.window.showInformationMessage(PickColor.colorReset);
           panel.dispose();
