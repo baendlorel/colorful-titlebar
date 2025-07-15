@@ -472,17 +472,19 @@
     const refresh = find('refresh');
 
     const freeze = () => {
-      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = true)
+      document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
       setTimeout(() => settings.classList.add('freeze'), 600);
-      setTimeout(() => {
-        settings.classList.remove('freeze');
-        Array.prototype.forEach.call(settings.elements, (el) => el.disabled = false)
-      }, 1600);
+      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = true)
+    }
+
+    const unfreeze = () => {
+      setTimeout(() => settings.classList.remove('freeze'), 1000);
+      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = false)
     }
 
     refresh.onclick = () => {
       freeze();
-      vscode.postMessage({ command: 'refresh', value: null });
+      vscode.postMessage({ name: 'refresh', value: null });
     }
 
     pickerBtn.onclick = pickColor.click.bind(pickColor);
@@ -496,12 +498,13 @@
 
     settings.addEventListener('change', function (event) {
       event.preventDefault();
-      document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
+      freeze();
+
+      const input = event.target;
       const data = {
         name: input.name,
         value: input.value
-      }
-      const input = event.target;
+      };
       // 如果数字类不符合要求，则返回并提示
       if (input.type === 'number') {
         const value = parseInt(input.value, 10);
@@ -520,7 +523,6 @@
         data.value = input.checked;
       }
 
-      freeze();
       vscode.postMessage(data);
     });
 
@@ -536,6 +538,7 @@
       } else {
         find(resp.name, 'error').textContent = resp.msg;
       }
+      unfreeze();
     });
   </script>
 </body>

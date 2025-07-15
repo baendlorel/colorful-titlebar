@@ -9,7 +9,7 @@ import { AfterStyle } from '@/features/gradient/consts';
 import RGBA from '@/common/rgba';
 import style from './style';
 
-const enum ControlCommand {
+const enum ControlName {
   ShowSuggest = 'showSuggest',
   WorkbenchCssPath = 'workbenchCssPath',
   Gradient = 'gradient',
@@ -506,17 +506,19 @@ export default async () => {
     const refresh = find('refresh');
 
     const freeze = () => {
-      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = true)
+      document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
       setTimeout(() => settings.classList.add('freeze'), 600);
-      setTimeout(() => {
-        settings.classList.remove('freeze');
-        Array.prototype.forEach.call(settings.elements, (el) => el.disabled = false)
-      }, 1600);
+      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = true)
+    }
+
+    const unfreeze = () => {
+      setTimeout(() => settings.classList.remove('freeze'), 1000);
+      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = false)
     }
 
     refresh.onclick = () => {
       freeze();
-      vscode.postMessage({ command: 'refresh', value: null });
+      vscode.postMessage({ name: 'refresh', value: null });
     }
 
     pickerBtn.onclick = pickColor.click.bind(pickColor);
@@ -530,12 +532,13 @@ export default async () => {
 
     settings.addEventListener('change', function (event) {
       event.preventDefault();
-      document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
+      freeze();
+
+      const input = event.target;
       const data = {
         name: input.name,
         value: input.value
-      }
-      const input = event.target;
+      };
       // 如果数字类不符合要求，则返回并提示
       if (input.type === 'number') {
         const value = parseInt(input.value, 10);
@@ -554,7 +557,6 @@ export default async () => {
         data.value = input.checked;
       }
 
-      freeze();
       vscode.postMessage(data);
     });
 
@@ -570,6 +572,7 @@ export default async () => {
       } else {
         find(resp.name, 'error').textContent = resp.msg;
       }
+      unfreeze();
     });
   </script>
 </body>
@@ -579,15 +582,16 @@ export default async () => {
   controlPanel.webview.onDidReceiveMessage(async (message) => {
     const result = {
       from: 'colorful-titlebar',
-      name: message.command,
+      name: message.name,
       msg: Panel.success,
       succ: true,
     };
     try {
-      const command = message.command as ControlCommand;
+      vscode.window.showInformationMessage(JSON.stringify(message));
+      const name = message.name as ControlName;
       const value = message.value;
-      switch (command) {
-        case ControlCommand.ShowSuggest:
+      switch (name) {
+        case ControlName.ShowSuggest:
           if (typeof value !== 'boolean') {
             result.succ = false;
             result.msg = Panel.typeError(value, 'a boolean');
@@ -596,7 +600,7 @@ export default async () => {
           await configs.set.showSuggest(value);
           break;
 
-        case ControlCommand.WorkbenchCssPath: {
+        case ControlName.WorkbenchCssPath: {
           if (typeof value !== 'string') {
             result.succ = false;
             result.msg = Panel.typeError(value, 'a string');
@@ -612,7 +616,7 @@ export default async () => {
           break;
         }
 
-        case ControlCommand.Gradient: {
+        case ControlName.Gradient: {
           let gradientStyle: AfterStyle;
           switch (Number(value)) {
             case GradientStyle.BrightCenter:
@@ -646,7 +650,7 @@ export default async () => {
           break;
         }
 
-        case ControlCommand.GradientBrightness: {
+        case ControlName.GradientBrightness: {
           const d = parseInt(value, 10) / 100;
           if (Number.isNaN(d) || d < 0 || d > 1) {
             result.succ = false;
@@ -657,7 +661,7 @@ export default async () => {
           result.msg = Panel.gradient.success;
           break;
         }
-        case ControlCommand.GradientDarkness: {
+        case ControlName.GradientDarkness: {
           const d = parseInt(value, 10) / 100;
           if (Number.isNaN(d) || d < 0 || d > 1) {
             result.succ = false;
@@ -669,7 +673,8 @@ export default async () => {
           break;
         }
 
-        case ControlCommand.HashSource: {
+        // fixme 为什么三种算出来都是紫色?
+        case ControlName.HashSource: {
           const d = parseInt(value, 10) as HashSource;
           const arr = [HashSource.FullPath, HashSource.ProjectName, HashSource.ProjectNameDate];
           if (!arr.includes(d)) {
@@ -682,15 +687,18 @@ export default async () => {
           break;
         }
 
-        case ControlCommand.Refresh: {
+        case ControlName.Refresh: {
           await style.refresh(true);
           break;
         }
 
-        case ControlCommand.PickColor: {
+        case ControlName.PickColor: {
           await applyManualColor(value);
           break;
         }
+
+        default:
+          throw new Error('Unknown control name: ' + name);
       }
     } catch (error) {
       if (error instanceof Error) {

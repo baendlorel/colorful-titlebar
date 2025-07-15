@@ -37,10 +37,12 @@ export default (() => {
       gradientBrightness: {
         label: '渐变亮度',
         description: '表示渐变较亮的地方有多亮',
+        success: '保存成功，重新选择渐变样式即可生效',
       },
       gradientDarkness: {
         label: '渐变暗度',
         description: '表示渐变较暗的地方有多暗',
+        success: '保存成功，重新选择渐变样式即可生效',
       },
       hashSource: {
         label: 'Hash入参',
@@ -180,10 +182,12 @@ export default (() => {
       gradientBrightness: {
         label: 'Gradient Brightness',
         description: 'Indicates how bright the brighter part of the gradient is',
+        success: 'Saved successfully, reselect gradient style to apply changes',
       },
       gradientDarkness: {
         label: 'Gradient Darkness',
         description: 'Indicates how dark the darker part of the gradient is',
+        success: 'Saved successfully, reselect gradient style to apply changes',
       },
       hashSource: {
         label: 'Hash Source',
