@@ -9,9 +9,9 @@ export const suggestInfo = configs.showSuggest
       const result = await vscode.window.showInformationMessage(
         msg,
         ...items,
-        Msg.DontShowAgain.button
+        Msg.BlockAllSuggestion.button
       );
-      if (result === Msg.DontShowAgain) {
+      if (result === Msg.BlockAllSuggestion) {
         await configs.set.showSuggest(false);
       }
       return result;

@@ -1,11 +1,11 @@
 import vscode from 'vscode';
-import { Consts, HashSource, TitleBarStyle } from './consts';
+import { Consts, GradientStyle, HashSource, TitleBarStyle } from './consts';
 
 export const Msg = (() => {
   const Zh = {
     Unknown: '未知',
 
-    DontShowAgain: { button: '不再提示' },
+    BlockAllSuggestion: { button: '屏蔽所有建议' },
     NotWorkspace: '没有打开工作区文件夹，不改变标题栏颜色',
     NotProject: '当前不是项目目录，不改变标题栏颜色',
 
@@ -19,9 +19,9 @@ export const Msg = (() => {
       gradient: {
         label: '渐变样式',
         description: '选择后需要重启生效',
-        brightLeft: '左侧较亮',
-        brightCenter: '中间较亮',
-        arcLeft: '左侧弧光',
+        [GradientStyle.BrightCenter]: '中间较亮',
+        [GradientStyle.BrightLeft]: '左侧较亮',
+        [GradientStyle.ArcLeft]: '左侧弧光',
       },
       hashSource: {
         label: 'Hash入参',
@@ -52,9 +52,9 @@ export const Msg = (() => {
         placeHolder: `例如：../../${Consts.MainCssFileName}`,
         workbenchCssPathInvalid: `${Consts.MainCssFileName}路径无效，请检查`,
         style: {
-          brightCenter: '中间较亮',
-          brightLeft: '左侧较亮',
-          arcLeft: '左侧弧光',
+          [GradientStyle.BrightCenter]: '中间较亮',
+          [GradientStyle.BrightLeft]: '左侧较亮',
+          [GradientStyle.ArcLeft]: '左侧弧光',
         },
         invalidStyle: '无效的样式',
         success: '修改css文件成功！重启VS Code生效。若碰到提示VS Code损坏，可以直接点击“不再显示”',
@@ -124,7 +124,7 @@ export const Msg = (() => {
 
   const En = {
     Unknown: 'unknown',
-    DontShowAgain: { button: 'Do not show again' },
+    BlockAllSuggestion: { button: 'Block Suggestions' },
     NotWorkspace: 'No workspace folder opened, titlebar color remains unchanged',
     NotProject: 'Current folder is not a project directory, titlebar color remains unchanged',
 
@@ -137,9 +137,10 @@ export const Msg = (() => {
       },
       gradient: {
         label: 'Gradient Style',
-        brightLeft: 'Bright Left',
-        brightCenter: 'Bright Center',
-        arcLeft: 'Arc Left',
+        description: 'Needs restart to take effect',
+        [GradientStyle.BrightCenter]: 'Bright Center',
+        [GradientStyle.BrightLeft]: 'Bright Left',
+        [GradientStyle.ArcLeft]: 'Arc Left',
       },
       hashSource: {
         label: 'Hash Source',
@@ -170,9 +171,9 @@ export const Msg = (() => {
         placeHolder: `Example: ../../${Consts.MainCssFileName}`,
         workbenchCssPathInvalid: `The path to "${Consts.MainCssFileName}" is invalid, please check`,
         style: {
-          brightCenter: 'Bright Center',
-          brightLeft: 'Bright Left',
-          arcLeft: 'Arc Left',
+          [GradientStyle.BrightCenter]: 'Bright Center',
+          [GradientStyle.BrightLeft]: 'Bright Left',
+          [GradientStyle.ArcLeft]: 'Arc Left',
         },
         invalidStyle: 'Invalid style',
         success:

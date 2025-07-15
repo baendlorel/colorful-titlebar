@@ -5,6 +5,7 @@ import { Msg } from '@/common/i18n';
 import { configs } from '@/common/configs';
 import { catcher } from '@/common/catcher';
 import { suggestInfo } from '@/common/notifications';
+import { GradientStyle } from '@/common/consts';
 
 import { Css } from './consts';
 import { getMainCssPath, backupCss, hackCss, restoreCss } from './hackers';
@@ -39,9 +40,9 @@ const enable = catcher(async () => {
   }
 
   const gradientStyle = await vscode.window.showQuickPick([
-    Enable.style.brightCenter,
-    Enable.style.brightLeft,
-    Enable.style.arcLeft,
+    Enable.style[GradientStyle.BrightCenter],
+    Enable.style[GradientStyle.BrightLeft],
+    Enable.style[GradientStyle.ArcLeft],
   ]);
   if (!gradientStyle) {
     return;

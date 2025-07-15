@@ -12,6 +12,12 @@ export const enum TitleBarStyle {
   InactiveBg = 'titleBar.inactiveBackground',
 }
 
+export const enum GradientStyle {
+  BrightLeft,
+  BrightCenter,
+  ArcLeft,
+}
+
 export const enum SettingsJson {
   FileName = 'settings.json',
   Dir = '.vscode',
