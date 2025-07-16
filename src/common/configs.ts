@@ -3,7 +3,6 @@ import vscode from 'vscode';
 import { Consts, HashSource } from './consts';
 
 const enum Prop {
-  ShowInfoPop = 'showInfoPop',
   ShowSuggest = 'showSuggest',
   LightThemeColors = 'lightThemeColors',
   DarkThemeColors = 'darkThemeColors',
@@ -15,7 +14,6 @@ const enum Prop {
 }
 
 const enum ConfigSection {
-  ShowInfoPop = `${Consts.Name}.${Prop.ShowInfoPop}`,
   ShowSuggest = `${Consts.Name}.${Prop.ShowSuggest}`,
   LightThemeColors = `${Consts.Name}.${Prop.LightThemeColors}`,
   DarkThemeColors = `${Consts.Name}.${Prop.DarkThemeColors}`,
@@ -38,12 +36,12 @@ class Config {
   /**
    * 本插件的配置数据
    */
-  static readonly self = vscode.workspace.getConfiguration(Consts.Name);
+  static self = vscode.workspace.getConfiguration(Consts.Name);
 
   /**
    * 全局配置数据
    */
-  readonly global = vscode.workspace.getConfiguration();
+  global = vscode.workspace.getConfiguration();
 
   readonly cwd: string;
 
@@ -85,10 +83,6 @@ class Config {
 
     // 如果没有工作区级别的设置，修改全局设置
     return { value, target: vscode.ConfigurationTarget.Global };
-  }
-
-  get [Prop.ShowInfoPop]() {
-    return Config.self.get<boolean>(Prop.ShowInfoPop, true);
   }
 
   get [Prop.ShowSuggest]() {
@@ -144,28 +138,29 @@ class Config {
   }
 
   readonly set = {
-    [Prop.ShowInfoPop](value: boolean) {
-      return Config.self.update(Prop.ShowInfoPop, value, vscode.ConfigurationTarget.Global);
+    async [Prop.ShowSuggest](value: boolean) {
+      await Config.self.update(Prop.ShowSuggest, value, vscode.ConfigurationTarget.Global);
+      Config.self = vscode.workspace.getConfiguration(Consts.Name);
     },
 
-    [Prop.ShowSuggest](value: boolean) {
-      return Config.self.update(Prop.ShowSuggest, value, vscode.ConfigurationTarget.Global);
+    async [Prop.HashSource](value: HashSource) {
+      await Config.self.update(Prop.HashSource, value, vscode.ConfigurationTarget.Global);
+      Config.self = vscode.workspace.getConfiguration(Consts.Name);
     },
 
-    [Prop.HashSource](value: HashSource) {
-      return Config.self.update(Prop.HashSource, value, vscode.ConfigurationTarget.Global);
+    async [Prop.WorkbenchCssPath](value: string) {
+      await Config.self.update(Prop.WorkbenchCssPath, value, vscode.ConfigurationTarget.Global);
+      Config.self = vscode.workspace.getConfiguration(Consts.Name);
     },
 
-    [Prop.WorkbenchCssPath](value: string) {
-      return Config.self.update(Prop.WorkbenchCssPath, value, vscode.ConfigurationTarget.Global);
+    async [Prop.GradientBrightness](value: number) {
+      await Config.self.update(Prop.GradientBrightness, value, vscode.ConfigurationTarget.Global);
+      Config.self = vscode.workspace.getConfiguration(Consts.Name);
     },
 
-    [Prop.GradientBrightness](value: number) {
-      return Config.self.update(Prop.GradientBrightness, value, vscode.ConfigurationTarget.Global);
-    },
-
-    [Prop.GradientDarkness](value: number) {
-      return Config.self.update(Prop.GradientDarkness, value, vscode.ConfigurationTarget.Global);
+    async [Prop.GradientDarkness](value: number) {
+      await Config.self.update(Prop.GradientDarkness, value, vscode.ConfigurationTarget.Global);
+      Config.self = vscode.workspace.getConfiguration(Consts.Name);
     },
   };
 }

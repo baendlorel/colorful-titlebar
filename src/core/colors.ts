@@ -26,7 +26,7 @@ const getHashSource = (fullPath: string) => {
     case HashSource.FullPath:
       return fullPath;
     case HashSource.ProjectNameDate:
-      return basename(fullPath) + new Date().toLocaleDateString();
+      return new Date().getDate().toString() + basename(fullPath);
     default:
       return basename(fullPath);
   }

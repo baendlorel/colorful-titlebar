@@ -322,7 +322,7 @@ export default async () => {
     }
 
     [theme="dark"] .select {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%9ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
     }
   </style>
 </head>
@@ -357,9 +357,7 @@ export default async () => {
         <div class="control-desc">${Panel.workbenchCssPath.description}</div>
       </div>
       <div class="control-input">
-        <input type="text" class="input-text" name="workbenchCssPath" value="${
-          configs.workbenchCssPath
-        }" />
+        <input type="text" class="input-text" name="workbenchCssPath" />
       </div>
       <div class="control-error" name="workbenchCssPath"></div>
       <div class="control-succ" name="workbenchCssPath"></div>
@@ -392,7 +390,7 @@ export default async () => {
         <div class="control-desc">${Panel.gradientBrightness.description}</div>
       </div>
       <div class="control-input input-percent">
-        <input type="number" min="0" max="100" step="5" class="" name="gradientBrightness" value="${gradientBrightness}" />
+        <input type="number" min="0" max="100" step="5" class="" name="gradientBrightness" />
       </div>
       <div class="control-error" name="gradientBrightness"></div>
       <div class="control-succ" name="gradientBrightness"></div>
@@ -404,7 +402,7 @@ export default async () => {
         <div class="control-desc">${Panel.gradientDarkness.description}</div>
       </div>
       <div class="control-input input-percent">
-        <input type="number" min="0" max="100" step="5" class="" name="gradientDarkness" value="${gradientDarkness}" />
+        <input type="number" min="0" max="100" step="5" class="" name="gradientDarkness" />
       </div>
       <div class="control-error" name="gradientDarkness"></div>
       <div class="control-succ" name="gradientDarkness"></div>
@@ -451,7 +449,7 @@ export default async () => {
       </div>
       <div class="control-input">
         <button type="button" class="btn" name="pickerBtn" style="background-color: #007ACC;">
-          asdf
+          ${Panel.pickColor.button}
         </button>
         <input type="color" class="picker" name="pickColor" value="#007ACC">
       </div>
@@ -461,7 +459,34 @@ export default async () => {
   </form>
 
   <script>
-    const vscode = typeof acquireVsCodeApi === 'function' ? acquireVsCodeApi() : { postMessage(a) { console.log('vscode.postMessage', a) } };
+    // functions
+    const freeze = () => {
+      document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
+      setTimeout(() => settings.classList.add('freeze'), 600);
+      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = true)
+    }
+
+    const unfreeze = () => {
+      setTimeout(() => settings.classList.remove('freeze'), 1000);
+      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = false)
+    }
+
+    const vspost = (() => {
+      let o = {
+        postMessage: (a) => console.log('vscode.postMessage', a)
+      };
+      if (typeof acquireVsCodeApi === 'function') {
+        o = acquireVsCodeApi();
+      }
+      return (data) => {
+        freeze();
+        o.postMessage({
+          from: 'colorful-titlebar',
+          ...data
+        });
+      }
+    })();
+
     const theme = () => {
       const currentTheme = document.body.getAttribute('theme');
       document.body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
@@ -505,21 +530,17 @@ export default async () => {
     const pickerBtn = find('pickerBtn');
     const refresh = find('refresh');
 
-    const freeze = () => {
-      document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
-      setTimeout(() => settings.classList.add('freeze'), 600);
-      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = true)
-    }
+    // init
+    find('showSuggest').checked = '${configs.showSuggest}' === 'true';
+    find('workbenchCssPath').value = '${configs.workbenchCssPath}';
+    find('hashSource').value = '${configs.hashSource}';
+    find('gradientBrightness').value = '${gradientBrightness}';
+    find('gradientDarkness').value = '${gradientDarkness}';
 
-    const unfreeze = () => {
-      setTimeout(() => settings.classList.remove('freeze'), 1000);
-      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = false)
-    }
 
-    refresh.onclick = () => {
-      freeze();
-      vscode.postMessage({ name: 'refresh', value: null });
-    }
+    // events
+
+    refresh.onclick = () => vspost({ name: 'refresh', value: null })
 
     pickerBtn.onclick = pickColor.click.bind(pickColor);
     pickColor.addEventListener('input', function () {
@@ -532,8 +553,6 @@ export default async () => {
 
     settings.addEventListener('change', function (event) {
       event.preventDefault();
-      freeze();
-
       const input = event.target;
       const data = {
         name: input.name,
@@ -557,7 +576,7 @@ export default async () => {
         data.value = input.checked;
       }
 
-      vscode.postMessage(data);
+      vspost(data);
     });
 
     window.addEventListener('message', (event) => {
@@ -565,14 +584,21 @@ export default async () => {
       if (resp.from !== 'colorful-titlebar') {
         return;
       }
-      if (resp.succ) {
-        if (resp.msg) {
-          find(resp.name, 'succ').textContent = resp.msg;
-        }
-      } else {
-        find(resp.name, 'error').textContent = resp.msg;
-      }
       unfreeze();
+
+      if (!resp.succ) {
+        find(resp.name, 'error').textContent = resp.msg;
+        return;
+      }
+
+      if (resp.msg) {
+        find(resp.name, 'succ').textContent = resp.msg;
+
+        // 如果调整了渐变配置，那么置空渐变选项以备重新选择
+        if (resp.name === 'gradientBrightness' || resp.name === 'gradientDarkness') {
+          find('gradient').value = '';
+        }
+      }
     });
   </script>
 </body>

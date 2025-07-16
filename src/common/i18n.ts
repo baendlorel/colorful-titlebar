@@ -27,8 +27,8 @@ export default (() => {
       },
       gradient: {
         label: '渐变样式',
-        description: '选择后需要重启生效',
-        empty: '',
+        description: '选择后立即注入css，选项不会保存在配置中。选择后需要重启生效',
+        empty: '-- 请选择 --',
         [GradientStyle.BrightCenter]: '中间较亮',
         [GradientStyle.BrightLeft]: '左侧较亮',
         [GradientStyle.ArcLeft]: '左侧弧光',
@@ -49,7 +49,7 @@ export default (() => {
         description: `将会以设定的内容作为计算Hash的依据`,
         [HashSource.ProjectName]: '项目名',
         [HashSource.FullPath]: '完整路径',
-        [HashSource.ProjectNameDate]: '项目名+日期',
+        [HashSource.ProjectNameDate]: '项目名 + Date.getDate()',
         success: '保存成功，点击"重新计算颜色"可以生效',
       },
       pickColor: {
@@ -172,8 +172,9 @@ export default (() => {
       },
       gradient: {
         label: 'Gradient Style',
-        description: 'Needs restart to take effect',
-        empty: '',
+        description:
+          'After selection, CSS is injected immediately, options are not saved in settings. Restart to take effect',
+        empty: '-- Select --',
         [GradientStyle.BrightCenter]: 'Bright Center',
         [GradientStyle.BrightLeft]: 'Bright Left',
         [GradientStyle.ArcLeft]: 'Arc Left',
@@ -194,7 +195,7 @@ export default (() => {
         description: `Determines the basis for calculating the hash used for color`,
         [HashSource.ProjectName]: 'Project Name',
         [HashSource.FullPath]: 'Full Path',
-        [HashSource.ProjectNameDate]: 'Project Name + Date',
+        [HashSource.ProjectNameDate]: 'Project Name + Date.getDate()',
         success: 'Saved successfully, click "Recalculate Color" to apply changes',
       },
       pickColor: {
