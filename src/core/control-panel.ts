@@ -56,6 +56,7 @@ export default async function (this: vscode.ExtensionContext) {
   <style>
     :root {
       --ct-primary: #226de7;
+      --ct-primary-light: #5595fc;
       --ct-success: #1fc34b;
       --ct-danger: #de2919;
       --ct-warning: #efb300;
@@ -72,7 +73,8 @@ export default async function (this: vscode.ExtensionContext) {
     }
 
     [theme="dark"] {
-      --ct-primary: #1162e6;
+      --ct-primary: #3980f3;
+      --ct-primary-light: #69a2ff;
       --ct-success: #15b941;
       --ct-danger: #e53020;
       --ct-warning: #fbbc05;
@@ -83,7 +85,7 @@ export default async function (this: vscode.ExtensionContext) {
       --ct-panel-bg: #292a2d;
       --ct-border-color: rgba(60, 64, 67, 0.5);
       --ct-shadow-color: rgba(0, 0, 0, 0.3);
-      --ct-shadow-light-color: rgba(128, 128, 128, 0.3);
+      --ct-shadow-light-color: rgba(34, 34, 34, 0.5);
       --ct-loading-bg-color: rgba(241, 241, 241, 0.12);
     }
 
@@ -158,16 +160,16 @@ export default async function (this: vscode.ExtensionContext) {
     }
 
     .header .colorful-title {
-      font-weight: 500;
+      font-weight: bold;
       font-size: 20px;
-      background: linear-gradient(90deg, var(--ct-danger), var(--ct-warning), var(--ct-success), var(--ct-primary), var(--ct-purple));
+      background: linear-gradient(91deg, var(--ct-danger), var(--ct-warning), var(--ct-success), var(--ct-primary), var(--ct-purple));
       background-clip: text;
       -webkit-background-clip: text;
       color: transparent;
       -webkit-text-fill-color: transparent;
-      text-shadow: 1px 1px 2px var(--ct-shadow-light-color);
+      text-shadow: 1px 1px 6px rgba(209, 209, 209, 0.5);
       font-family: 'Segoe UI', sans-serif;
-      margin: 0.2em 0 0.7em 0;
+      margin: 0.2em 0.4em 0.7em 0;
     }
 
     .header p {
@@ -181,7 +183,13 @@ export default async function (this: vscode.ExtensionContext) {
       text-decoration: none;
     }
 
+    .header a:hover {
+      text-decoration: underline;
+    }
+
     .header .version {
+      margin-left: 10px;
+      font-size: 0.7em;
       color: var(--ct-text-color-weak);
     }
 
@@ -312,19 +320,22 @@ export default async function (this: vscode.ExtensionContext) {
       min-width: 120px;
     }
 
-    .input-text {
-      width: 200px;
-      min-width: 150px;
-    }
 
+    .textarea,
     .select,
-    .input-text,
     .input-percent input[type="number"] {
       border: 1px solid var(--ct-border-color);
       border-radius: 8px;
       padding: 8px 30px 8px 12px;
       background-color: var(--ct-panel-bg);
       color: var(--ct-text-color);
+    }
+
+    .textarea {
+      padding: 8px 12px 8px 12px;
+      font-family: 'Roboto', sans-serif;
+      resize: none;
+      overflow: hidden;
     }
 
     .input-percent input[type="number"] {
@@ -357,19 +368,22 @@ export default async function (this: vscode.ExtensionContext) {
       cursor: pointer;
     }
 
+    textarea,
     button,
     input,
     select {
       transition: all 0.3s ease;
     }
 
-    .select:hover {
+    .textarea:hover,
+    .select:hover,
+    .input-percent input[type="number"]:focus {
       border-color: var(--ct-primary);
       box-shadow: 0 0 0 1px var(--ct-primary);
     }
 
+    .textarea:focus,
     .select:focus,
-    .input-text:focus,
     .input-percent input[type="number"]:focus {
       outline: none;
       border-color: var(--ct-primary);
@@ -792,8 +806,10 @@ export default async function (this: vscode.ExtensionContext) {
     <form name="settings" class="control-panel">
       <div class="header">
         <div>
-          <h1><span class="colorful-title">Colorful Titlebar</span> ${Panel.title}</h1>
-          <p><span class="version">v${version} by</span><a href="https://github.com/baendlorel">Kasukabe Tsumugi</a></p>
+          <h1><span class="colorful-title">Colorful Titlebar</span> ${
+            Panel.title
+          }<span class="version">v${version}</span></h1>
+          <p>by<a href="https://github.com/baendlorel">Kasukabe Tsumugi</a></p>
           <p>${Panel.description}</p>
         </div>
         <div>
@@ -841,7 +857,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-desc">${Panel.workbenchCssPath.description}</div>
         </div>
         <div class="control-input">
-          <input type="text" class="input-text" name="workbenchCssPath" />
+          <textarea class="textarea" name="workbenchCssPath"></textarea>
         </div>
         <div class="control-error" name="workbenchCssPath"></div>
         <div class="control-succ" name="workbenchCssPath"></div>
@@ -937,7 +953,7 @@ export default async function (this: vscode.ExtensionContext) {
           <button type="button" class="btn" name="pickerBtn">
             ${Panel.pickColor.button}
           </button>
-          <input type="color" class="picker" name="pickColor" value="${currentColor}">
+          <input type="color" class="picker" name="pickColor">
         </div>
         <div class="control-error" name="pickColor"></div>
         <div class="control-succ" name="pickColor"></div>
@@ -1018,27 +1034,39 @@ export default async function (this: vscode.ExtensionContext) {
     const pickColor = find('pickColor');
     const pickerBtn = find('pickerBtn');
     const refresh = find('refresh');
+    const workbenchCssPath = find('workbenchCssPath')
 
     // init
     if (isProd) {
       find('theme').checked = "${configs.theme}" === 'light';
       find('showSuggest').checked = '${configs.showSuggest}' === 'true';
-      find('workbenchCssPath').value = '${configs.workbenchCssPath}';
+      workbenchCssPath.value = '${configs.workbenchCssPath}';
       find('hashSource').value = '${configs.hashSource}';
       find('gradientBrightness').value = '${gradientBrightness}';
       find('gradientDarkness').value = '${gradientDarkness}';
       find('pickerBtn').style.backgroundColor = '${currentColor}';
+      pickColor.value = '${currentColor}';
     } else {
       find('theme').checked = true;
       find('showSuggest').checked = false;
-      find('workbenchCssPath').value = '/d/work/aaa.css';
+      workbenchCssPath.value = '/d/work/ddddddddddd/fffffffff/44444444/222222222/44444444/aaa.css';
       find('hashSource').value = '';
       find('gradientBrightness').value = '99';
       find('gradientDarkness').value = '12';
       find('pickerBtn').style.backgroundColor = '#007ACC';
+      pickColor.value = '#007ACC';
     }
 
     // events
+
+    workbenchCssPath.addEventListener('input', () => {
+      workbenchCssPath.style.height = 'auto';
+      workbenchCssPath.style.height = workbenchCssPath.scrollHeight + 'px';
+    });
+    workbenchCssPath.style.height = 'auto';
+    workbenchCssPath.style.height = workbenchCssPath.scrollHeight + 'px';
+
+
     find('theme').addEventListener('change', theme);
 
     refresh.onclick = () => vspost({ name: 'refresh', value: null })
