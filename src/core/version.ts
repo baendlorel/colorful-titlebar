@@ -18,7 +18,7 @@ class Version {
     if (currentVersion !== lastVersion) {
       await context.globalState.update('lastVersion', currentVersion);
       vscode.window.showInformationMessage(
-        `🎉 ${Consts.DisplayName} ${i18n.Version.updated}${currentVersion}`
+        `🎉 ${Consts.DisplayName} ${i18n.Version.updated(currentVersion)}`
       );
       await controlPanel.call(context);
     }
