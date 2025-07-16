@@ -219,6 +219,16 @@ Issues and Pull Requests are welcome!
 
 ## 📝 Changelog
 
+### 1.2.1
+
+- **🔧 Bug Fixes**: Fixed control panel not responding to configuration changes
+- **⚡ Performance**: Added version management and update event detection
+- **🛡️ Safety**: Prevented multiple control panel instances from opening simultaneously
+- **🎨 UI Improvements**: Enhanced control panel styling with colorful title effects
+- **📝 UX Enhancement**: Improved textarea auto-resize for CSS path configuration
+- **🔄 Config Management**: Fixed global configuration updates not refreshing properly
+- **📊 Feedback**: Added color output information when recalculating colors
+
 ### 1.2.0
 
 - **🔥 Breaking Change**: Replaced all commands with unified Control Panel
