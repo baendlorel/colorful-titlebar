@@ -2,8 +2,9 @@ import vscode from 'vscode';
 import { existsSync } from 'node:fs';
 
 import { GradientStyle, HashSource, TitleBarConsts } from '@/common/consts';
-import configs from '@/common/configs';
 import i18n from '@/common/i18n';
+import configs from '@/common/configs';
+
 import hacker from '@/features/gradient/hacker';
 import { AfterStyle } from '@/features/gradient/consts';
 import RGBA from '@/common/rgba';
@@ -33,14 +34,14 @@ export default async () => {
   );
 
   // 准备一些数据
+  const env = 'prod';
   const currentColorStyle = configs.global.get(TitleBarConsts.WorkbenchSection) ?? {};
   const currentColor = Reflect.get(currentColorStyle, TitleBarConsts.ActiveBg) || '#007ACC';
-
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
   const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
 
   controlPanel.webview.html = `<!DOCTYPE html>
-<html lang="zh-CN" theme="${configs.theme}">
+<html lang="zh-CN">
 
 <head>
   <meta charset="UTF-8">
@@ -48,31 +49,32 @@ export default async () => {
   <title>${Panel.title}</title>
   <style>
     :root {
-      --primary-color: #4285f4;
-      --success-color: #34a853;
-      --danger-color: #ea4335;
-      --warning-color: #fbbc05;
-      --text-color: #202124;
-      --text-color-weak: rgba(32, 33, 36, 0.7);
-      --bg-color: #f8f9fa;
-      --panel-bg: #ffffff;
-      --border-color: rgba(224, 224, 224, 0.5);
-      --shadow-color: rgba(0, 0, 0, 0.1);
-      --loading-bg-color: rgba(71, 73, 78, 0.12);
+      --ct-primary-color: #4285f4;
+      --ct-success-color: #34a853;
+      --ct-danger-color: #ea4335;
+      --ct-warning-color: #fbbc05;
+      --ct-text-color: #202124;
+      --ct-text-color-weak: rgba(32, 33, 36, 0.7);
+      --ct-bg-color: #f8f9fa;
+      --ct-panel-bg: #ffffff;
+      --ct-border-color: rgba(224, 224, 224, 0.5);
+      --ct-shadow-color: rgba(0, 0, 0, 0.1);
+      --ct-loading-bg-color: rgba(71, 73, 78, 0.12);
+      --ct-focus-shadow: rgba(66, 133, 244, 0.2);
     }
 
     [theme="dark"] {
-      --primary-color: #4285f4;
-      --success-color: #34a853;
-      --danger-color: #ea4335;
-      --warning-color: #fbbc05;
-      --text-color: #e8eaed;
-      --text-color-weak: rgba(232, 234, 237, 0.7);
-      --bg-color: #202124;
-      --panel-bg: #292a2d;
-      --border-color: rgba(60, 64, 67, 0.5);
-      --shadow-color: rgba(0, 0, 0, 0.3);
-      --loading-bg-color: rgba(241, 241, 241, 0.12);
+      --ct-primary-color: #4285f4;
+      --ct-success-color: #34a853;
+      --ct-danger-color: #ea4335;
+      --ct-warning-color: #fbbc05;
+      --ct-text-color: #e8eaed;
+      --ct-text-color-weak: rgba(232, 234, 237, 0.7);
+      --ct-bg-color: #202124;
+      --ct-panel-bg: #292a2d;
+      --ct-border-color: rgba(60, 64, 67, 0.5);
+      --ct-shadow-color: rgba(0, 0, 0, 0.3);
+      --ct-loading-bg-color: rgba(241, 241, 241, 0.12);
     }
 
     * {
@@ -82,10 +84,10 @@ export default async () => {
       font-size: 14px;
     }
 
-    body {
+    .body {
       font-family: 'Roboto', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
+      background-color: transparent;
+      color: var(--ct-text-color);
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -99,11 +101,11 @@ export default async () => {
       padding: 30px;
       width: 100%;
       max-width: 500px;
-      background-color: var(--panel-bg);
+      background-color: var(--ct-panel-bg);
       border-radius: 16px;
-      box-shadow: 0 10px 30px var(--shadow-color);
+      box-shadow: 0 10px 30px var(--ct-shadow-color);
       transition: background-color 0.3s;
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--ct-border-color);
     }
 
     .control-panel::after {
@@ -121,7 +123,7 @@ export default async () => {
       top: 0;
       border-radius: 16px;
       pointer-events: none;
-      background-color: var(--loading-bg-color);
+      background-color: var(--ct-loading-bg-color);
       opacity: 0;
       transition: opacity 0.3s;
     }
@@ -139,13 +141,13 @@ export default async () => {
     }
 
     .header h1 {
-      color: var(--text-color);
+      color: var(--ct-text-color);
       font-weight: 500;
       font-size: 20px;
     }
 
     .header p {
-      color: var(--text-color);
+      color: var(--ct-text-color);
       opacity: 0.7;
     }
 
@@ -157,13 +159,13 @@ export default async () => {
       margin-bottom: 10px;
       padding-bottom: 10px;
       align-items: center;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--ct-border-color);
     }
 
     .control-label-group {
       display: grid;
       grid-template-rows: auto auto;
-      color: var(--text-color);
+      color: var(--ct-text-color);
       font-weight: 500;
       margin-right: 20px;
     }
@@ -172,19 +174,19 @@ export default async () => {
 
     .control-desc {
       font-size: 0.8em;
-      color: var(--text-color-weak);
+      color: var(--ct-text-color-weak);
     }
 
     .control-error {
       grid-column: 1 / span 2;
       font-size: 0.8em;
-      color: var(--danger-color);
+      color: var(--ct-danger-color);
     }
 
     .control-succ {
       grid-column: 1 / span 2;
       font-size: 0.8em;
-      color: var(--success-color);
+      color: var(--ct-success-color);
     }
 
     .control-input {
@@ -230,11 +232,23 @@ export default async () => {
     }
 
     input:checked+.slider {
-      background-color: var(--primary-color);
+      background-color: var(--ct-primary-color);
     }
 
     input:checked+.slider:before {
       transform: translateX(20px);
+    }
+
+    [theme="dark"] .slider {
+      background-color: #555;
+    }
+
+    [theme="dark"] .slider:before {
+      background-color: #f1f1f1;
+    }
+
+    [theme="dark"] input:checked+.slider {
+      background-color: var(--ct-primary-color);
     }
 
     .btn {
@@ -247,7 +261,7 @@ export default async () => {
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: var(--primary-color);
+      background-color: var(--ct-primary-color);
       color: white;
     }
 
@@ -274,11 +288,11 @@ export default async () => {
     .select,
     .input-text,
     .input-percent input[type="number"] {
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--ct-border-color);
       border-radius: 8px;
       padding: 8px 30px 8px 12px;
-      background-color: var(--panel-bg);
-      color: var(--text-color);
+      background-color: var(--ct-panel-bg);
+      color: var(--ct-text-color);
     }
 
     .input-percent input[type="number"] {
@@ -298,11 +312,10 @@ export default async () => {
       content: '%';
       right: 40px;
       margin-top: -2px;
-      color: var(--text-color-weak);
+      color: var(--ct-text-color-weak);
     }
 
     .select {
-      transition: all 0.3s ease;
       appearance: none;
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
       background-position: right 8px center;
@@ -312,174 +325,196 @@ export default async () => {
       cursor: pointer;
     }
 
-    .select:hover {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 1px var(--primary-color);
+    button,
+    input,
+    select {
+      transition: all 0.3s ease;
     }
 
-    .select:focus {
+    .select:hover {
+      border-color: var(--ct-primary-color);
+      box-shadow: 0 0 0 1px var(--ct-primary-color);
+    }
+
+    .select:focus,
+    .input-text:focus,
+    .input-percent input[type="number"]:focus {
       outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+      border-color: var(--ct-primary-color);
+      box-shadow: 0 0 0 2px var(--ct-focus-shadow);
+    }
+
+    .btn:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--ct-focus-shadow);
+    }
+
+    .toggle-switch input:focus+.slider {
+      box-shadow: 0 0 0 2px var(--ct-focus-shadow);
     }
 
     [theme="dark"] .select {
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23abadb4' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
     }
   </style>
 </head>
 
 <body>
-  <form name="settings" class="control-panel">
-    <div class="header" onclick="theme()">
-      <div>
-        <h1>${Panel.title}</h1>
-        <p>${Panel.description}</p>
+  <div class="body" theme="${configs.theme}">
+    <form name="settings" class="control-panel">
+      <div class="header" onclick="theme()">
+        <div>
+          <h1>${Panel.title}</h1>
+          <p>${Panel.description}</p>
+        </div>
       </div>
-    </div>
 
-    <div class="control-item">
-      <div class="control-label-group">
-        <div class="control-label">${Panel.showSuggest.label}</div>
-        <div class="control-desc">${Panel.showSuggest.description}</div>
+      <div class="control-item">
+        <div class="control-label-group">
+          <div class="control-label">${Panel.showSuggest.label}</div>
+          <div class="control-desc">${Panel.showSuggest.description}</div>
+        </div>
+        <div class="control-input">
+          <label class="toggle-switch">
+            <input type="checkbox" name="showSuggest">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="control-error" name="showSuggest"></div>
+        <div class="control-succ" name="showSuggest"></div>
       </div>
-      <div class="control-input">
-        <label class="toggle-switch">
-          <input type="checkbox" name="showSuggest">
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="control-error" name="showSuggest"></div>
-      <div class="control-succ" name="showSuggest"></div>
-    </div>
 
-    <div class="control-item">
-      <div class="control-label-group">
-        <div class="control-label">${Panel.workbenchCssPath.label}</div>
-        <div class="control-desc">${Panel.workbenchCssPath.description}</div>
+      <div class="control-item">
+        <div class="control-label-group">
+          <div class="control-label">${Panel.workbenchCssPath.label}</div>
+          <div class="control-desc">${Panel.workbenchCssPath.description}</div>
+        </div>
+        <div class="control-input">
+          <input type="text" class="input-text" name="workbenchCssPath" />
+        </div>
+        <div class="control-error" name="workbenchCssPath"></div>
+        <div class="control-succ" name="workbenchCssPath"></div>
       </div>
-      <div class="control-input">
-        <input type="text" class="input-text" name="workbenchCssPath" />
-      </div>
-      <div class="control-error" name="workbenchCssPath"></div>
-      <div class="control-succ" name="workbenchCssPath"></div>
-    </div>
 
-    <div class="control-item">
-      <div class="control-label-group">
-        <label class="control-label">${Panel.gradient.label}</label>
-        <div class="control-desc">${Panel.gradient.description}</div>
-      </div>
-      <div class="control-input">
-        <select name="gradient" class="select">
-          <option value="" selected>${Panel.gradient.empty}</option>
-          <option value="${GradientStyle.BrightCenter}">${
+      <div class="control-item">
+        <div class="control-label-group">
+          <label class="control-label">${Panel.gradient.label}</label>
+          <div class="control-desc">${Panel.gradient.description}</div>
+        </div>
+        <div class="control-input">
+          <select name="gradient" class="select">
+            <option value="" selected>${Panel.gradient.empty}</option>
+            <option value="${GradientStyle.BrightCenter}">${
     Panel.gradient[GradientStyle.BrightCenter]
   }</option>
-          <option value="${GradientStyle.BrightLeft}">${
+            <option value="${GradientStyle.BrightLeft}">${
     Panel.gradient[GradientStyle.BrightLeft]
   }</option>
-          <option value="${GradientStyle.ArcLeft}">${Panel.gradient[GradientStyle.ArcLeft]}</option>
-        </select>
+            <option value="${GradientStyle.ArcLeft}">${
+    Panel.gradient[GradientStyle.ArcLeft]
+  }</option>
+          </select>
+        </div>
+        <div class="control-error" name="gradient"></div>
+        <div class="control-succ" name="gradient"></div>
       </div>
-      <div class="control-error" name="gradient"></div>
-      <div class="control-succ" name="gradient"></div>
-    </div>
 
-    <div class="control-item">
-      <div class="control-label-group">
-        <div class="control-label">${Panel.gradientBrightness.label}</div>
-        <div class="control-desc">${Panel.gradientBrightness.description}</div>
+      <div class="control-item">
+        <div class="control-label-group">
+          <div class="control-label">${Panel.gradientBrightness.label}</div>
+          <div class="control-desc">${Panel.gradientBrightness.description}</div>
+        </div>
+        <div class="control-input input-percent">
+          <input type="number" min="0" max="100" step="5" class="" name="gradientBrightness" />
+        </div>
+        <div class="control-error" name="gradientBrightness"></div>
+        <div class="control-succ" name="gradientBrightness"></div>
       </div>
-      <div class="control-input input-percent">
-        <input type="number" min="0" max="100" step="5" class="" name="gradientBrightness" />
-      </div>
-      <div class="control-error" name="gradientBrightness"></div>
-      <div class="control-succ" name="gradientBrightness"></div>
-    </div>
 
-    <div class="control-item">
-      <div class="control-label-group">
-        <div class="control-label">${Panel.gradientDarkness.label}</div>
-        <div class="control-desc">${Panel.gradientDarkness.description}</div>
+      <div class="control-item">
+        <div class="control-label-group">
+          <div class="control-label">${Panel.gradientDarkness.label}</div>
+          <div class="control-desc">${Panel.gradientDarkness.description}</div>
+        </div>
+        <div class="control-input input-percent">
+          <input type="number" min="0" max="100" step="5" class="" name="gradientDarkness" />
+        </div>
+        <div class="control-error" name="gradientDarkness"></div>
+        <div class="control-succ" name="gradientDarkness"></div>
       </div>
-      <div class="control-input input-percent">
-        <input type="number" min="0" max="100" step="5" class="" name="gradientDarkness" />
-      </div>
-      <div class="control-error" name="gradientDarkness"></div>
-      <div class="control-succ" name="gradientDarkness"></div>
-    </div>
 
-    <div class="control-item">
-      <div class="control-label-group">
-        <div class="control-label">${Panel.hashSource.label}</div>
-        <div class="control-desc">${Panel.hashSource.description}</div>
-      </div>
-      <div class="control-input">
-        <select name="hashSource" class="select">
-          <option value="${HashSource.FullPath}">${Panel.hashSource[HashSource.FullPath]}</option>
-          <option value="${HashSource.ProjectName}">${
+      <div class="control-item">
+        <div class="control-label-group">
+          <div class="control-label">${Panel.hashSource.label}</div>
+          <div class="control-desc">${Panel.hashSource.description}</div>
+        </div>
+        <div class="control-input">
+          <select name="hashSource" class="select">
+            <option value="${HashSource.FullPath}">${Panel.hashSource[HashSource.FullPath]}</option>
+            <option value="${HashSource.ProjectName}">${
     Panel.hashSource[HashSource.ProjectName]
   }</option>
-          <option value="${HashSource.ProjectNameDate}">${
+            <option value="${HashSource.ProjectNameDate}">${
     Panel.hashSource[HashSource.ProjectNameDate]
   }</option>
-        </select>
+          </select>
+        </div>
+        <div class="control-error" name="hashSource"></div>
+        <div class="control-succ" name="hashSource"></div>
       </div>
-      <div class="control-error" name="hashSource"></div>
-      <div class="control-succ" name="hashSource"></div>
-    </div>
 
-    <div class="control-item">
-      <div class="control-label-group">
-        <div class="control-label">${Panel.refresh.label}</div>
-        <div class="control-desc">${Panel.refresh.description}</div>
+      <div class="control-item">
+        <div class="control-label-group">
+          <div class="control-label">${Panel.refresh.label}</div>
+          <div class="control-desc">${Panel.refresh.description}</div>
+        </div>
+        <div class="control-input">
+          <button type="button" class="btn" name="refresh">
+            <span>${Panel.refresh.button}</span>
+          </button>
+        </div>
+        <div class="control-error" name="refresh"></div>
+        <div class="control-succ" name="refresh"></div>
       </div>
-      <div class="control-input">
-        <button type="button" class="btn" name="refresh">
-          <span>${Panel.refresh.button}</span>
-        </button>
-      </div>
-      <div class="control-error" name="refresh"></div>
-      <div class="control-succ" name="refresh"></div>
-    </div>
 
-    <div class="control-item">
-      <div class="control-label-group">
-        <div class="control-label">${Panel.pickColor.label}</div>
-        <div class="control-desc">${Panel.pickColor.description}</div>
+      <div class="control-item">
+        <div class="control-label-group">
+          <div class="control-label">${Panel.pickColor.label}</div>
+          <div class="control-desc">${Panel.pickColor.description}</div>
+        </div>
+        <div class="control-input">
+          <button type="button" class="btn" name="pickerBtn">
+            ${Panel.pickColor.button}
+          </button>
+          <input type="color" class="picker" name="pickColor" value="${currentColor}">
+        </div>
+        <div class="control-error" name="pickColor"></div>
+        <div class="control-succ" name="pickColor"></div>
       </div>
-      <div class="control-input">
-        <button type="button" class="btn" name="pickerBtn">
-          ${Panel.pickColor.button}
-        </button>
-        <input type="color" class="picker" name="pickColor" value="${currentColor}">
-      </div>
-      <div class="control-error" name="pickColor"></div>
-      <div class="control-succ" name="pickColor"></div>
-    </div>
-  </form>
+    </form>
+  </div>
 
   <script>
+    const isProd = '${env}' === 'prod';
+
     // functions
     const freeze = () => {
       document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
-      setTimeout(() => settings.classList.add('freeze'), 600);
-      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = true)
+      if (isProd) {
+        setTimeout(() => settings.classList.add('freeze'), 600);
+        Array.from(settings.elements).forEach((el) => el.disabled = true);
+      }
     }
 
     const unfreeze = () => {
       setTimeout(() => settings.classList.remove('freeze'), 1000);
-      Array.prototype.forEach.call(settings.elements, (el) => el.disabled = false)
+      Array.from(settings.elements).forEach((el) => el.disabled = false)
     }
 
     const vspost = (() => {
-      let o = {
+      let o = isProd ? acquireVsCodeApi() : {
         postMessage: (a) => console.log('vscode.postMessage', a)
       };
-      if (typeof acquireVsCodeApi === 'function') {
-        o = acquireVsCodeApi();
-      }
       return (data) => {
         freeze();
         o.postMessage({
@@ -490,8 +525,9 @@ export default async () => {
     })();
 
     const theme = () => {
-      const currentTheme = document.body.getAttribute('theme');
-      document.body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
+      const body = document.querySelector('.body');
+      const currentTheme = body.getAttribute('theme');
+      body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
     }
 
     // tp = form | error | succ
@@ -533,12 +569,21 @@ export default async () => {
     const refresh = find('refresh');
 
     // init
-    find('showSuggest').checked = '${configs.showSuggest}' === 'true';
-    find('workbenchCssPath').value = '${configs.workbenchCssPath}';
-    find('hashSource').value = '${configs.hashSource}';
-    find('gradientBrightness').value = '${gradientBrightness}';
-    find('gradientDarkness').value = '${gradientDarkness}';
-    find('pickerBtn').style.backgroundColor = '${currentColor}';
+    if (isProd) {
+      find('showSuggest').checked = '${configs.showSuggest}' === 'true';
+      find('workbenchCssPath').value = '${configs.workbenchCssPath}';
+      find('hashSource').value = '${configs.hashSource}';
+      find('gradientBrightness').value = '${gradientBrightness}';
+      find('gradientDarkness').value = '${gradientDarkness}';
+      find('pickerBtn').style.backgroundColor = '${currentColor}';
+    } else {
+      find('showSuggest').checked = false;
+      find('workbenchCssPath').value = '/d/work/aaa.css';
+      find('hashSource').value = '';
+      find('gradientBrightness').value = '99';
+      find('gradientDarkness').value = '12';
+      find('pickerBtn').style.backgroundColor = '#007ACC';
+    }
 
     // events
 
