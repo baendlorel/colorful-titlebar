@@ -61,11 +61,13 @@ export default (() => {
         label: '重新计算颜色',
         description: `再次让本插件自动计算颜色`,
         button: '开始计算',
+        success: (token: string, color: string) =>
+          `重新计算颜色成功，哈希入参：${token}，颜色：${color}`,
       },
     },
 
-    Commands: {
-      enableGradient: {
+    Features: {
+      gradient: {
         suggest: {
           msg: '已支持美丽的标题栏渐变色！需要开启吗？',
           yes: '好的！',
@@ -95,31 +97,12 @@ export default (() => {
           fail: '备份css文件失败！',
         },
       },
-      disableGradient: {
-        fail: '关闭渐变色标题栏失败！',
-      },
-      pickColor: {
+      color: {
         suggest: {
           msg: '对自动计算的颜色不满意？可以手动选择！',
           yes: '我要手选！',
           no: '现在这个蛮好',
         },
-        title: '选择标题栏颜色',
-        html: {
-          description: '选择一个颜色来设置标题栏的背景色',
-          input: '选择颜色',
-          preview: '预览',
-          colorValue: '颜色值',
-          apply: '应用',
-          reset: '重置',
-        },
-        titleBarStyleWarning: '标题栏样式必须设置为"custom"才能应用颜色。您想现在设置吗？',
-        setStyleButton: '是的',
-        cancelButton: '不了',
-        styleSetSuccess: '标题栏样式设置为custom成功！',
-        colorApplied: (color: string) => `标题栏颜色已应用：${color}`,
-        colorReset: '标题栏颜色已重置为自动生成',
-        error: (error: string) => `错误：${error}`,
       },
     },
 
@@ -127,10 +110,6 @@ export default (() => {
       [vscode.ConfigurationTarget.Workspace]: '工作区',
       [vscode.ConfigurationTarget.WorkspaceFolder]: '工作区文件夹',
       [vscode.ConfigurationTarget.Global]: '全局',
-    },
-    Config: {
-      changed: '检测到配置变化，重启后生效',
-      gradientChangedButInvalidCssPath: `虽然修改了渐变配置但${Consts.WorkbenchCssName}文件路径不正确，修改将无法生效！`,
     },
 
     // 设置标题栏颜色
@@ -207,11 +186,13 @@ export default (() => {
         label: 'Recalculate Color',
         description: `Recalculate the titlebar color automatically`,
         button: 'Calculate',
+        success: (token: string, color: string) =>
+          `Recalculated color successfully, hash input: ${token}, color: ${color}`,
       },
     },
 
-    Commands: {
-      enableGradient: {
+    Features: {
+      gradient: {
         suggest: {
           msg: 'Gradient titlebar is supported! Do you want to enable it now?',
           yes: 'YES! Enable it now!',
@@ -242,32 +223,12 @@ export default (() => {
           fail: 'Backup CSS file restoration failed!',
         },
       },
-      disableGradient: {
-        fail: 'Disabling gradient titlebar failed!',
-      },
-      pickColor: {
+      color: {
         suggest: {
           msg: 'Not satisfied with the auto-calculated color? You can choose manually!',
           yes: 'I want to pick a color',
           no: 'This one is fine',
         },
-        title: 'Pick Titlebar Color',
-        html: {
-          description: 'Select a color to set the titlebar background',
-          input: 'Pick Color',
-          preview: 'Preview',
-          colorValue: 'Color Value',
-          apply: 'Apply',
-          reset: 'Reset',
-        },
-        titleBarStyleWarning:
-          'Title bar style must be set to "custom" to apply colors. Would you like to set it now?',
-        setStyleButton: 'Yes',
-        cancelButton: 'No',
-        styleSetSuccess: 'Title bar style set to custom successfully!',
-        colorApplied: (color: string) => `Titlebar color applied: ${color}`,
-        colorReset: 'Titlebar color reset to auto-generated',
-        error: (error: string) => `Error: ${error}`,
       },
     },
 
@@ -275,11 +236,6 @@ export default (() => {
       [vscode.ConfigurationTarget.Workspace]: 'Workspace',
       [vscode.ConfigurationTarget.WorkspaceFolder]: 'Workspace Folder',
       [vscode.ConfigurationTarget.Global]: 'Global',
-    },
-
-    Config: {
-      changed: 'Detected color configuration change, restart to apply',
-      gradientChangedButInvalidCssPath: `Although gradient config has changed, the path to "${Consts.WorkbenchCssName}" is incorrect, changes will not take effect!`,
     },
 
     // 设置标题栏颜色

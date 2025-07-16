@@ -154,6 +154,7 @@
   "scripts": {
     "build": "rimraf out && rollup -c",
     "watch": "tsc -watch -p ./",
+    "check": "tsc -p tsconfig.build.json",
     "test": "tsx tests/index.test.ts",
     "lint": "eslint src --ext ts",
     "package": "vsce package",

@@ -19,7 +19,7 @@ export const getColor = (fullPath: string): RGBA => {
   return getColorByK(k, configs.colorSet);
 };
 
-const getHashSource = (fullPath: string) => {
+export const getHashSource = (fullPath: string) => {
   switch (configs.hashSource) {
     case HashSource.ProjectName:
       return basename(fullPath);

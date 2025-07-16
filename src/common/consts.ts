@@ -19,10 +19,6 @@ export const enum SettingsJson {
 }
 
 export const enum Commands {
-  // EnableGradient = `${Consts.Name}.enableGradient`,
-  // DisableGradient = `${Consts.Name}.disableGradient`,
-  // PickColor = `${Consts.Name}.pickColor`,
-  // Refresh = `${Consts.Name}.refresh`,
   ControlPanel = `${Consts.Name}.controlPanel`,
 }
 

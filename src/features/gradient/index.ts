@@ -10,7 +10,7 @@ import { Css } from './consts';
 import hacker from './hacker';
 
 class Gradient {
-  private readonly Enable = i18n.Commands.enableGradient;
+  private readonly Enable = i18n.Features.gradient;
 
   async suggest() {
     // 如果已经记载了主css路径并嵌入了样式，则无需弹出建议

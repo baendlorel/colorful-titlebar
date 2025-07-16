@@ -55,7 +55,7 @@ class TitleBarStyle {
     );
 
     if (!satisfied) {
-      const suggest = i18n.Commands.pickColor.suggest;
+      const suggest = i18n.Features.color.suggest;
 
       // 询问用户是否要手动选择颜色
       const result = await popSuggest(suggest.msg, suggest.yes, suggest.no);

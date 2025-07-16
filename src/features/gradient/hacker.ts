@@ -9,7 +9,7 @@ import configs from '@/common/configs';
 import { AfterStyle, Css } from './consts';
 
 class Hacker {
-  private readonly Enable = i18n.Commands.enableGradient;
+  private readonly Enable = i18n.Features.gradient;
 
   /**
    * 获取主css文件的路径

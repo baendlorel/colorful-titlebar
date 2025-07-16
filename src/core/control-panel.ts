@@ -9,6 +9,7 @@ import hacker from '@/features/gradient/hacker';
 import { AfterStyle } from '@/features/gradient/consts';
 import RGBA from '@/common/rgba';
 import style from './style';
+import { getColor, getHashSource } from './colors';
 
 const enum ControlName {
   ShowSuggest = 'showSuggest',
@@ -30,7 +31,7 @@ export default async () => {
     'controllPanel',
     Panel.title,
     vscode.ViewColumn.One,
-    { enableScripts: true }
+    { enableScripts: true, retainContextWhenHidden: true }
   );
 
   // 准备一些数据
@@ -869,10 +870,10 @@ export default async () => {
         </div>
         <div class="control-input">
           <select name="hashSource" class="select">
-            <option value="${HashSource.FullPath}">${Panel.hashSource[HashSource.FullPath]}</option>
             <option value="${HashSource.ProjectName}">${
     Panel.hashSource[HashSource.ProjectName]
   }</option>
+            <option value="${HashSource.FullPath}">${Panel.hashSource[HashSource.FullPath]}</option>
             <option value="${HashSource.ProjectNameDate}">${
     Panel.hashSource[HashSource.ProjectNameDate]
   }</option>
@@ -1188,6 +1189,9 @@ export default async () => {
 
         case ControlName.Refresh: {
           await style.refresh(true);
+          const token = getHashSource(configs.cwd);
+          const color = getColor(configs.cwd);
+          result.msg = Panel.refresh.success(token, color.toString());
           break;
         }
 
