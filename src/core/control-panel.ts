@@ -1,7 +1,7 @@
 import vscode from 'vscode';
 import { existsSync } from 'node:fs';
 
-import { GradientStyle, HashSource, TitleBarConsts } from '@/common/consts';
+import { Consts, GradientStyle, HashSource, TitleBarConsts } from '@/common/consts';
 import i18n from '@/common/i18n';
 import configs from '@/common/configs';
 
@@ -10,6 +10,7 @@ import { AfterStyle } from '@/features/gradient/consts';
 import RGBA from '@/common/rgba';
 import style from './style';
 import { getColor, getHashSource } from './colors';
+import version from './version';
 
 const enum ControlName {
   ShowSuggest = 'showSuggest',
@@ -22,26 +23,30 @@ const enum ControlName {
   PickColor = 'pickColor',
 }
 
-/**
- * Opens a color picker to manually select titlebar color
- */
+let controlPanel: vscode.WebviewPanel | null = null;
+
 export default async function (this: vscode.ExtensionContext) {
+  // 防止创建多个设置页面
+  if (controlPanel !== null) {
+    return;
+  }
+
   const Panel = i18n.ControlPanel;
-  const controlPanel = vscode.window.createWebviewPanel(
+  controlPanel = vscode.window.createWebviewPanel(
     'controllPanel',
     Panel.title,
     vscode.ViewColumn.One,
     { enableScripts: true, retainContextWhenHidden: true }
   );
 
+  controlPanel.onDidDispose(() => {
+    controlPanel = null;
+  });
+
   // 准备一些数据
   const env = 'prod';
   const lang = configs.lang;
-  const extension = vscode.extensions.getExtension(this.extension.id);
-  if (!extension) {
-    vscode.window.showErrorMessage('怎么可能没找到自己？');
-  }
-  const version = extension?.packageJSON.version ?? 'outdated';
+  const ver = version.get(this);
   const currentColor = configs.currentColor ?? '#007ACC';
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
   const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
@@ -806,9 +811,9 @@ export default async function (this: vscode.ExtensionContext) {
     <form name="settings" class="control-panel">
       <div class="header">
         <div>
-          <h1><span class="colorful-title">Colorful Titlebar</span> ${
-            Panel.title
-          }<span class="version">v${version}</span></h1>
+          <h1><span class="colorful-title">${Consts.DisplayName}</span> ${
+    Panel.title
+  }<span class="version">v${ver}</span></h1>
           <p>by<a href="https://github.com/baendlorel">Kasukabe Tsumugi</a></p>
           <p>${Panel.description}</p>
         </div>
@@ -1267,8 +1272,9 @@ export default async function (this: vscode.ExtensionContext) {
         vscode.window.showErrorMessage(error.message);
       }
     } finally {
-      // controlPanel.dispose();
-      await controlPanel.webview.postMessage(result);
+      if (controlPanel) {
+        await controlPanel.webview.postMessage(result);
+      }
     }
   });
 }

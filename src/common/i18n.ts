@@ -9,6 +9,12 @@ export default (() => {
     NotWorkspace: '没有打开工作区文件夹，不改变标题栏颜色',
     NotProject: '当前不是项目目录，不改变标题栏颜色',
 
+    Version: {
+      updated: (v: string) => `已更新至 v${v}，为您打开控制面板以查看新功能`,
+      selfNotFound: '怎么可能没找到自己？',
+      button: '打开控制面板！',
+    },
+
     ControlPanel: {
       title: '设置',
       description: '在这里可以控制标题栏颜色和样式',
@@ -129,6 +135,13 @@ export default (() => {
     BlockAllSuggestion: { button: 'Block Suggestions' },
     NotWorkspace: 'No workspace folder opened, titlebar color remains unchanged',
     NotProject: 'Current folder is not a project directory, titlebar color remains unchanged',
+
+    Version: {
+      updated: (v: string) =>
+        `is updated to v${v}. The control panel is opened to see the new features`,
+      selfNotFound: 'How could I not find myself?',
+      button: 'Open Control Panel!',
+    },
 
     ControlPanel: {
       title: 'Settings',

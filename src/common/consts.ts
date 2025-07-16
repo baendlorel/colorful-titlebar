@@ -1,5 +1,6 @@
 export const enum Consts {
   Name = 'colorful-titlebar',
+  DisplayName = 'Colorful Titlebar',
   WorkbenchCssName = 'workbench.desktop.main.css',
   InvisibleSeparator = '\u2063',
 }
