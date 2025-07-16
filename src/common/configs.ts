@@ -74,6 +74,10 @@ class Config {
 
   // # 全局的设定
 
+  get currentColor() {
+    return this[TitleBarConsts.WorkbenchSection]?.[TitleBarConsts.ActiveBg];
+  }
+
   /**
    * 当前的标题栏颜色配置，可能是`undefined`
    */
@@ -94,16 +98,24 @@ class Config {
     },
   };
 
-  readonly setGlobal = {
+  readonly setWorkspace = {
     async [TitleBarConsts.WorkbenchSection](value: Partial<TitleBarStyleCustomization>) {
+      vscode.window.showInformationMessage(
+        `开始保存${JSON.stringify(value)}，到${TitleBarConsts.WorkbenchSection}  ${
+          vscode.ConfigurationTarget.Global
+        }`
+      );
+
       await Config.global.update(
         TitleBarConsts.WorkbenchSection,
         value,
-        vscode.ConfigurationTarget.Global
+        vscode.ConfigurationTarget.Workspace
       );
       Config.global = vscode.workspace.getConfiguration();
     },
+  };
 
+  readonly setGlobal = {
     async [TitleBarConsts.Section](value: string) {
       await Config.global.update(TitleBarConsts.Section, value, vscode.ConfigurationTarget.Global);
       Config.global = vscode.workspace.getConfiguration();

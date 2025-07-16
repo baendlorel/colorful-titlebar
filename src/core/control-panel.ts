@@ -37,8 +37,7 @@ export default async () => {
   // 准备一些数据
   const env = 'prod';
   const lang = configs.lang;
-  const currentColor =
-    configs[TitleBarConsts.WorkbenchSection]?.[TitleBarConsts.ActiveBg] ?? '#007ACC';
+  const currentColor = configs.currentColor ?? '#007ACC';
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
   const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
 
@@ -921,13 +920,13 @@ export default async () => {
     const freeze = () => {
       document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
       if (isProd) {
-        setTimeout(() => settings.classList.add('freeze'), 600);
+        settings.classList.add('freeze');
         Array.from(settings.elements).forEach((el) => el.disabled = true);
       }
     }
 
     const unfreeze = () => {
-      setTimeout(() => settings.classList.remove('freeze'), 1000);
+      setTimeout(() => settings.classList.remove('freeze'), 200);
       Array.from(settings.elements).forEach((el) => el.disabled = false)
     }
 
@@ -1224,5 +1223,5 @@ const applyManualColor = async (colorHex: string) => {
     [TitleBarConsts.InactiveBg]: color.toGreyDarkenString(),
   };
 
-  await configs.setGlobal[TitleBarConsts.WorkbenchSection](newStyle);
+  await configs.setWorkspace[TitleBarConsts.WorkbenchSection](newStyle);
 };

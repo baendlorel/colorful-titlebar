@@ -19,17 +19,19 @@ class TitleBarStyle {
       return;
     }
 
-    // 如果标题栏样式不是custom，则不设置颜色
+    // 如果标题栏样式不是custom，且用户坚持不改，那么则不设置颜色
     const globalTitleBarStyleIsCustom = await this.tryCustom();
     if (!globalTitleBarStyleIsCustom) {
       return;
     }
 
+    // 不是项目文件夹就不设置
     const isProject = await this.checkDirIsProject();
     if (!isProject) {
       return;
     }
 
+    // 开始计算颜色并应用
     const color = getColor(configs.cwd);
     const newStyle = {
       [TitleBarConsts.ActiveBg]: color.toString(),
@@ -43,7 +45,8 @@ class TitleBarStyle {
     ) {
       return;
     }
-    await configs.setGlobal[TitleBarConsts.WorkbenchSection](newStyle);
+
+    await configs.setWorkspace[TitleBarConsts.WorkbenchSection](newStyle);
 
     if (!satisfied) {
       const suggest = i18n.Features.color.suggest;
@@ -74,7 +77,7 @@ class TitleBarStyle {
       [TitleBarConsts.ActiveBg]: undefined,
       [TitleBarConsts.InactiveBg]: undefined,
     };
-    await configs.setGlobal[TitleBarConsts.WorkbenchSection](emptyStyle);
+    await configs.setWorkspace[TitleBarConsts.WorkbenchSection](emptyStyle);
 
     // 如果.vscode下只有settings一个文件，而且内容和上面的compact一样，那么删除.vscode
     const settingsPath = join(configs.cwd, SettingsJson.Dir); // , 'settings.json'
