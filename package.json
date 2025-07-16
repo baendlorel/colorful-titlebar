@@ -47,6 +47,10 @@
     "configuration": {
       "title": "%configuration.title%",
       "properties": {
+        "colorful-titlebar.currentVersion": {
+          "type": "string",
+          "default": "outdated"
+        },
         "colorful-titlebar.showSuggest": {
           "type": "boolean",
           "default": true,

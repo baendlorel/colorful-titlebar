@@ -2,6 +2,7 @@ import vscode from 'vscode';
 import { Consts } from '@/common/consts';
 import i18n from '@/common/i18n';
 import controlPanel from './control-panel';
+import configs from '@/common/configs';
 
 class Version {
   get(context: vscode.ExtensionContext) {
@@ -13,15 +14,17 @@ class Version {
   }
 
   async updated(context: vscode.ExtensionContext) {
-    const lastVersion = context.globalState.get('lastVersion');
-    const currentVersion = this.get(context);
-    if (currentVersion !== lastVersion) {
-      await context.globalState.update('lastVersion', currentVersion);
+    const version = configs.currentVersion;
+    const actualVersion = this.get(context);
+    if (actualVersion !== version) {
       vscode.window.showInformationMessage(
-        `🎉 ${Consts.DisplayName} ${i18n.Version.updated(currentVersion)}`
+        `🎉 ${Consts.DisplayName} ${i18n.Version.updated(actualVersion)}`
       );
+      configs.set.currentVersion(actualVersion);
       await controlPanel.call(context);
+      return true;
     }
+    return false;
   }
 }
 

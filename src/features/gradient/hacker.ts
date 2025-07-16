@@ -83,14 +83,6 @@ class Hacker {
   /**
    * 会在command注册的地方就确认`cssPath`是否存在
    */
-  private async backup(cssPath: string): Promise<void> {
-    const buffer = await readFile(cssPath);
-    await writeFile(`${cssPath}.${Css.BackupSuffix}`, buffer);
-  }
-
-  /**
-   * 会在command注册的地方就确认`cssPath`是否存在
-   */
   async restore(cssPath: string): Promise<void> {
     const backupPath = `${cssPath}.${Css.BackupSuffix}`;
     if (!existsSync(backupPath)) {

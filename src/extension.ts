@@ -15,10 +15,12 @@ export const activate = catcher(async (context: vscode.ExtensionContext) => {
   // 如果颜色没有设置过，那么应用标题栏颜色
   await style.applyIfNotSet();
 
-  // 建议开启渐变
-  await gradient.suggest();
-
   await version.updated(context);
+
+  // if (!isUpdated) {
+  //   // 建议开启渐变
+  //   await gradient.suggest();
+  // }
 });
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function

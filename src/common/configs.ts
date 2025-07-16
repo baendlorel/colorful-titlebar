@@ -3,6 +3,7 @@ import vscode from 'vscode';
 import { Consts, HashSource, TitleBarConsts } from './consts';
 
 const enum Prop {
+  CurrentVersion = 'currentVersion',
   ShowSuggest = 'showSuggest',
   LightThemeColors = 'lightThemeColors',
   DarkThemeColors = 'darkThemeColors',
@@ -124,6 +125,10 @@ class Config {
 
   // # 本插件的设定
 
+  get [Prop.CurrentVersion]() {
+    return Config.self.get<string>(Prop.CurrentVersion, 'outdated');
+  }
+
   get [Prop.ShowSuggest]() {
     return Config.self.get<boolean>(Prop.ShowSuggest, true);
   }
@@ -150,30 +155,39 @@ class Config {
     return Config.self.get<number>(Prop.GradientDarkness, Defaults.GradientDarkness);
   }
 
+  private static refresh() {
+    Config.self = vscode.workspace.getConfiguration(Consts.Name);
+  }
+
   readonly set = {
+    async [Prop.CurrentVersion](value: string) {
+      await Config.self.update(Prop.CurrentVersion, value, vscode.ConfigurationTarget.Global);
+      Config.refresh();
+    },
+
     async [Prop.ShowSuggest](value: boolean) {
       await Config.self.update(Prop.ShowSuggest, value, vscode.ConfigurationTarget.Global);
-      Config.self = vscode.workspace.getConfiguration(Consts.Name);
+      Config.refresh();
     },
 
     async [Prop.HashSource](value: HashSource) {
       await Config.self.update(Prop.HashSource, value, vscode.ConfigurationTarget.Global);
-      Config.self = vscode.workspace.getConfiguration(Consts.Name);
+      Config.refresh();
     },
 
     async [Prop.WorkbenchCssPath](value: string) {
       await Config.self.update(Prop.WorkbenchCssPath, value, vscode.ConfigurationTarget.Global);
-      Config.self = vscode.workspace.getConfiguration(Consts.Name);
+      Config.refresh();
     },
 
     async [Prop.GradientBrightness](value: number) {
       await Config.self.update(Prop.GradientBrightness, value, vscode.ConfigurationTarget.Global);
-      Config.self = vscode.workspace.getConfiguration(Consts.Name);
+      Config.refresh();
     },
 
     async [Prop.GradientDarkness](value: number) {
       await Config.self.update(Prop.GradientDarkness, value, vscode.ConfigurationTarget.Global);
-      Config.self = vscode.workspace.getConfiguration(Consts.Name);
+      Config.refresh();
     },
   };
 }

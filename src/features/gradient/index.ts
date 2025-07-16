@@ -26,6 +26,7 @@ class Gradient {
     if (!configs.showSuggest) {
       return;
     }
+
     const now = await popSuggest(this.Enable.suggest.msg, this.Enable.suggest.yes);
     if (now !== this.Enable.suggest.yes) {
       return;
