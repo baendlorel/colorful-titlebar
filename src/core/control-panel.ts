@@ -37,8 +37,8 @@ export default async () => {
   // 准备一些数据
   const env = 'prod';
   const lang = configs.lang;
-  const currentColorStyle = configs.global.get(TitleBarConsts.WorkbenchSection) ?? {};
-  const currentColor = Reflect.get(currentColorStyle, TitleBarConsts.ActiveBg) || '#007ACC';
+  const currentColor =
+    configs[TitleBarConsts.WorkbenchSection]?.[TitleBarConsts.ActiveBg] ?? '#007ACC';
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
   const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
 
@@ -1224,9 +1224,5 @@ const applyManualColor = async (colorHex: string) => {
     [TitleBarConsts.InactiveBg]: color.toGreyDarkenString(),
   };
 
-  await configs.global.update(
-    TitleBarConsts.WorkbenchSection,
-    newStyle,
-    vscode.ConfigurationTarget.Workspace
-  );
+  await configs.setGlobal[TitleBarConsts.WorkbenchSection](newStyle);
 };

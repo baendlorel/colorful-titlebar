@@ -1,6 +1,6 @@
 import vscode from 'vscode';
 
-import { Consts, HashSource } from './consts';
+import { Consts, HashSource, TitleBarConsts } from './consts';
 
 const enum Prop {
   ShowSuggest = 'showSuggest',
@@ -21,16 +21,21 @@ const enum Defaults {
   GradientDarkness = 0.26,
 }
 
+interface TitleBarStyleCustomization {
+  [TitleBarConsts.ActiveBg]: string;
+  [TitleBarConsts.InactiveBg]: string;
+}
+
 class Config {
   /**
    * 本插件的配置数据
    */
-  static self = vscode.workspace.getConfiguration(Consts.Name);
+  private static self = vscode.workspace.getConfiguration(Consts.Name);
 
   /**
    * 全局配置数据
    */
-  global = vscode.workspace.getConfiguration();
+  private static global = vscode.workspace.getConfiguration();
 
   readonly cwd: string;
 
@@ -39,39 +44,6 @@ class Config {
   constructor() {
     const cwd = vscode.workspace.workspaceFolders?.[0];
     this.cwd = cwd?.uri.fsPath ?? '';
-  }
-
-  /**
-   * 按照 VS Code 设置优先级确定配置级别并返回配置数据
-   * 优先级: WorkspaceFolder > Workspace > Global > Default
-   */
-  inspect<T = unknown>(
-    config: vscode.WorkspaceConfiguration,
-    section: string
-  ): { value: T | undefined; target: vscode.ConfigurationTarget } {
-    const value = config.get<T>(section);
-    const inspection = config.inspect(section);
-
-    if (value === undefined) {
-      // 如果没有设置，返回默认值和全局配置目标
-      return { value, target: vscode.ConfigurationTarget.Global };
-    }
-
-    if (typeof inspection !== 'object' || inspection === null) {
-      return { value, target: vscode.ConfigurationTarget.Global };
-    }
-
-    // 按优先级从高到低检查，谁有设置就修改谁
-    if (inspection.workspaceFolderValue === value) {
-      return { value, target: vscode.ConfigurationTarget.WorkspaceFolder };
-    }
-
-    if (inspection.workspaceValue === value) {
-      return { value, target: vscode.ConfigurationTarget.Workspace };
-    }
-
-    // 如果没有工作区级别的设置，修改全局设置
-    return { value, target: vscode.ConfigurationTarget.Global };
   }
 
   get theme(): 'dark' | 'light' {
@@ -99,6 +71,46 @@ class Config {
     }
     return Config.self.get<string[]>(Prop.DarkThemeColors, colors);
   }
+
+  // # 全局的设定
+
+  /**
+   * 当前的标题栏颜色配置，可能是`undefined`
+   */
+  get [TitleBarConsts.WorkbenchSection]() {
+    return Config.global.get<TitleBarStyleCustomization>(TitleBarConsts.WorkbenchSection);
+  }
+
+  /**
+   * 全局设定，必须是`custom`才行
+   */
+  get [TitleBarConsts.Section]() {
+    return Config.global.get<string>(TitleBarConsts.Section);
+  }
+
+  readonly inspectGlobal = {
+    get [TitleBarConsts.WorkbenchSection]() {
+      return Config.global.inspect<TitleBarStyleCustomization>(TitleBarConsts.WorkbenchSection);
+    },
+  };
+
+  readonly setGlobal = {
+    async [TitleBarConsts.WorkbenchSection](value: Partial<TitleBarStyleCustomization>) {
+      await Config.global.update(
+        TitleBarConsts.WorkbenchSection,
+        value,
+        vscode.ConfigurationTarget.Global
+      );
+      Config.global = vscode.workspace.getConfiguration();
+    },
+
+    async [TitleBarConsts.Section](value: string) {
+      await Config.global.update(TitleBarConsts.Section, value, vscode.ConfigurationTarget.Global);
+      Config.global = vscode.workspace.getConfiguration();
+    },
+  };
+
+  // # 本插件的设定
 
   get [Prop.ShowSuggest]() {
     return Config.self.get<boolean>(Prop.ShowSuggest, true);

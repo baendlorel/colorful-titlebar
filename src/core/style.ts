@@ -9,11 +9,6 @@ import popSuggest from '@/common/pop-suggest';
 
 import { getColor } from './colors';
 
-interface ConfigOpt {
-  [TitleBarConsts.ActiveBg]: string;
-  [TitleBarConsts.InactiveBg]: string;
-}
-
 class TitleBarStyle {
   /**
    * 设置标题栏颜色
@@ -40,7 +35,7 @@ class TitleBarStyle {
       [TitleBarConsts.ActiveBg]: color.toString(),
       [TitleBarConsts.InactiveBg]: color.toGreyDarkenString(),
     };
-    const oldStyle = configs.global.get<ConfigOpt>(TitleBarConsts.WorkbenchSection);
+    const oldStyle = configs[TitleBarConsts.WorkbenchSection];
     if (
       oldStyle &&
       oldStyle[TitleBarConsts.ActiveBg] === newStyle[TitleBarConsts.ActiveBg] &&
@@ -48,11 +43,7 @@ class TitleBarStyle {
     ) {
       return;
     }
-    await configs.global.update(
-      TitleBarConsts.WorkbenchSection,
-      newStyle,
-      vscode.ConfigurationTarget.Workspace
-    );
+    await configs.setGlobal[TitleBarConsts.WorkbenchSection](newStyle);
 
     if (!satisfied) {
       const suggest = i18n.Features.color.suggest;
@@ -83,11 +74,7 @@ class TitleBarStyle {
       [TitleBarConsts.ActiveBg]: undefined,
       [TitleBarConsts.InactiveBg]: undefined,
     };
-    await configs.global.update(
-      TitleBarConsts.WorkbenchSection,
-      emptyStyle,
-      vscode.ConfigurationTarget.Workspace
-    );
+    await configs.setGlobal[TitleBarConsts.WorkbenchSection](emptyStyle);
 
     // 如果.vscode下只有settings一个文件，而且内容和上面的compact一样，那么删除.vscode
     const settingsPath = join(configs.cwd, SettingsJson.Dir); // , 'settings.json'
@@ -102,8 +89,8 @@ class TitleBarStyle {
    * 看看是不是已经设置了颜色，已经设置了就不要重复了
    */
   private alreadySet(): boolean {
-    const workspaceConfig = configs.global.inspect(TitleBarConsts.WorkbenchSection);
-    const workspaceValue = workspaceConfig?.workspaceValue as ConfigOpt | undefined;
+    const workspaceConfig = configs.inspectGlobal[TitleBarConsts.WorkbenchSection];
+    const workspaceValue = workspaceConfig?.workspaceValue;
 
     if (!workspaceValue) {
       return false;
@@ -131,14 +118,13 @@ class TitleBarStyle {
    */
   private async tryCustom(): Promise<boolean> {
     // 检测当前标题栏样式设置
-    const Global = vscode.ConfigurationTarget.Global;
-    const value = configs.global.get<string>(TitleBarConsts.Section);
+    const value = configs[TitleBarConsts.Section];
     if (value === TitleBarConsts.Expected) {
       return true;
     }
 
     const result = await vscode.window.showWarningMessage(
-      i18n.NotCustomTitleBarStyle(i18n.ConfigLevel[Global]),
+      i18n.NotCustomTitleBarStyle(i18n.ConfigLevel[vscode.ConfigurationTarget.Global]),
       i18n.SetTitleBarStyleToCustom,
       i18n.Cancel
     );
@@ -146,7 +132,7 @@ class TitleBarStyle {
       throw false;
     }
 
-    await configs.global.update(TitleBarConsts.Section, TitleBarConsts.Expected, Global);
+    await configs.setGlobal[TitleBarConsts.Section](TitleBarConsts.Expected);
     vscode.window.showInformationMessage(i18n.SetTitleBarStyleToCustomSuccess);
     return true;
   }
