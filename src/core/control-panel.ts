@@ -1208,11 +1208,6 @@ export default async () => {
       await controlPanel.webview.postMessage(result);
     }
   });
-
-  // 发送测试消息到webview
-  setTimeout(() => {
-    controlPanel.webview.postMessage({ command: 'fromExtension', text: '开局消息！' });
-  }, 1000);
 };
 
 /**
