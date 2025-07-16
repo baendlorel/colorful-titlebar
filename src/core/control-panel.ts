@@ -357,18 +357,436 @@ export default async () => {
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23abadb4' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
     }
   </style>
+  <style category="theme-switch">
+    .kskb-theme-switch {
+      --kskb-border: 1px;
+      --kskb-base: 20px;
+      --kskb-emoji-size: 20px;
+      --kskb-pad: 2px;
+      --kskb-width: calc(var(--kskb-base) * 4);
+      --kskb-height: calc(var(--kskb-base) * 2);
+      --kskb-emoji-diameter: calc(var(--kskb-base) * 2 - var(--kskb-pad) * 2 - var(--kskb-border) * 2);
+      --kskb-sun-x: calc(var(--kskb-width) - var(--kskb-emoji-diameter) - var(--kskb-pad) - var(--kskb-border));
+      --kskb-moon-x: calc(var(--kskb-pad) + var(--kskb-border));
+      --kskb-func: cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .kskb-theme-switch {
+      position: relative;
+      display: inline-block;
+      width: var(--kskb-width);
+      height: var(--kskb-height);
+      border-width: var(--kskb-border);
+      border-style: solid;
+      border-radius: calc(var(--kskb-base) + var(--kskb-border));
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: all 0.8s var(--kskb-func);
+
+      background-color: #3F3F3F;
+      border-color: #8e8e8e;
+    }
+
+    .kskb-theme-switch::before,
+    .kskb-theme-switch::after {
+      position: absolute;
+      content: '';
+      border-radius: calc(var(--kskb-base) + var(--kskb-border));
+      transition: all 0.5s;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .kskb-theme-switch::before {
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+
+    .kskb-theme-switch::after {
+      width: 300%;
+      height: 600%;
+      top: -250%;
+      left: -75%;
+    }
+
+    .kskb-theme-switch::before {
+      background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.36) 0%, transparent 50%);
+      z-index: 10;
+    }
+
+    .kskb-theme-switch:has(.kskb-dummy:not(:checked)):hover::before {
+      opacity: 1;
+    }
+
+    /* 太阳射线 */
+    .kskb-theme-switch::after {
+      background:
+        repeating-conic-gradient(rgba(255, 255, 251, 0.26) 0deg 18deg,
+          transparent 18deg 40deg);
+      animation: kskbSunRays 12s infinite linear, kskbSunGlow 3s infinite alternate ease-in-out;
+    }
+
+    @keyframes kskbSunRays {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes kskbSunGlow {
+      0% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    .kskb-theme-switch:has(.kskb-dummy:checked):hover::after {
+      animation-play-state: running;
+    }
+
+    .kskb-theme-switch:has(.kskb-dummy:not(:checked))::after {
+      animation-play-state: paused;
+      display: none;
+    }
+
+    .kskb-dummy {
+      width: 0;
+      height: 0;
+      border: 0;
+    }
+
+    .kskb-moon,
+    .kskb-sun {
+      position: absolute;
+      top: calc(var(--kskb-pad) + var(--kskb-border));
+      width: var(--kskb-emoji-diameter);
+      height: var(--kskb-emoji-diameter);
+      border-radius: var(--kskb-base);
+      transition: all 0.5s var(--kskb-func);
+      z-index: 5;
+    }
+
+    .kskb-icon::before {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+    }
+
+    .kskb-sun .kskb-icon::before {
+      content: '☀️';
+      font-size: var(--kskb-emoji-size);
+    }
+
+    .kskb-moon .kskb-icon::before {
+      content: '🌙';
+      font-size: var(--kskb-emoji-size);
+    }
+
+    .kskb-moon {
+      left: var(--kskb-moon-x);
+      background: linear-gradient(145deg, #5a5a5a, #424242);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .kskb-sun {
+      left: var(--kskb-sun-x);
+      background: linear-gradient(145deg, #fffac1, #ffd06c);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+
+    /* 当 checkbox 被选中时的样式 */
+    .kskb-dummy:not(:checked)~.kskb-moon {
+      left: var(--kskb-moon-x);
+      opacity: 1;
+    }
+
+    .kskb-dummy:checked~.kskb-moon {
+      left: var(--kskb-sun-x);
+      opacity: 0;
+    }
+
+    .kskb-dummy:not(:checked)~.kskb-sun {
+      left: var(--kskb-moon-x);
+      opacity: 0;
+    }
+
+    .kskb-dummy:checked~.kskb-sun {
+      left: var(--kskb-sun-x);
+      opacity: 1;
+    }
+
+    .kskb-theme-switch:has(.kskb-dummy:checked) {
+      background-color: #b8f0ff;
+      border-color: #fbfbfb;
+    }
+  </style>
+
+  <style category="stars">
+    /* 添加星星装饰（仅在暗色模式下可见） */
+    .kskb-stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      opacity: 0;
+      transition: opacity 0.5s var(--kskb-func);
+      z-index: 10;
+    }
+
+    .kskb-dummy:not(:checked)~.kskb-stars {
+      opacity: 0.45;
+    }
+
+    .kskb-star {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      animation: kskbTwinkle 2.4s infinite alternate;
+      transition: left 0.6s var(--kskb-func);
+    }
+
+    @keyframes kskbTwinkle {
+      0% {
+        opacity: 0.2;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    /* 创建一些随机星星 */
+    .kskb-star:nth-child(1) {
+      width: 2px;
+      height: 2px;
+      top: 8%;
+      left: 48%;
+      animation-delay: 0.2s;
+    }
+
+    .kskb-dummy:checked~.kskb-stars .kskb-star:nth-child(1) {
+      left: 148%;
+    }
+
+    .kskb-star:nth-child(2) {
+      width: 3px;
+      height: 3px;
+      top: 20%;
+      left: 16%;
+      animation-delay: 0.5s;
+    }
+
+    .kskb-dummy:checked~.kskb-stars .kskb-star:nth-child(2) {
+      left: 116%;
+    }
+
+    .kskb-star:nth-child(3) {
+      width: 2px;
+      height: 2px;
+      top: 72%;
+      left: 51%;
+      animation-delay: 0.8s;
+    }
+
+    .kskb-dummy:checked~.kskb-stars .kskb-star:nth-child(3) {
+      left: 151%;
+    }
+
+    .kskb-star:nth-child(4) {
+      width: 3px;
+      height: 3px;
+      top: 20%;
+      left: 80%;
+      animation-delay: 1.1s;
+    }
+
+    .kskb-dummy:checked~.kskb-stars .kskb-star:nth-child(4) {
+      left: 180%;
+    }
+
+    .kskb-star:nth-child(5) {
+      width: 2px;
+      height: 2px;
+      top: 52%;
+      left: 72%;
+      animation-delay: 1.4s;
+    }
+
+    .kskb-dummy:checked~.kskb-stars .kskb-star:nth-child(5) {
+      left: 172%;
+    }
+  </style>
+
+  <style category="clouds">
+    /* 添加云朵装饰（仅在明亮模式下可见） */
+    .kskb-clouds {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      opacity: 0;
+      transition: opacity 0.5s var(--kskb-func);
+    }
+
+    .kskb-dummy:checked~.kskb-clouds {
+      opacity: 0.6;
+    }
+
+    .kskb-cloud {
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 20px;
+      animation: float 4s infinite ease-in-out;
+      transition: left 0.8s var(--kskb-func);
+      scale: 3.5;
+    }
+
+    .kskb-cloud::before,
+    .kskb-cloud::after {
+      content: '';
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 20px;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-2px);
+      }
+    }
+
+    /* 创建不同大小的云朵 */
+    .kskb-cloud:nth-child(1) {
+      width: 8px;
+      height: 4px;
+      top: 5%;
+      left: -120%;
+      animation-delay: 0.3s;
+    }
+
+    .kskb-cloud:nth-child(1)::before {
+      width: 6px;
+      height: 6px;
+      top: -3px;
+      left: 2px;
+    }
+
+    .kskb-cloud:nth-child(1)::after {
+      width: 4px;
+      height: 4px;
+      top: -2px;
+      right: 1px;
+    }
+
+    .kskb-dummy:checked~.kskb-clouds .kskb-cloud:nth-child(1) {
+      left: 26%;
+    }
+
+    .kskb-cloud:nth-child(2) {
+      width: 10px;
+      height: 5px;
+      top: 92%;
+      left: -25%;
+      animation-delay: 0.8s;
+    }
+
+    .kskb-cloud:nth-child(2)::before {
+      width: 7px;
+      height: 7px;
+      top: -4px;
+      left: 3px;
+    }
+
+    .kskb-cloud:nth-child(2)::after {
+      width: 5px;
+      height: 5px;
+      top: -3px;
+      right: 2px;
+    }
+
+    .kskb-dummy:checked~.kskb-clouds .kskb-cloud:nth-child(2) {
+      left: 75%;
+    }
+
+    .kskb-cloud:nth-child(3) {
+      width: 6px;
+      height: 3px;
+      top: 92%;
+      left: -110%;
+      animation-delay: 1.2s;
+    }
+
+    .kskb-cloud:nth-child(3)::before {
+      width: 4px;
+      height: 4px;
+      top: -2px;
+      left: 2px;
+    }
+
+    .kskb-cloud:nth-child(3)::after {
+      width: 3px;
+      height: 3px;
+      top: -1px;
+      right: 1px;
+    }
+
+    .kskb-dummy:checked~.kskb-clouds .kskb-cloud:nth-child(3) {
+      left: 24%;
+    }
+  </style>
 </head>
 
 <body>
   <div class="body" theme="${configs.theme}">
-    <form name="settings" class="control-panel">
-      <div class="header" onclick="theme()">
-        <div>
-          <h1>${Panel.title}</h1>
-          <p>${Panel.description}</p>
-        </div>
+    <div class="header">
+      <div>
+        <h1>${Panel.title}</h1>
+        <p>${Panel.description}</p>
       </div>
-
+      <div>
+        <label for="theme" class="kskb-theme-switch">
+          <input type="checkbox" id="theme" name="theme" class="kskb-dummy">
+          <div class="kskb-moon">
+            <div class="kskb-icon"></div>
+          </div>
+          <div class="kskb-sun">
+            <div class="kskb-icon"></div>
+          </div>
+          <div class="kskb-stars">
+            <div class="kskb-star"></div>
+            <div class="kskb-star"></div>
+            <div class="kskb-star"></div>
+            <div class="kskb-star"></div>
+            <div class="kskb-star"></div>
+          </div>
+          <div class="kskb-clouds">
+            <div class="kskb-cloud"></div>
+            <div class="kskb-cloud"></div>
+            <div class="kskb-cloud"></div>
+          </div>
+        </label>
+      </div>
+    </div>
+    <form name="settings" class="control-panel">
       <div class="control-item">
         <div class="control-label-group">
           <div class="control-label">${Panel.showSuggest.label}</div>
@@ -570,6 +988,7 @@ export default async () => {
 
     // init
     if (isProd) {
+      find('theme').checked = "${configs.theme}" === 'light';
       find('showSuggest').checked = '${configs.showSuggest}' === 'true';
       find('workbenchCssPath').value = '${configs.workbenchCssPath}';
       find('hashSource').value = '${configs.hashSource}';
@@ -577,6 +996,7 @@ export default async () => {
       find('gradientDarkness').value = '${gradientDarkness}';
       find('pickerBtn').style.backgroundColor = '${currentColor}';
     } else {
+      find('theme').checked = true;
       find('showSuggest').checked = false;
       find('workbenchCssPath').value = '/d/work/aaa.css';
       find('hashSource').value = '';
@@ -586,6 +1006,7 @@ export default async () => {
     }
 
     // events
+    find('theme').addEventListener('change', theme);
 
     refresh.onclick = () => vspost({ name: 'refresh', value: null })
 
@@ -660,7 +1081,7 @@ export default async () => {
       succ: true,
     };
     try {
-      vscode.window.showInformationMessage(JSON.stringify(message));
+      // vscode.window.showInformationMessage(JSON.stringify(message));
       const name = message.name as ControlName;
       const value = message.value;
       switch (name) {
@@ -746,7 +1167,6 @@ export default async () => {
           break;
         }
 
-        // fixme 为什么三种算出来都是紫色?
         case ControlName.HashSource: {
           const d = parseInt(value, 10) as HashSource;
           const arr = [HashSource.FullPath, HashSource.ProjectName, HashSource.ProjectNameDate];
