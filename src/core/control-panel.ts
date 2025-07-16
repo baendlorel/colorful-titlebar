@@ -35,6 +35,7 @@ export default async () => {
 
   // 准备一些数据
   const env = 'prod';
+  const lang = configs.lang;
   const currentColorStyle = configs.global.get(TitleBarConsts.WorkbenchSection) ?? {};
   const currentColor = Reflect.get(currentColorStyle, TitleBarConsts.ActiveBg) || '#007ACC';
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
@@ -757,36 +758,36 @@ export default async () => {
 
 <body>
   <div class="body" theme="${configs.theme}">
-    <div class="header">
-      <div>
-        <h1>${Panel.title}</h1>
-        <p>${Panel.description}</p>
-      </div>
-      <div>
-        <label for="theme" class="kskb-theme-switch">
-          <input type="checkbox" id="theme" name="theme" class="kskb-dummy">
-          <div class="kskb-moon">
-            <div class="kskb-icon"></div>
-          </div>
-          <div class="kskb-sun">
-            <div class="kskb-icon"></div>
-          </div>
-          <div class="kskb-stars">
-            <div class="kskb-star"></div>
-            <div class="kskb-star"></div>
-            <div class="kskb-star"></div>
-            <div class="kskb-star"></div>
-            <div class="kskb-star"></div>
-          </div>
-          <div class="kskb-clouds">
-            <div class="kskb-cloud"></div>
-            <div class="kskb-cloud"></div>
-            <div class="kskb-cloud"></div>
-          </div>
-        </label>
-      </div>
-    </div>
     <form name="settings" class="control-panel">
+      <div class="header">
+        <div>
+          <h1>${Panel.title}</h1>
+          <p>${Panel.description}</p>
+        </div>
+        <div>
+          <label for="theme" class="kskb-theme-switch">
+            <input type="checkbox" id="theme" name="theme" class="kskb-dummy">
+            <div class="kskb-moon">
+              <div class="kskb-icon"></div>
+            </div>
+            <div class="kskb-sun">
+              <div class="kskb-icon"></div>
+            </div>
+            <div class="kskb-stars">
+              <div class="kskb-star"></div>
+              <div class="kskb-star"></div>
+              <div class="kskb-star"></div>
+              <div class="kskb-star"></div>
+              <div class="kskb-star"></div>
+            </div>
+            <div class="kskb-clouds">
+              <div class="kskb-cloud"></div>
+              <div class="kskb-cloud"></div>
+              <div class="kskb-cloud"></div>
+            </div>
+          </label>
+        </div>
+      </div>
       <div class="control-item">
         <div class="control-label-group">
           <div class="control-label">${Panel.showSuggest.label}</div>
@@ -968,7 +969,7 @@ export default async () => {
       const en = {
         NumberLimit: (min, max, isInt = true) => ['Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max].join(' ')
       }
-      switch ('${configs.lang}') {
+      switch ('${lang}') {
         case 'zh':
           return zh;
         case 'en':
@@ -1022,6 +1023,11 @@ export default async () => {
     settings.addEventListener('change', function (event) {
       event.preventDefault();
       const input = event.target;
+      // 控制面板的主题变更不需要推送给插件
+      if (input.name === 'theme') {
+        return;
+      }
+
       const data = {
         name: input.name,
         value: input.value

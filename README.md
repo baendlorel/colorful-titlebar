@@ -13,23 +13,81 @@ A VS Code extension that adds colorful background colors to the title bar based 
 - 🌍 **Multi-language Support**: Full Chinese and English interface
 - ✨ **Gradient Overlay Effects**: Add beautiful gradient overlays to enhance the titlebar appearance (requires CSS hacking)
 
+## 🔥 Breaking Changes in v1.2.0
+
+**All previous commands have been removed and replaced with a unified Control Panel!** The new control panel provides a more intuitive and user-friendly interface for managing all extension settings. [Learn more about the Control Panel](#control-panel).
+
+![Control Panel](https://raw.githubusercontent.com/baendlorel/colorful-titlebar/refs/heads/main/draft/control-panel.png)
+
 ## ⚠️ Important Notice
 
 **The gradient feature modifies VS Code's core CSS files**, which may trigger VS Code's integrity check and show a "corrupted" warning. This is expected behavior and doesn't affect functionality. The extension automatically creates backups before any modifications.
 
-## 📦 Installation
+## Installation
 
 1. Clone or download this project
 2. Run `pnpm install` in the project directory
 3. Run `pnpm build` to compile the extension
 4. Press `F5` to test the extension in a new VS Code window
 
+## Control Panel
+
+The extension now features a comprehensive Control Panel that replaces all previous commands with a unified, user-friendly interface.
+
+### Opening the Control Panel
+
+- **Command**: `Ctrl+Shift+P` → "Colorful Titlebar: Open Control Panel"
+- **Menu**: Right-click on the title bar → "Colorful Titlebar Settings"
+
+### Control Panel Features
+
+The Control Panel provides real-time configuration of all extension settings:
+
+#### 🔧 Basic Settings
+
+- **Show Information Messages**: Toggle information pop-ups on/off
+- **Workbench CSS Path**: Specify custom path to VS Code's workbench CSS file (for gradient features)
+
+#### 🌈 Color Configuration
+
+- **Hash Source**: Choose how colors are generated:
+  - Project Name: Based on folder name only
+  - Full Path: Based on complete project path
+  - Project Name + Date: Based on project name and current date
+- **Color Picker**: Manually select a custom color for the current project
+
+#### ✨ Gradient Settings
+
+- **Gradient Style**: Choose from multiple gradient overlay effects:
+  - None: Disable gradient overlays
+  - Bright Center: Linear gradient with bright center
+  - Bright Left: Radial gradient from left side
+  - Arc Left: Alternative radial gradient from left
+- **Gradient Brightness**: Control the brightness/opacity of bright areas (0-100%)
+- **Gradient Darkness**: Control the darkness/opacity of dark areas (0-100%)
+
+#### 🔄 Actions
+
+- **Refresh Colors**: Force regenerate colors for the current project
+- **Apply Settings**: All changes are applied immediately with visual feedback
+
+### Real-time Feedback
+
+The Control Panel provides:
+
+- **Live Preview**: Changes are applied immediately
+- **Error Handling**: Clear error messages for invalid inputs
+- **Success Notifications**: Confirmation when settings are successfully applied
+- **Theme Adaptation**: Control panel automatically adapts to VS Code's current theme
+
 ## 🚀 Usage
 
-### Commands
+### Quick Start
 
-- **Enable Gradient Overlay**: `Ctrl+Shift+P` → "Enable Titlebar Gradient"
-- **Disable Gradient Overlay**: `Ctrl+Shift+P` → "Disable Titlebar Gradient"
+1. Open any project in VS Code
+2. The extension automatically detects projects and applies colors
+3. Use `Ctrl+Shift+P` → "Colorful Titlebar: Open Control Panel" to customize settings
+4. Enjoy your colorful titlebar!
 
 ### Gradient Styles
 
@@ -161,6 +219,24 @@ Issues and Pull Requests are welcome!
 
 ## 📝 Changelog
 
+### 1.2.0
+
+- **🔥 Breaking Change**: Replaced all commands with unified Control Panel
+- **New Control Panel**: Intuitive web-based interface for all settings
+- **Enhanced Color Picker**: Manual color selection with live preview
+- **Improved User Experience**: Better error handling and success feedback
+- Fixed issue where gradient enabling was triggered regardless of blocking pop-up information
+
+### 1.1.0
+
+- Added gradient brightness and darkness configuration options
+- Multiple hash source selection - supports project name, full path, project name + date
+- Code structure adjustments, experimented with various error handling approaches but ultimately chose simplified approach
+
+### 1.0.0
+
+- Beautiful gradient overlay effects. Inspired by Idea
+
 ### 0.0.1
 
 - Initial release
@@ -168,7 +244,3 @@ Issues and Pull Requests are welcome!
 - Multi-language support
 - Customizable color palettes
 - Smart project detection
-
-### 1.0.0
-
-- Beautiful gradient overlay effects. Inspired by Idea
