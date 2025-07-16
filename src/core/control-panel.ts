@@ -25,7 +25,7 @@ const enum ControlName {
 /**
  * Opens a color picker to manually select titlebar color
  */
-export default async () => {
+export default async function (this: vscode.ExtensionContext) {
   const Panel = i18n.ControlPanel;
   const controlPanel = vscode.window.createWebviewPanel(
     'controllPanel',
@@ -37,6 +37,11 @@ export default async () => {
   // 准备一些数据
   const env = 'prod';
   const lang = configs.lang;
+  const extension = vscode.extensions.getExtension(this.extension.id);
+  if (!extension) {
+    vscode.window.showErrorMessage('怎么可能没找到自己？');
+  }
+  const version = extension?.packageJSON.version ?? 'outdated';
   const currentColor = configs.currentColor ?? '#007ACC';
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
   const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
@@ -50,31 +55,35 @@ export default async () => {
   <title>${Panel.title}</title>
   <style>
     :root {
-      --ct-primary-color: #4285f4;
-      --ct-success-color: #34a853;
-      --ct-danger-color: #ea4335;
-      --ct-warning-color: #fbbc05;
+      --ct-primary: #226de7;
+      --ct-success: #1fc34b;
+      --ct-danger: #de2919;
+      --ct-warning: #efb300;
+      --ct-purple: #6c08d1;
       --ct-text-color: #202124;
       --ct-text-color-weak: rgba(32, 33, 36, 0.7);
       --ct-bg-color: #f8f9fa;
       --ct-panel-bg: #ffffff;
       --ct-border-color: rgba(224, 224, 224, 0.5);
       --ct-shadow-color: rgba(0, 0, 0, 0.1);
+      --ct-shadow-light-color: rgba(0, 0, 0, 0.1);
       --ct-loading-bg-color: rgba(71, 73, 78, 0.12);
       --ct-focus-shadow: rgba(66, 133, 244, 0.2);
     }
 
     [theme="dark"] {
-      --ct-primary-color: #4285f4;
-      --ct-success-color: #34a853;
-      --ct-danger-color: #ea4335;
-      --ct-warning-color: #fbbc05;
+      --ct-primary: #1162e6;
+      --ct-success: #15b941;
+      --ct-danger: #e53020;
+      --ct-warning: #fbbc05;
+      --ct-purple: #792bc7;
       --ct-text-color: #e8eaed;
       --ct-text-color-weak: rgba(232, 234, 237, 0.7);
       --ct-bg-color: #202124;
       --ct-panel-bg: #292a2d;
       --ct-border-color: rgba(60, 64, 67, 0.5);
       --ct-shadow-color: rgba(0, 0, 0, 0.3);
+      --ct-shadow-light-color: rgba(128, 128, 128, 0.3);
       --ct-loading-bg-color: rgba(241, 241, 241, 0.12);
     }
 
@@ -145,11 +154,35 @@ export default async () => {
       color: var(--ct-text-color);
       font-weight: 500;
       font-size: 20px;
+      text-shadow: 1px 1px 2px var(--ct-shadow-light-color);
+    }
+
+    .header .colorful-title {
+      font-weight: 500;
+      font-size: 20px;
+      background: linear-gradient(90deg, var(--ct-danger), var(--ct-warning), var(--ct-success), var(--ct-primary), var(--ct-purple));
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 1px 1px 2px var(--ct-shadow-light-color);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0.2em 0 0.7em 0;
     }
 
     .header p {
-      color: var(--ct-text-color);
-      opacity: 0.7;
+      color: var(--ct-text-color-weak);
+      margin: 5px 0px 0px 0px;
+    }
+
+    .header a {
+      margin-left: 5px;
+      color: var(--ct-primary);
+      text-decoration: none;
+    }
+
+    .header .version {
+      color: var(--ct-text-color-weak);
     }
 
 
@@ -171,8 +204,6 @@ export default async () => {
       margin-right: 20px;
     }
 
-    .control-label {}
-
     .control-desc {
       font-size: 0.8em;
       color: var(--ct-text-color-weak);
@@ -181,13 +212,13 @@ export default async () => {
     .control-error {
       grid-column: 1 / span 2;
       font-size: 0.8em;
-      color: var(--ct-danger-color);
+      color: var(--ct-danger);
     }
 
     .control-succ {
       grid-column: 1 / span 2;
       font-size: 0.8em;
-      color: var(--ct-success-color);
+      color: var(--ct-success);
     }
 
     .control-input {
@@ -233,7 +264,7 @@ export default async () => {
     }
 
     input:checked+.slider {
-      background-color: var(--ct-primary-color);
+      background-color: var(--ct-primary);
     }
 
     input:checked+.slider:before {
@@ -249,7 +280,7 @@ export default async () => {
     }
 
     [theme="dark"] input:checked+.slider {
-      background-color: var(--ct-primary-color);
+      background-color: var(--ct-primary);
     }
 
     .btn {
@@ -262,7 +293,7 @@ export default async () => {
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: var(--ct-primary-color);
+      background-color: var(--ct-primary);
       color: white;
     }
 
@@ -333,15 +364,15 @@ export default async () => {
     }
 
     .select:hover {
-      border-color: var(--ct-primary-color);
-      box-shadow: 0 0 0 1px var(--ct-primary-color);
+      border-color: var(--ct-primary);
+      box-shadow: 0 0 0 1px var(--ct-primary);
     }
 
     .select:focus,
     .input-text:focus,
     .input-percent input[type="number"]:focus {
       outline: none;
-      border-color: var(--ct-primary-color);
+      border-color: var(--ct-primary);
       box-shadow: 0 0 0 2px var(--ct-focus-shadow);
     }
 
@@ -761,7 +792,8 @@ export default async () => {
     <form name="settings" class="control-panel">
       <div class="header">
         <div>
-          <h1>${Panel.title}</h1>
+          <h1><span class="colorful-title">Colorful Titlebar</span> ${Panel.title}</h1>
+          <p><span class="version">v${version} by</span><a href="https://github.com/baendlorel">Kasukabe Tsumugi</a></p>
           <p>${Panel.description}</p>
         </div>
         <div>
@@ -1211,7 +1243,7 @@ export default async () => {
       await controlPanel.webview.postMessage(result);
     }
   });
-};
+}
 
 /**
  * Apply manually selected color to titlebar

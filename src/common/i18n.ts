@@ -10,7 +10,7 @@ export default (() => {
     NotProject: '当前不是项目目录，不改变标题栏颜色',
 
     ControlPanel: {
-      title: 'Colorful Titlebar 控制面板',
+      title: '设置',
       description: '在这里可以控制标题栏颜色和样式',
       loading: '更新中...',
       typeError: (value: string | number | boolean, shouldBe?: string) =>
@@ -131,7 +131,7 @@ export default (() => {
     NotProject: 'Current folder is not a project directory, titlebar color remains unchanged',
 
     ControlPanel: {
-      title: 'Colorful Titlebar Control Panel',
+      title: 'Settings',
       description: 'Control titlebar color and style here',
       loading: 'Updating...',
       success: 'Saved successfully',

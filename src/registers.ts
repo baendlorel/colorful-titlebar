@@ -9,7 +9,7 @@ export default (context: vscode.ExtensionContext) => {
     // vscode.commands.registerCommand(Commands.DisableGradient, catcher(gradient.disable)),
     // vscode.commands.registerCommand(Commands.Refresh, style.refresh.bind(style)),
     // vscode.commands.registerCommand(Commands.PickColor, pickColor),
-    vscode.commands.registerCommand(Commands.ControlPanel, controlPanel),
+    vscode.commands.registerCommand(Commands.ControlPanel, controlPanel.bind(context)),
   ].filter((v) => v !== undefined);
   context.subscriptions.push(...commands);
 };
