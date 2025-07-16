@@ -33,6 +33,9 @@ export default async () => {
   );
 
   // 准备一些数据
+  const currentColorStyle = configs.global.get(TitleBarConsts.WorkbenchSection) ?? {};
+  const currentColor = Reflect.get(currentColorStyle, TitleBarConsts.ActiveBg) || '#007ACC';
+
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
   const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
 
@@ -256,11 +259,11 @@ export default async () => {
       width: 0;
       height: 0;
       opacity: 0;
+      border: 0;
     }
 
     .select {
-      width: 120px;
-      min-width: 80px;
+      min-width: 120px;
     }
 
     .input-text {
@@ -294,8 +297,7 @@ export default async () => {
       position: absolute;
       content: '%';
       right: 40px;
-      margin-top: -1px;
-      font-size: 1em;
+      margin-top: -2px;
       color: var(--text-color-weak);
     }
 
@@ -448,10 +450,10 @@ export default async () => {
         <div class="control-desc">${Panel.pickColor.description}</div>
       </div>
       <div class="control-input">
-        <button type="button" class="btn" name="pickerBtn" style="background-color: #007ACC;">
+        <button type="button" class="btn" name="pickerBtn">
           ${Panel.pickColor.button}
         </button>
-        <input type="color" class="picker" name="pickColor" value="#007ACC">
+        <input type="color" class="picker" name="pickColor" value="${currentColor}">
       </div>
       <div class="control-error" name="pickColor"></div>
       <div class="control-succ" name="pickColor"></div>
@@ -536,7 +538,7 @@ export default async () => {
     find('hashSource').value = '${configs.hashSource}';
     find('gradientBrightness').value = '${gradientBrightness}';
     find('gradientDarkness').value = '${gradientDarkness}';
-
+    find('pickerBtn').style.backgroundColor = '${currentColor}';
 
     // events
 

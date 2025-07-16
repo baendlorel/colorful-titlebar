@@ -8,7 +8,7 @@
   "configuration.hashSource.description": "生成基于哈希的颜色的源",
   "configuration.hashSource.projectName.description": "仅从项目文件夹名称生成颜色哈希",
   "configuration.hashSource.fullPath.description": "从完整项目路径生成颜色哈希，因此不同位置的相同项目将具有不同的颜色",
-  "configuration.hashSource.projectNameDate.description": "从项目名称和日期生成颜色哈希，使其每天都是唯一的",
+  "configuration.hashSource.projectNameDate.description": "从项目名称和日期（Date.getDate()）生成颜色哈希，使其每天都是唯一的",
   "configuration.lightThemeColors.description": "用于在浅色主题中生成基于项目的标题栏颜色选择渐变的颜色。支持 `#RRGGBB`、`#RRGGBBAA`、`rgb(R,G,B)`、`rgba(R,G,B,A)`、`hsl(H,S,L)`、`hsla(H,S,L,A)`",
   "configuration.darkThemeColors.description": "用于在深色主题中生成基于项目的标题栏颜色选择渐变的颜色。支持 `#RRGGBB`、`#RRGGBBAA`、`rgb(R,G,B)`、`rgba(R,G,B,A)`、`hsl(H,S,L)`、`hsla(H,S,L,A)`",
   "configuration.projectIndicators.description": "指示项目目录的文件或目录名称（不会修剪）",

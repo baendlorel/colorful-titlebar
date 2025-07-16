@@ -218,11 +218,11 @@
       width: 0;
       height: 0;
       opacity: 0;
+      border: 0;
     }
 
     .select {
-      width: 120px;
-      min-width: 80px;
+      min-width: 120px;
     }
 
     .input-text {
@@ -256,8 +256,7 @@
       position: absolute;
       content: '%';
       right: 40px;
-      margin-top: -1px;
-      font-size: 1em;
+      margin-top: -2px;
       color: var(--text-color-weak);
     }
 
@@ -410,10 +409,10 @@
         <div class="control-desc">${Panel.pickColor.description}</div>
       </div>
       <div class="control-input">
-        <button type="button" class="btn" name="pickerBtn" style="background-color: #007ACC;">
+        <button type="button" class="btn" name="pickerBtn">
           ${Panel.pickColor.button}
         </button>
-        <input type="color" class="picker" name="pickColor" value="#007ACC">
+        <input type="color" class="picker" name="pickColor" value="${currentColor}">
       </div>
       <div class="control-error" name="pickColor"></div>
       <div class="control-succ" name="pickColor"></div>
@@ -498,7 +497,7 @@
     find('hashSource').value = '${configs.hashSource}';
     find('gradientBrightness').value = '${gradientBrightness}';
     find('gradientDarkness').value = '${gradientDarkness}';
-
+    find('pickerBtn').style.backgroundColor = '${currentColor}';
 
     // events
 
