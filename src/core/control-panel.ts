@@ -12,6 +12,7 @@ import { getColor, getColorByK, getHashSource } from './colors';
 import version from './version';
 
 // todo 事件switch改为map版？
+// todo 增加更多配置项？
 const enum ControlName {
   ShowSuggest = 'showSuggest',
   WorkbenchCssPath = 'workbenchCssPath',
@@ -187,7 +188,6 @@ export default async function (this: vscode.ExtensionContext) {
     }
 
     .header .version {
-      margin-left: 10px;
       font-size: 0.7em;
       color: var(--ct-text-color-weak);
     }
@@ -822,9 +822,9 @@ export default async function (this: vscode.ExtensionContext) {
     <form id="settings" class="control-panel">
       <div class="header">
         <div>
-          <h1><span class="colorful-title">${Consts.DisplayName}</span> ${
-    Panel.title
-  }<span class="version">v${version.get(this)}</span></h1>
+          <h1><span class="colorful-title">${
+            Consts.DisplayName
+          }</span><span class="version">v${version.get(this)}</span></h1>
           <p>by<a href="https://github.com/baendlorel">Kasukabe Tsumugi</a></p>
           <p>${Panel.description}</p>
         </div>
