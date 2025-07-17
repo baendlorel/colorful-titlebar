@@ -26,13 +26,136 @@ const enum ControlName {
   'RandomColor.specify' = 'randomColor.specify',
 }
 
+interface HandelResult {
+  from: Consts.Name;
+  name: ControlName;
+  succ: boolean;
+  msg: string;
+}
+
+type PostedValue = string | number | boolean;
+
+const Panel = i18n.ControlPanel;
+
+const handlerMap = {
+  [ControlName.ShowSuggest]: async (result: HandelResult, value: PostedValue) => {
+    if (typeof value !== 'boolean') {
+      result.succ = false;
+      result.msg = Panel.typeError(value, 'a boolean');
+      throw null;
+    }
+    await configs.set.showSuggest(value);
+  },
+  [ControlName.WorkbenchCssPath]: async (result: HandelResult, value: PostedValue) => {
+    if (typeof value !== 'string') {
+      result.succ = false;
+      result.msg = Panel.typeError(value, 'a string');
+      throw null;
+    }
+    const cssPath = value.trim();
+    if (!existsSync(cssPath)) {
+      result.succ = false;
+      result.msg = Panel.workbenchCssPath.notExist;
+      throw null;
+    }
+    await configs.set.workbenchCssPath(cssPath);
+  },
+  [ControlName.Gradient]: async (result: HandelResult, value: PostedValue) => {
+    let gradientStyle: AfterStyle;
+    switch (Number(value)) {
+      case GradientStyle.BrightCenter:
+        gradientStyle = AfterStyle.BrightCenter;
+        break;
+      case GradientStyle.BrightLeft:
+        gradientStyle = AfterStyle.BrightLeft;
+        break;
+      case GradientStyle.ArcLeft:
+        gradientStyle = AfterStyle.ArcLeft;
+        break;
+      default:
+        result.succ = false;
+        result.msg = Panel.typeError(
+          value,
+          [
+            'one of ',
+            GradientStyle.BrightCenter,
+            GradientStyle.BrightLeft,
+            GradientStyle.ArcLeft,
+          ].join()
+        );
+        throw null;
+    }
+    const cssPath = await hacker.getWorkbenchCssPath();
+    if (!cssPath) {
+      return;
+    }
+    await hacker.inject(cssPath, gradientStyle);
+    result.msg = Panel.gradient.success;
+  },
+  [ControlName.GradientBrightness]: async (result: HandelResult, value: PostedValue) => {
+    const d = parseInt(String(value), 10) / 100;
+    if (Number.isNaN(d) || d < 0 || d > 1) {
+      result.succ = false;
+      result.msg = Panel.typeError(value);
+      throw null;
+    }
+    await configs.set.gradientBrightness(d);
+    result.msg = Panel.gradient.success;
+  },
+  [ControlName.GradientDarkness]: async (result: HandelResult, value: PostedValue) => {
+    const d = parseInt(String(value), 10) / 100;
+    if (Number.isNaN(d) || d < 0 || d > 1) {
+      result.succ = false;
+      result.msg = Panel.typeError(value);
+      throw null;
+    }
+    await configs.set.gradientDarkness(d);
+    result.msg = Panel.gradient.success;
+  },
+  [ControlName.HashSource]: async (result: HandelResult, value: PostedValue) => {
+    const d = parseInt(String(value), 10) as HashSource;
+    const arr = [HashSource.FullPath, HashSource.ProjectName, HashSource.ProjectNameDate];
+    if (!arr.includes(d)) {
+      result.succ = false;
+      result.msg = Panel.typeError(value, `one of ${arr.join(', ')}`);
+      throw null;
+    }
+    await configs.set.hashSource(d);
+    result.msg = Panel.hashSource.success;
+  },
+  [ControlName.Refresh]: async (result: HandelResult, _value: PostedValue) => {
+    const token = getHashSource(configs.cwd);
+    const color = getColor(configs.cwd);
+    await applyManualColor(color);
+    result.msg = Panel.refresh.success(token, color.toString());
+  },
+  [ControlName['RandomColor.colorSet']]: async (_result: HandelResult, _value: PostedValue) => {
+    const color = getColorByK(Math.random());
+    await applyManualColor(color);
+  },
+  [ControlName['RandomColor.pure']]: async (_result: HandelResult, _value: PostedValue) => {
+    const color = RGBA.uniformRandom();
+    await applyManualColor(color);
+  },
+  [ControlName['RandomColor.specify']]: async (result: HandelResult, value: PostedValue) => {
+    if (typeof value !== 'string') {
+      result.succ = false;
+      result.msg = Panel.typeError(value, 'a string');
+      throw null;
+    }
+    await applyManualColor(value);
+  },
+  default: () => {
+    throw new Error('Unknown control name: ' + name);
+  },
+};
+
 let controlPanel: vscode.WebviewPanel | null = null;
 
 export default async function (this: vscode.ExtensionContext) {
   if (controlPanel !== null) {
     return; // 防止创建多个设置页面
   }
-  const Panel = i18n.ControlPanel;
   (controlPanel = vscode.window.createWebviewPanel(
     'controllPanel',
     Panel.title,
@@ -1174,140 +1297,23 @@ export default async function (this: vscode.ExtensionContext) {
 </html>`;
 
   controlPanel.webview.onDidReceiveMessage(async (message) => {
-    const result = {
-      from: 'colorful-titlebar',
+    if (typeof message !== 'object' || !message.name) {
+      vscode.window.showErrorMessage('从控制面板接收到了无效的message：' + String(message));
+      return;
+    }
+
+    const result: HandelResult = {
+      from: Consts.Name,
       name: message.name,
-      msg: Panel.success,
       succ: true,
+      msg: Panel.success,
     };
+
+    // vscode.window.showInformationMessage(JSON.stringify(message));
+
     try {
-      // vscode.window.showInformationMessage(JSON.stringify(message));
-      const name = message.name as ControlName;
-      const value = message.value;
-      switch (name) {
-        case ControlName.ShowSuggest:
-          if (typeof value !== 'boolean') {
-            result.succ = false;
-            result.msg = Panel.typeError(value, 'a boolean');
-            throw null;
-          }
-          await configs.set.showSuggest(value);
-          break;
-
-        case ControlName.WorkbenchCssPath: {
-          if (typeof value !== 'string') {
-            result.succ = false;
-            result.msg = Panel.typeError(value, 'a string');
-            throw null;
-          }
-          const cssPath = value.trim();
-          if (!existsSync(cssPath)) {
-            result.succ = false;
-            result.msg = Panel.workbenchCssPath.notExist;
-            throw null;
-          }
-          await configs.set.workbenchCssPath(cssPath);
-          break;
-        }
-
-        case ControlName.Gradient: {
-          let gradientStyle: AfterStyle;
-          switch (Number(value)) {
-            case GradientStyle.BrightCenter:
-              gradientStyle = AfterStyle.BrightCenter;
-              break;
-            case GradientStyle.BrightLeft:
-              gradientStyle = AfterStyle.BrightLeft;
-              break;
-            case GradientStyle.ArcLeft:
-              gradientStyle = AfterStyle.ArcLeft;
-              break;
-            default:
-              result.succ = false;
-              result.msg = Panel.typeError(
-                value,
-                [
-                  'one of ',
-                  GradientStyle.BrightCenter,
-                  GradientStyle.BrightLeft,
-                  GradientStyle.ArcLeft,
-                ].join()
-              );
-              throw null;
-          }
-          const cssPath = await hacker.getWorkbenchCssPath();
-          if (!cssPath) {
-            return;
-          }
-          await hacker.inject(cssPath, gradientStyle);
-          result.msg = Panel.gradient.success;
-          break;
-        }
-
-        case ControlName.GradientBrightness: {
-          const d = parseInt(value, 10) / 100;
-          if (Number.isNaN(d) || d < 0 || d > 1) {
-            result.succ = false;
-            result.msg = Panel.typeError(value);
-            throw null;
-          }
-          await configs.set.gradientBrightness(d);
-          result.msg = Panel.gradient.success;
-          break;
-        }
-        case ControlName.GradientDarkness: {
-          const d = parseInt(value, 10) / 100;
-          if (Number.isNaN(d) || d < 0 || d > 1) {
-            result.succ = false;
-            result.msg = Panel.typeError(value);
-            throw null;
-          }
-          await configs.set.gradientDarkness(d);
-          result.msg = Panel.gradient.success;
-          break;
-        }
-
-        case ControlName.HashSource: {
-          const d = parseInt(value, 10) as HashSource;
-          const arr = [HashSource.FullPath, HashSource.ProjectName, HashSource.ProjectNameDate];
-          if (!arr.includes(d)) {
-            result.succ = false;
-            result.msg = Panel.typeError(value, `one of ${arr.join(', ')}`);
-            throw null;
-          }
-          await configs.set.hashSource(d);
-          result.msg = Panel.hashSource.success;
-          break;
-        }
-
-        case ControlName.Refresh: {
-          const token = getHashSource(configs.cwd);
-          const color = getColor(configs.cwd);
-          await applyManualColor(color);
-          result.msg = Panel.refresh.success(token, color.toString());
-          break;
-        }
-
-        case ControlName['RandomColor.colorSet']: {
-          const color = getColorByK(Math.random());
-          await applyManualColor(color);
-          break;
-        }
-
-        case ControlName['RandomColor.pure']: {
-          const color = RGBA.uniformRandom();
-          await applyManualColor(color);
-          break;
-        }
-
-        case ControlName['RandomColor.specify']: {
-          await applyManualColor(value);
-          break;
-        }
-
-        default:
-          throw new Error('Unknown control name: ' + name);
-      }
+      const handler = handlerMap[result.name] ?? handlerMap.default;
+      await handler(result, message.value);
     } catch (error) {
       if (error instanceof Error) {
         vscode.window.showErrorMessage(error.message);

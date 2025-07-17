@@ -3,7 +3,6 @@ import vscode from 'vscode';
 import style from './core/style';
 import catcher from './common/catcher';
 import register from './registers';
-import gradient from './features/gradient';
 import version from './core/version';
 
 export const activate = catcher(async (context: vscode.ExtensionContext) => {
@@ -16,11 +15,6 @@ export const activate = catcher(async (context: vscode.ExtensionContext) => {
   await style.applyIfNotSet();
 
   await version.updated(context);
-
-  // if (!isUpdated) {
-  //   // 建议开启渐变
-  //   await gradient.suggest();
-  // }
 });
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
