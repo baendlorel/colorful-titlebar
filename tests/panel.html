@@ -1176,12 +1176,13 @@
               ${Panel.randomColor.label}
             </button>
             <div class="dropdown-menu">
-              <button type="button" class="dropdown-item" name="randomColor.colorSet">
+              <button type="button" class="control-input dropdown-item" name="randomColor.colorSet">
                 ${Panel.randomColor.colorSet}
               </button>
-              <button type="button" class="dropdown-item" name="randomColor.pure">
+              <button type="button" class="control-input dropdown-item" name="randomColor.pure">
                 ${Panel.randomColor.pure}
               </button>
+              <!--control-input 不需要，因为这个按钮是靠选颜色来变更的-->
               <button type="button" class="dropdown-item color-picker" title="${Panel.randomColor.specify}" name="randomColor.specify">
                 <span>&nbsp;&nbsp;${Panel.randomColor.specify}</span>
                 <input type="color" class="control-input" name="randomColor.specify">
@@ -1199,7 +1200,7 @@
           <div class="control-desc">${Panel.refresh.description}</div>
         </div>
         <div class="control-form">
-          <button type="button" class="control-button" name="refresh">
+          <button type="button" class="control-input control-button" name="refresh">
             <span>${Panel.refresh.button}</span>
           </button>
         </div>
@@ -1253,30 +1254,19 @@
   <script>
     const isProd = '${env}' === 'prod';
 
-    /**
-     * # utils
-     */
-    function vspost(data) {
-      let o = isProd ? acquireVsCodeApi() : {
-        postMessage: (a) => console.trace('vscode.postMessage', a)
-      };
-      freeze();
-      o.postMessage({
-        from: 'colorful-titlebar',
-        ...data
-      });
-    }
-
     function s(...strings) {
       return ''.concat(...strings);
     }
 
     /**
      * 默认查找的是输入元素，可以指定查找类型
-     * @param {string} name - 元素的 name 属性
-     * @param {string} tp - 元素类型：input | button | error | succ
+     * - 如果用#开头，那么以它是元素id来继续搜索
+     * @type {(name: string, tp: 'input' | 'button' | 'error' | 'succ' ) => HTMLElement}
      */
     function find(name, tp = 'input') {
+      if (name.startsWith('#')) {
+        return document.querySelector(name);
+      }
       switch (tp) {
         case 'succ':
           return document.querySelector(s('.control-succ[name="', name, '"]'));
@@ -1298,9 +1288,20 @@
     }
 
     /**
-     * # vars 
+     * @type {(data: { name: string, value: any } ) => void}
      */
-    function getI18n() {
+    function vspost(data) {
+      let o = isProd ? acquireVsCodeApi() : {
+        postMessage: (a) => console.log('vscode.postMessage', a)
+      };
+      freeze();
+      o.postMessage({
+        from: 'colorful-titlebar',
+        ...data
+      });
+    }
+
+    const i18n = (function () {
       const zh = {
         NumberLimit: (min, max, isInt = true) => s('请输入', min, '到', max, '之间的', isInt ? '整数' : '数')
       }
@@ -1315,33 +1316,28 @@
         default:
           return zh;
       }
-    }
-
-    const i18n = getI18n();
+    })();
 
     /**
      * @type {HTMLFormElement} 
      */
-    const settings = document.getElementById('settings');
-    const controlInputs = $('.control-input');
-
     function freeze() {
       $('.control-error,.control-succ').forEach(el => el.textContent = '');
       if (isProd) {
-        settings.classList.add('freeze');
-        controlInputs.forEach((el) => el.disabled = true);
+        find('#settings').classList.add('freeze');
+        $('.control-input').forEach((el) => el.disabled = true);
       }
     }
 
     function unfreeze() {
-      setTimeout(() => settings.classList.remove('freeze'), 200);
-      controlInputs.forEach((el) => el.disabled = false)
+      setTimeout(() => find('#settings').classList.remove('freeze'), 200);
+      $('.control-input').forEach((el) => el.disabled = false)
     }
 
     /**
      * # init 
      */
-    {
+    function initSettingsValue(isProd) {
       if (isProd) {
         document.getElementById('theme').checked = "${configs.theme}" === 'light';
         find('showSuggest').checked = '${configs.showSuggest}' === 'true';
@@ -1366,60 +1362,127 @@
         find('randomColor.specify').value = '#EE7ACC';
         find('projectIndicators').value = '.git;Cargo.toml;README.md;package.json;pom.xml;build.gradle;Makefile';
       }
-      initColorPalette();
     }
 
-    // 初始化主题切换器
-    document.getElementById('theme').addEventListener('change', function () {
-      const body = document.querySelector('.body');
-      const currentTheme = body.getAttribute('theme');
-      body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
-    });
+    function initSettingsChangeEvents() {
+      // 要推送到插件的输入变更事件
+      find('#settings').addEventListener('change', (event) => {
+        /**
+         * @type {HTMLInputElement} 
+         */
+        const input = event.target;
+        const data = {
+          name: input.name,
+          value: input.value
+        };
 
-    // 初始化所有textarea
-    $('textarea').forEach((textarea) => {
-      textarea.addEventListener('input', function (event) {
+        // 如果数字类不符合要求，则返回并提示
+        if (input.type === 'number') {
+          const value = parseInt(input.value, 10);
+          let max = parseInt(input.max, 10);
+          let min = parseInt(input.min, 10);
+          max = Number.isNaN(max) ? Infinity : max;
+          min = Number.isNaN(min) ? Infinity : min;
+
+          if (Number.isNaN(value) || value < min || value > max) {
+            find(input.name, 'error').innerText = i18n.NumberLimit(min, max, true);
+            input.value = input.defaultValue; // 恢复默认值
+            return;
+          }
+          data.value = value;
+        } else if (input.type === 'checkbox') {
+          data.value = input.checked;
+        } else if (input.classList.contains('palette-input')) {
+          // 已经在初始化调色盘的地方处理过了
+          return;
+        }
+
+        vspost(data);
+      });
+
+      // 要推送到插件的按钮点击事件
+      $('button.control-input[name]').forEach((button) => {
+        const name = button.getAttribute('name');
+        find(name, 'button').onclick = () => vspost({ name, value: null });
+      });
+
+      // 插件回馈的结果
+      window.addEventListener('message', (event) => {
+        const resp = event.data;
+        if (resp.from !== 'colorful-titlebar') {
+          return;
+        }
+        unfreeze();
+
+        if (!resp.succ) {
+          find(resp.name, 'error').textContent = resp.msg;
+          return;
+        }
+
+        if (resp.msg) {
+          find(resp.name, 'succ').textContent = resp.msg;
+
+          // 如果调整了渐变配置，那么置空渐变选项以备重新选择
+          if (resp.name === 'gradientBrightness' || resp.name === 'gradientDarkness') {
+            find('gradient').value = '';
+          }
+        }
+      });
+    }
+
+    function initSimpleInputs() {
+      // 初始化主题切换器
+      document.getElementById('theme').addEventListener('change', function () {
+        const body = document.querySelector('.body');
+        const currentTheme = body.getAttribute('theme');
+        body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
+      });
+
+      // 初始化所有textarea
+      $('textarea').forEach((textarea) => {
+        textarea.addEventListener('input', function (event) {
+          textarea.style.height = 'auto';
+          textarea.style.height = textarea.scrollHeight + 'px';
+        });
         textarea.style.height = 'auto';
         textarea.style.height = textarea.scrollHeight + 'px';
       });
-      textarea.style.height = 'auto';
-      textarea.style.height = textarea.scrollHeight + 'px';
-    });
 
-    // 初始化单独的颜色选择器
-    $('button.color-picker').forEach((picker) => {
-      const colorInput = picker.querySelector('input[type="color"]');
-      colorInput.addEventListener('input', function () {
-        const [r, g, b] = colorInput.value
-          .replace('#', '')
-          .match(/.{2}/g)
-          .map((hex) => parseInt(hex, 16));
-        const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
-        picker.style.color = brightness > 128 ? '#000' : '#fff';
-        picker.style.backgroundColor = colorInput.value;
+      // 初始化单独的颜色选择器
+      $('button.color-picker').forEach((picker) => {
+        const colorInput = picker.querySelector('input[type="color"]');
+        colorInput.addEventListener('input', function () {
+          const [r, g, b] = colorInput.value
+            .replace('#', '')
+            .match(/.{2}/g)
+            .map((hex) => parseInt(hex, 16));
+          const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
+          picker.style.color = brightness > 128 ? '#000' : '#fff';
+          picker.style.backgroundColor = colorInput.value;
+          picker.title = colorInput.value;
+        });
+        picker.addEventListener('click', colorInput.click.bind(colorInput));
         picker.title = colorInput.value;
       });
-      picker.addEventListener('click', colorInput.click.bind(colorInput));
-      picker.title = colorInput.value;
-    });
-
-    // 要推送到插件的事件
-    ['randomColor.colorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
-      find(name, 'button').onclick = () => vspost({ name, value: find(name)?.value });
-    });
+    }
 
     /**
      * # 颜色套组编辑器
      */
     function initColorPalette() {
       $('.palette').forEach((palette) => {
-        const name = palette.getAttribute('name')
+
+        const name = palette.getAttribute('name');
         // 因为color-list的元素是不断变化的，因此事件只能注册在div上
         const colorList = palette.querySelector('.color-list');
 
         function is(e, className) {
           return e.target.classList.contains(className);
         }
+
+        palette.addEventListener('change', () => {
+          vspost({ name, value: getPalleteColors(name) });
+        });
 
         colorList.addEventListener('click', (e) => {
           // 如果点击了添加按钮，则添加新颜色
@@ -1476,10 +1539,6 @@
       });
     }
 
-    /**
-     * 创建颜色项元素
-     * - 加颜色要用，渲染要用，是个常用的函数
-     */
     function createPaletteItem(name, color) {
       const item = document.createElement('div');
       item.className = 'palette-item';
@@ -1511,10 +1570,6 @@
       return $('.palette-input[belong="' + name + '"]').map((input) => input.value);
     }
 
-    /**
-     * 更新颜色套组并发送到插件
-     * @param {HTMLElement}
-     */
     function onPaletteChange(name) {
       vspost({ name, value: getPalleteColors(name) });
     }
@@ -1581,63 +1636,11 @@
       draggedElement = null;
     }
 
-    settings.addEventListener('change', (event) => {
-      /**
-       * @type {HTMLInputElement} 
-       */
-      const input = event.target;
-      const data = {
-        name: input.name,
-        value: input.value
-      };
-
-      // 如果数字类不符合要求，则返回并提示
-      if (input.type === 'number') {
-        const value = parseInt(input.value, 10);
-        let max = parseInt(input.max, 10);
-        let min = parseInt(input.min, 10);
-        max = Number.isNaN(max) ? Infinity : max;
-        min = Number.isNaN(min) ? Infinity : min;
-
-        if (Number.isNaN(value) || value < min || value > max) {
-          find(input.name, 'error').innerText = i18n.NumberLimit(min, max, true);
-          input.value = input.defaultValue; // 恢复默认值
-          return;
-        }
-        data.value = value;
-      } else if (input.type === 'checkbox') {
-        data.value = input.checked;
-      } else if (input.classList.contains('palette-input')) {
-        const name = input.getAttribute('belong');
-        data.name = name;
-        data.value = getPalleteColors(name);
-      }
-
-      vspost(data);
-    });
-
-    // 插件回馈的结果
-    window.addEventListener('message', (event) => {
-      const resp = event.data;
-      if (resp.from !== 'colorful-titlebar') {
-        return;
-      }
-      unfreeze();
-
-      if (!resp.succ) {
-        find(resp.name, 'error').textContent = resp.msg;
-        return;
-      }
-
-      if (resp.msg) {
-        find(resp.name, 'succ').textContent = resp.msg;
-
-        // 如果调整了渐变配置，那么置空渐变选项以备重新选择
-        if (resp.name === 'gradientBrightness' || resp.name === 'gradientDarkness') {
-          find('gradient').value = '';
-        }
-      }
-    });
+    // 开始初始化
+    initColorPalette();
+    initSettingsValue(isProd);
+    initSimpleInputs();
+    initSettingsChangeEvents();
   </script>
 </body>
 
