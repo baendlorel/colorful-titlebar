@@ -149,7 +149,18 @@ const handlerMap = {
   },
   [ControlName.LightThemeColors]: async (result: HandelResult, value: PostedValue) => {},
   [ControlName.DarkThemeColors]: async (result: HandelResult, value: PostedValue) => {},
-  [ControlName.ProjectIndicators]: async (result: HandelResult, value: PostedValue) => {},
+  [ControlName.ProjectIndicators]: async (result: HandelResult, value: PostedValue) => {
+    if (typeof value !== 'string') {
+      result.succ = false;
+      result.msg = Panel.typeError(value, 'a string');
+      throw null;
+    }
+    const indicators = value
+      .split(';')
+      .map((item) => item.trim())
+      .filter(Boolean);
+    await configs.set.projectIndicators(indicators);
+  },
 };
 
 let controlPanel: vscode.WebviewPanel | null = null;
@@ -170,6 +181,7 @@ export default async function (this: vscode.ExtensionContext) {
   const currentColor = configs.currentColor ?? '#007ACC';
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
   const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
+  const projectIndicators = configs.projectIndicators.join(';');
 
   controlPanel.webview.html = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -320,7 +332,7 @@ export default async function (this: vscode.ExtensionContext) {
 
     .control-item {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr 210px;
       grid-template-rows: auto auto auto;
       column-gap: 20px;
       margin-bottom: 10px;
@@ -340,6 +352,13 @@ export default async function (this: vscode.ExtensionContext) {
       color: var(--ct-text-color-weak);
     }
 
+    .control-input-group {
+      display: flex;
+      align-items: center;
+      font-family: Arial, Helvetica, sans-serif;
+      justify-content: flex-end;
+    }
+
     .control-error {
       grid-column: 1 / span 2;
       font-size: 0.8em;
@@ -350,12 +369,6 @@ export default async function (this: vscode.ExtensionContext) {
       grid-column: 1 / span 2;
       font-size: 0.8em;
       color: var(--ct-success);
-    }
-
-    .control-input-group {
-      display: flex;
-      align-items: center;
-      font-family: Arial, Helvetica, sans-serif;
     }
 
     .toggle-switch {
@@ -454,7 +467,7 @@ export default async function (this: vscode.ExtensionContext) {
       left: 52%;
       top: 47%;
       transform: translate(-50%, -50%);
-      font-size: 1.5em;
+      font-size: 1.2em;
     }
 
     .select {
@@ -473,10 +486,22 @@ export default async function (this: vscode.ExtensionContext) {
     }
 
     .textarea {
+      flex: 1;
       padding: 8px 12px 8px 12px;
       font-family: 'Roboto', sans-serif;
       resize: none;
       overflow: hidden;
+    }
+
+    .select {
+      flex: 1;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 8px center;
+      background-repeat: no-repeat;
+      background-size: 16px;
+      padding-right: 26px;
+      cursor: pointer;
     }
 
     .input-percent input[type="number"] {
@@ -497,16 +522,6 @@ export default async function (this: vscode.ExtensionContext) {
       right: 40px;
       margin-top: -2px;
       color: var(--ct-text-color-weak);
-    }
-
-    .select {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-      background-position: right 8px center;
-      background-repeat: no-repeat;
-      background-size: 16px;
-      padding-right: 26px;
-      cursor: pointer;
     }
 
     textarea,
@@ -531,7 +546,7 @@ export default async function (this: vscode.ExtensionContext) {
       box-shadow: 0 0 0 2px var(--ct-focus-shadow);
     }
 
-    .btn:focus {
+    .control-button:focus {
       outline: none;
       box-shadow: 0 0 0 2px var(--ct-focus-shadow);
     }
@@ -542,6 +557,132 @@ export default async function (this: vscode.ExtensionContext) {
 
     [theme="dark"] .select {
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23abadb4' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    }
+
+    /* 下拉菜单样式 */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-button {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 26px 8px 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--ct-primary);
+      color: white;
+      min-width: 120px;
+      position: relative;
+    }
+
+    .dropdown-button::after {
+      position: absolute;
+      right: 12px;
+      content: '';
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      padding: 3px;
+      transform: rotate(45deg);
+      transition: transform 0.3s ease;
+    }
+
+    .dropdown:hover .dropdown-button::after,
+    .dropdown:focus-within .dropdown-button::after {
+      transform: rotate(-135deg);
+    }
+
+    .dropdown-button:hover {
+      opacity: 0.9;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: var(--ct-panel-bg);
+      border: 1px solid var(--ct-border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px var(--ct-shadow-color);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .dropdown:hover .dropdown-menu,
+    .dropdown:focus-within .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 8px 16px;
+      border: none;
+      background: none;
+      color: var(--ct-text-color);
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      border-bottom: 1px solid var(--ct-border-color);
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    /* .dropdown-item:focus  */
+    .dropdown-item:hover {
+      background-color: var(--ct-primary);
+      color: white;
+      outline: none;
+    }
+
+    .dropdown-item:active {
+      opacity: 0.9;
+    }
+
+    /* 防止下拉菜单在悬停时闪烁 */
+    .dropdown:hover,
+    .dropdown:focus-within {
+      z-index: 11;
+    }
+
+    .color-picker {
+      position: relative;
+      padding-left: 40px;
+    }
+
+    .color-picker::before {
+      content: '🎨';
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.3em;
+    }
+
+    .color-picker input[type="color"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
     }
   </style>
   <style category="theme-switch">
@@ -1013,12 +1154,12 @@ export default async function (this: vscode.ExtensionContext) {
         <div class="control-input-group">
           <select name="gradient" class="control-input select">
             <option value="" selected>${Panel.gradient.empty}</option>
-            <option value="${GradientStyle.BrightCenter}">${
-    Panel.gradient[GradientStyle.BrightCenter]
-  }</option>
-            <option value="${GradientStyle.BrightLeft}">${
-    Panel.gradient[GradientStyle.BrightLeft]
-  }</option>
+            <option value="${GradientStyle.BrightCenter}">
+              ${Panel.gradient[GradientStyle.BrightCenter]}
+            </option>
+            <option value="${GradientStyle.BrightLeft}">
+              ${Panel.gradient[GradientStyle.BrightLeft]}
+            </option>
             <option value="${GradientStyle.ArcLeft}">${
     Panel.gradient[GradientStyle.ArcLeft]
   }</option>
@@ -1059,17 +1200,47 @@ export default async function (this: vscode.ExtensionContext) {
         </div>
         <div class="control-input-group">
           <select name="hashSource" class="control-input select">
-            <option value="${HashSource.ProjectName}">${
-    Panel.hashSource[HashSource.ProjectName]
-  }</option>
+            <option value="${HashSource.ProjectName}">
+              ${Panel.hashSource[HashSource.ProjectName]}
+            </option>
             <option value="${HashSource.FullPath}">${Panel.hashSource[HashSource.FullPath]}</option>
-            <option value="${HashSource.ProjectNameDate}">${
-    Panel.hashSource[HashSource.ProjectNameDate]
-  }</option>
+            <option value="${HashSource.ProjectNameDate}">
+              ${Panel.hashSource[HashSource.ProjectNameDate]}
+            </option>
           </select>
         </div>
         <div class="control-error" name="hashSource"></div>
         <div class="control-succ" name="hashSource"></div>
+      </div>
+
+      <div class="control-item">
+        <div class="control-label-group">
+          <div class="control-label">${Panel.randomColor.label}</div>
+          <div class="control-desc">${Panel.randomColor.description}</div>
+        </div>
+        <div class="control-input-group">
+          <div class="dropdown">
+            <button type="button" class="dropdown-button" tabindex="0">
+              ${Panel.randomColor.label}
+            </button>
+            <div class="dropdown-menu">
+              <button type="button" class="dropdown-item" name="randomColor.colorSet">
+                ${Panel.randomColor.colorSet}
+              </button>
+              <button type="button" class="dropdown-item" name="randomColor.pure">
+                ${Panel.randomColor.pure}
+              </button>
+              <button type="button" class="dropdown-item color-picker" title="${
+                Panel.randomColor.specify
+              }" name="randomColor.specify">
+                <span>&nbsp;&nbsp;${Panel.randomColor.specify}</span>
+                <input type="color" class="control-input" name="randomColor.specify">
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="control-error" name="randomColor"></div>
+        <div class="control-succ" name="randomColor"></div>
       </div>
 
       <div class="control-item">
@@ -1088,211 +1259,218 @@ export default async function (this: vscode.ExtensionContext) {
 
       <div class="control-item">
         <div class="control-label-group">
-          <div class="control-label">${Panel.randomColor.label}</div>
-          <div class="control-desc">${Panel.randomColor.description}</div>
+          <div class="control-label">${Panel.projectIndicators.label}</div>
+          <div class="control-desc">${Panel.projectIndicators.description}</div>
         </div>
-        <div class="control-input-group" style="display: grid;grid-template-columns: auto auto auto;column-gap: 10px;">
-          <button type="button" class="control-button" name="randomColor.colorSet">
-            ${Panel.randomColor.colorSet}
-          </button>
-          <button type="button" class="control-button" name="randomColor.pure">
-            ${Panel.randomColor.pure}
-          </button>
-          <button type="button" class="control-button picker" title="${
-            Panel.randomColor.specify
-          }" name="randomColor.specify">
-            选
-            <input type="color" class="control-input" name="randomColor.specify">
-          </button>
+        <div class="control-input-group">
+          <textarea class="control-input textarea" name="projectIndicators"></textarea>
         </div>
-        <div class="control-error" name="randomColor"></div>
-        <div class="control-succ" name="randomColor"></div>
+        <div class="control-error" name="projectIndicators"></div>
+        <div class="control-succ" name="projectIndicators"></div>
       </div>
     </form>
   </div>
 
   <script>
-    const isProd = '${env}' === 'prod';
+    {
+      const isProd = '${env}' === 'prod';
 
-    // functions
+      // functions
+      const vspost = (() => {
+        let o = isProd ? acquireVsCodeApi() : {
+          postMessage: (a) => console.log('vscode.postMessage', a)
+        };
+        return function (data) {
+          freeze();
+          o.postMessage({
+            from: 'colorful-titlebar',
+            ...data
+          });
+        }
+      })();
 
-    const vspost = (() => {
-      let o = isProd ? acquireVsCodeApi() : {
-        postMessage: (a) => console.log('vscode.postMessage', a)
+      const theme = () => {
+        const body = document.querySelector('.body');
+        const currentTheme = body.getAttribute('theme');
+        body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
+      }
+
+      /**
+       * 默认查找的是输入元素，可以指定查找类型
+       * @param {string} name - 元素的 name 属性
+       * @param {string} tp - 元素类型：input | button | error | succ
+       */
+      const find = (name, tp = 'input') => {
+        switch (tp) {
+          case 'succ':
+            return document.querySelector(['.control-succ[name="', name, '"]'].join(''));
+          case 'error':
+            return document.querySelector(['.control-error[name="', name, '"]'].join(''));
+          case 'button':
+            return document.querySelector(['button[name="', name, '"]', ',.control-button[name="', name, '"]'].join(''));
+          case 'input':
+          default:
+            return document.querySelector(['.control-input[name="', name, '"]'].join(''))
+        }
       };
-      return function (data) {
-        freeze();
-        o.postMessage({
-          from: 'colorful-titlebar',
-          ...data
-        });
-      }
-    })();
 
-    const theme = () => {
-      const body = document.querySelector('.body');
-      const currentTheme = body.getAttribute('theme');
-      body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
-    }
+      const i18n = (() => {
+        const zh = {
+          NumberLimit: (min, max, isInt = true) => ['请输入', min, '到', max, '之间的', isInt ? '整数' : '数'].join('')
+        }
+        const en = {
+          NumberLimit: (min, max, isInt = true) => ['Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max].join(' ')
+        }
+        switch ('${configs.lang}') {
+          case 'zh':
+            return zh;
+          case 'en':
+            return en;
+          default:
+            return zh;
+        }
+      })()
 
-    /**
-     * 默认查找的是输入元素，可以指定查找类型
-     * @param {string} name - 元素的 name 属性
-     * @param {string} tp - 元素类型：input | button | error | succ
-     */
-    const find = (name, tp = 'input') => {
-      switch (tp) {
-        case 'succ':
-          return document.querySelector(['.control-succ[name="', name, '"]'].join(''));
-        case 'error':
-          return document.querySelector(['.control-error[name="', name, '"]'].join(''));
-        case 'button':
-          return document.querySelector(['.control-button[name="', name, '"]'].join(''));
-        case 'input':
-        default:
-          return document.querySelector(['.control-input[name="', name, '"]'].join(''))
-      }
-    };
+      /**
+       * @type {HTMLFormElement} 
+       */
+      const settings = document.getElementById('settings');
+      const formInputs = Array.from(settings.elements);
 
-    const i18n = (() => {
-      const zh = {
-        NumberLimit: (min, max, isInt = true) => ['请输入', min, '到', max, '之间的', isInt ? '整数' : '数'].join('')
+      const freeze = () => {
+        document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
+        if (isProd) {
+          settings.classList.add('freeze');
+          formInputs.forEach((el) => el.disabled = true);
+        }
       }
-      const en = {
-        NumberLimit: (min, max, isInt = true) => ['Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max].join(' ')
-      }
-      switch ('${configs.lang}') {
-        case 'zh':
-          return zh;
-        case 'en':
-          return en;
-        default:
-          return zh;
-      }
-    })()
 
-    /**
-     * @type {HTMLFormElement} 
-     */
-    const settings = document.getElementById('settings');
-    const formInputs = Array.from(settings.elements);
+      const unfreeze = () => {
+        setTimeout(() => settings.classList.remove('freeze'), 200);
+        formInputs.forEach((el) => el.disabled = false)
+      }
 
-    const freeze = () => {
-      document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
+      // init
       if (isProd) {
-        settings.classList.add('freeze');
-        formInputs.forEach((el) => el.disabled = true);
+        find('theme').checked = "${configs.theme}" === 'light';
+        find('showSuggest').checked = '${configs.showSuggest}' === 'true';
+        find('workbenchCssPath').value = '${configs.workbenchCssPath}';
+        find('hashSource').value = '${configs.hashSource}';
+        find('gradientBrightness').value = '${gradientBrightness}';
+        find('gradientDarkness').value = '${gradientDarkness}';
+        find('randomColor.specify', 'button').style.backgroundColor = '${currentColor}';
+        find('randomColor.specify').value = '${currentColor}';
+        find('projectIndicators').value = '${projectIndicators}';
+      } else {
+        const testScript = document.createElement('script');
+        testScript.src = './template-replacer.js';
+        document.body.appendChild(testScript);
+        find('theme').checked = true;
+        find('showSuggest').checked = false;
+        find('workbenchCssPath').value = '/d/work/ddddddddddd/fffffffff/44444444/222222222/44444444/aaa.css';
+        find('hashSource').value = '';
+        find('gradientBrightness').value = '99';
+        find('gradientDarkness').value = '12';
+        find('randomColor.specify', 'button').style.backgroundColor = '#EE7ACC';
+        find('randomColor.specify').value = '#EE7ACC';
+        find('projectIndicators').value = '.git;Cargo.toml;README.md;package.json;pom.xml;build.gradle;Makefile';
       }
-    }
 
-    const unfreeze = () => {
-      setTimeout(() => settings.classList.remove('freeze'), 200);
-      formInputs.forEach((el) => el.disabled = false)
-    }
+      // 初始化主题切换器
+      find('theme').addEventListener('change', theme);
 
-    // init
-    if (isProd) {
-      find('theme').checked = "${configs.theme}" === 'light';
-      find('showSuggest').checked = '${configs.showSuggest}' === 'true';
-      find('workbenchCssPath').value = '${configs.workbenchCssPath}';
-      find('hashSource').value = '${configs.hashSource}';
-      find('gradientBrightness').value = '${gradientBrightness}';
-      find('gradientDarkness').value = '${gradientDarkness}';
-      find('randomColor.specify', 'button').style.backgroundColor = '${currentColor}';
-      find('randomColor.specify').value = '${currentColor}';
-    } else {
-      find('theme').checked = true;
-      find('showSuggest').checked = false;
-      find('workbenchCssPath').value = '/d/work/ddddddddddd/fffffffff/44444444/222222222/44444444/aaa.css';
-      find('hashSource').value = '';
-      find('gradientBrightness').value = '99';
-      find('gradientDarkness').value = '12';
-      find('randomColor.specify', 'button').style.backgroundColor = '#007ACC';
-      find('randomColor.specify').value = '#007ACC';
-    }
-
-    // events
-    find('theme').addEventListener('change', theme);
-
-    // 初始化所有textarea
-    Array.from(document.querySelectorAll('textarea')).forEach((textarea) => {
-      textarea.addEventListener('input', (event) => {
+      // 初始化所有textarea
+      Array.from(document.querySelectorAll('textarea')).forEach((textarea) => {
+        textarea.addEventListener('input', (event) => {
+          textarea.style.height = 'auto';
+          textarea.style.height = textarea.scrollHeight + 'px';
+        });
         textarea.style.height = 'auto';
         textarea.style.height = textarea.scrollHeight + 'px';
       });
-      textarea.style.height = 'auto';
-      textarea.style.height = textarea.scrollHeight + 'px';
-    });
 
-    ['randomColor.colorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
-      find(name, 'button').onclick = () => vspost({ name, value: find(name)?.value })
-    });
 
-    // 初始化所有颜色选择器
-    Array.from(document.querySelectorAll('.picker')).forEach((picker) => {
-      const colorInput = find(picker.name);
-      picker.addEventListener('click', colorInput.click.bind(colorInput));
-      picker.addEventListener('input', (input) => {
-        const color = colorInput.value;
-        picker.style.backgroundColor = color;
+      // 初始化所有颜色选择器
+      Array.from(document.querySelectorAll('button.color-picker')).forEach((picker) => {
+        const colorInput = picker.querySelector('input[type="color"]');
+        colorInput.addEventListener('input', () => {
+          const [r, g, b] = colorInput.value
+            .replace('#', '')
+            .match(/.{2}/g)
+            .map((hex) => parseInt(hex, 16));
+          const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
+          picker.style.color = brightness > 128 ? '#000' : '#fff';
+          picker.style.backgroundColor = colorInput.value
+        });
+        picker.addEventListener('click', colorInput.click.bind(colorInput));
+
       });
-    });
 
-    settings.addEventListener('change', function (event) {
-      event.preventDefault();
-      const input = event.target;
-      // 控制面板的主题变更不需要推送给插件
-      if (input.name === 'theme') {
-        return;
-      }
+      // 要推送到插件的事件
+      ['randomColor.colorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
+        const button = find(name, 'button');
+        if (button) {
+          button.onclick = () => vspost({ name, value: find(name)?.value });
+        }
+      });
 
-      const data = {
-        name: input.name,
-        value: input.value
-      };
-
-      // 如果数字类不符合要求，则返回并提示
-      if (input.type === 'number') {
-        const value = parseInt(input.value, 10);
-        let max = parseInt(input.max, 10);
-        let min = parseInt(input.min, 10);
-        max = Number.isNaN(max) ? Infinity : max;
-        min = Number.isNaN(min) ? Infinity : min;
-
-        if (Number.isNaN(value) || value < min || value > max) {
-          find(input.name, 'error').innerText = i18n.NumberLimit(min, max, true);
-          input.value = input.defaultValue; // 恢复默认值
+      settings.addEventListener('change', function (event) {
+        event.preventDefault();
+        const input = event.target;
+        // 控制面板的主题变更不需要推送给插件
+        if (input.name === 'theme') {
           return;
         }
-        data.value = value;
-      } else if (input.type === 'checkbox') {
-        data.value = input.checked;
-      }
 
-      vspost(data);
-    });
+        const data = {
+          name: input.name,
+          value: input.value
+        };
 
-    window.addEventListener('message', (event) => {
-      const resp = event.data;
-      if (resp.from !== 'colorful-titlebar') {
-        return;
-      }
-      unfreeze();
+        // 如果数字类不符合要求，则返回并提示
+        if (input.type === 'number') {
+          const value = parseInt(input.value, 10);
+          let max = parseInt(input.max, 10);
+          let min = parseInt(input.min, 10);
+          max = Number.isNaN(max) ? Infinity : max;
+          min = Number.isNaN(min) ? Infinity : min;
 
-      if (!resp.succ) {
-        find(resp.name, 'error').textContent = resp.msg;
-        return;
-      }
-
-      if (resp.msg) {
-        find(resp.name, 'succ').textContent = resp.msg;
-
-        // 如果调整了渐变配置，那么置空渐变选项以备重新选择
-        if (resp.name === 'gradientBrightness' || resp.name === 'gradientDarkness') {
-          find('gradient').value = '';
+          if (Number.isNaN(value) || value < min || value > max) {
+            find(input.name, 'error').innerText = i18n.NumberLimit(min, max, true);
+            input.value = input.defaultValue; // 恢复默认值
+            return;
+          }
+          data.value = value;
+        } else if (input.type === 'checkbox') {
+          data.value = input.checked;
         }
-      }
-    });
+
+        vspost(data);
+      });
+
+      // 插件回馈的结果
+      window.addEventListener('message', (event) => {
+        const resp = event.data;
+        if (resp.from !== 'colorful-titlebar') {
+          return;
+        }
+        unfreeze();
+
+        if (!resp.succ) {
+          find(resp.name, 'error').textContent = resp.msg;
+          return;
+        }
+
+        if (resp.msg) {
+          find(resp.name, 'succ').textContent = resp.msg;
+
+          // 如果调整了渐变配置，那么置空渐变选项以备重新选择
+          if (resp.name === 'gradientBrightness' || resp.name === 'gradientDarkness') {
+            find('gradient').value = '';
+          }
+        }
+      });
+    } 
   </script>
 </body>
 

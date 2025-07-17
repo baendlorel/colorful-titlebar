@@ -59,11 +59,15 @@
         },
 
         randomColor: {
-          label: '随机/指定颜色',
+          label: '操作',
           description: '可以选择用当前配置的颜色来随机、纯随机或者直接用调色盘🎨指定颜色',
           colorSet: '当前套组',
           pure: '纯随机',
-          specify: '直接指定一个颜色',
+          specify: '调色盘',
+        },
+        projectIndicators: {
+          label: '项目指示器',
+          description: `含有这些文件的文件夹会计算标题栏颜色`,
         },
       },
     },
@@ -121,12 +125,16 @@
         },
 
         randomColor: {
-          label: 'Random/Specify Color',
+          label: 'Random/Specify',
           description:
             'You can choose to randomize with current configured colors, pure random, or directly specify a color with the color picker🎨',
           colorSet: 'Current Set',
           pure: 'Pure Random',
-          specify: 'Specify a Color',
+          specify: 'Palette',
+        },
+        projectIndicators: {
+          label: 'Project Indicators',
+          description: `Folders containing these files will have their titlebar color calculated`,
         },
       },
     },
@@ -213,6 +221,18 @@
   const replace = (text) => {
     return text
       .replace(
+        '${Panel.gradient[GradientStyle.BrightCenter]}',
+        mockData.Panel.gradient[mockData.GradientStyle.BrightCenter]
+      )
+      .replace(
+        '${Panel.gradient[GradientStyle.BrightLeft]}',
+        mockData.Panel.gradient[mockData.GradientStyle.BrightLeft]
+      )
+      .replace(
+        '${Panel.gradient[GradientStyle.ArcLeft]}',
+        mockData.Panel.gradient[mockData.GradientStyle.ArcLeft]
+      )
+      .replace(
         '${Panel.hashSource[HashSource.ProjectName]}',
         mockData.Panel.hashSource[mockData.HashSource.ProjectName]
       )
@@ -278,96 +298,6 @@
     };
 
     visit(document.body);
-
-    // const html = document.documentElement.outerHTML;
-
-    // let replacedHtml = html
-    //   // 基础替换
-    //   .replace(/\$\{Panel\.title\}/g, mockData.Panel.title)
-    //   .replace(/\$\{Panel\.loading\}/g, mockData.Panel.loading)
-    //   .replace(/\$\{Panel\.description\}/g, mockData.Panel.description)
-    //   .replace(/\$\{Consts\.DisplayName\}/g, mockData.Consts.DisplayName)
-    //   .replace(/\$\{version\.get\(this\)\}/g, mockData.version.get())
-    //   .replace(/\$\{configs\.theme\}/g, mockData.configs.theme)
-    //   .replace(/\$\{configs\.showSuggest\}/g, mockData.configs.showSuggest)
-    //   .replace(/\$\{configs\.workbenchCssPath\}/g, mockData.configs.workbenchCssPath)
-    //   .replace(/\$\{configs\.hashSource\}/g, mockData.configs.hashSource)
-    //   .replace(/\$\{configs\.lang\}/g, mockData.configs.lang)
-    //   .replace(/\$\{gradientBrightness\}/g, mockData.gradientBrightness)
-    //   .replace(/\$\{gradientDarkness\}/g, mockData.gradientDarkness)
-    //   .replace(/\$\{currentColor\}/g, mockData.currentColor)
-    //   .replace(/\$\{env\}/g, mockData.env)
-
-    //   // Panel 字段
-    //   .replace(/\$\{Panel\.showSuggest\.label\}/g, mockData.Panel.showSuggest.label)
-    //   .replace(/\$\{Panel\.showSuggest\.description\}/g, mockData.Panel.showSuggest.description)
-    //   .replace(/\$\{Panel\.workbenchCssPath\.label\}/g, mockData.Panel.workbenchCssPath.label)
-    //   .replace(
-    //     /\$\{Panel\.workbenchCssPath\.description\}/g,
-    //     mockData.Panel.workbenchCssPath.description
-    //   )
-    //   .replace(/\$\{Panel\.gradient\.label\}/g, mockData.Panel.gradient.label)
-    //   .replace(/\$\{Panel\.gradient\.description\}/g, mockData.Panel.gradient.description)
-    //   .replace(/\$\{Panel\.gradient\.empty\}/g, mockData.Panel.gradient.empty)
-    //   .replace(/\$\{Panel\.gradientBrightness\.label\}/g, mockData.Panel.gradientBrightness.label)
-    //   .replace(
-    //     /\$\{Panel\.gradientBrightness\.description\}/g,
-    //     mockData.Panel.gradientBrightness.description
-    //   )
-    //   .replace(/\$\{Panel\.gradientDarkness\.label\}/g, mockData.Panel.gradientDarkness.label)
-    //   .replace(
-    //     /\$\{Panel\.gradientDarkness\.description\}/g,
-    //     mockData.Panel.gradientDarkness.description
-    //   )
-    //   .replace(/\$\{Panel\.hashSource\.label\}/g, mockData.Panel.hashSource.label)
-    //   .replace(/\$\{Panel\.hashSource\.description\}/g, mockData.Panel.hashSource.description)
-    //   .replace(/\$\{Panel\.refresh\.label\}/g, mockData.Panel.refresh.label)
-    //   .replace(/\$\{Panel\.refresh\.description\}/g, mockData.Panel.refresh.description)
-    //   .replace(/\$\{Panel\.refresh\.button\}/g, mockData.Panel.refresh.button)
-    //   .replace(/\$\{Panel\.randomColor\.label\}/g, mockData.Panel.randomColor.label)
-    //   .replace(/\$\{Panel\.randomColor\.description\}/g, mockData.Panel.randomColor.description)
-    //   .replace(/\$\{Panel\.randomColor\.colorSet\}/g, mockData.Panel.randomColor.colorSet)
-    //   .replace(/\$\{Panel\.randomColor\.pure\}/g, mockData.Panel.randomColor.pure)
-    //   .replace(/\$\{Panel\.randomColor\.specify\}/g, mockData.Panel.randomColor.specify)
-
-    //   // 枚举值
-    //   .replace(/\$\{GradientStyle\.BrightCenter\}/g, mockData.GradientStyle.BrightCenter)
-    //   .replace(/\$\{GradientStyle\.BrightLeft\}/g, mockData.GradientStyle.BrightLeft)
-    //   .replace(/\$\{GradientStyle\.ArcLeft\}/g, mockData.GradientStyle.ArcLeft)
-    //   .replace(/\$\{HashSource\.ProjectName\}/g, mockData.HashSource.ProjectName)
-    //   .replace(/\$\{HashSource\.FullPath\}/g, mockData.HashSource.FullPath)
-    //   .replace(/\$\{HashSource\.ProjectNameDate\}/g, mockData.HashSource.ProjectNameDate)
-
-    //   // 复杂的嵌套引用
-    //   .replace(
-    //     /\$\{Panel\.gradient\[GradientStyle\.BrightCenter\]\}/g,
-    //     mockData.Panel.gradient[mockData.GradientStyle.BrightCenter]
-    //   )
-    //   .replace(
-    //     /\$\{Panel\.gradient\[GradientStyle\.BrightLeft\]\}/g,
-    //     mockData.Panel.gradient[mockData.GradientStyle.BrightLeft]
-    //   )
-    //   .replace(
-    //     /\$\{Panel\.gradient\[GradientStyle\.ArcLeft\]\}/g,
-    //     mockData.Panel.gradient[mockData.GradientStyle.ArcLeft]
-    //   )
-    //   .replace(
-    //     /\$\{Panel\.hashSource\[HashSource\.ProjectName\]\}/g,
-    //     mockData.Panel.hashSource[mockData.HashSource.ProjectName]
-    //   )
-    //   .replace(
-    //     /\$\{Panel\.hashSource\[HashSource\.FullPath\]\}/g,
-    //     mockData.Panel.hashSource[mockData.HashSource.FullPath]
-    //   )
-    //   .replace(
-    //     /\$\{Panel\.hashSource\[HashSource\.ProjectNameDate\]\}/g,
-    //     mockData.Panel.hashSource[mockData.HashSource.ProjectNameDate]
-    //   );
-
-    // // 重写整个文档
-    // document.open();
-    // document.write(replacedHtml);
-    // document.close();
   }
 
   // 导出调试数据到全局作用域

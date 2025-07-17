@@ -66,11 +66,15 @@ export default (() => {
           `重新计算颜色成功，哈希入参：${token}，颜色：${color}`,
       },
       randomColor: {
-        label: '随机/指定颜色',
+        label: '操作',
         description: `可以选择用当前配置的颜色来随机、纯随机或者直接用调色盘🎨指定颜色`,
         colorSet: '当前套组',
         pure: '纯随机',
         specify: '调色盘',
+      },
+      projectIndicators: {
+        label: '项目指示器',
+        description: `含有这些文件的文件夹会计算标题栏颜色`,
       },
     },
 
@@ -200,11 +204,15 @@ export default (() => {
           `Recalculated color successfully, hash input: ${token}, color: ${color}`,
       },
       randomColor: {
-        label: 'Random/Specify Color',
+        label: 'Random/Specify',
         description: `Choose to randomize within the current color set, pure random or directly specify a color using 🎨`,
         colorSet: 'Current Color Set',
         pure: 'Pure Random',
         specify: 'Palette',
+      },
+      projectIndicators: {
+        label: 'Project Indicators',
+        description: `Folders containing these files will have their titlebar color calculated`,
       },
     },
 

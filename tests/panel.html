@@ -147,7 +147,7 @@
 
     .control-item {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr 210px;
       grid-template-rows: auto auto auto;
       column-gap: 20px;
       margin-bottom: 10px;
@@ -167,6 +167,13 @@
       color: var(--ct-text-color-weak);
     }
 
+    .control-input-group {
+      display: flex;
+      align-items: center;
+      font-family: Arial, Helvetica, sans-serif;
+      justify-content: flex-end;
+    }
+
     .control-error {
       grid-column: 1 / span 2;
       font-size: 0.8em;
@@ -177,12 +184,6 @@
       grid-column: 1 / span 2;
       font-size: 0.8em;
       color: var(--ct-success);
-    }
-
-    .control-input-group {
-      display: flex;
-      align-items: center;
-      font-family: Arial, Helvetica, sans-serif;
     }
 
     .toggle-switch {
@@ -300,10 +301,22 @@
     }
 
     .textarea {
+      flex: 1;
       padding: 8px 12px 8px 12px;
       font-family: 'Roboto', sans-serif;
       resize: none;
       overflow: hidden;
+    }
+
+    .select {
+      flex: 1;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 8px center;
+      background-repeat: no-repeat;
+      background-size: 16px;
+      padding-right: 26px;
+      cursor: pointer;
     }
 
     .input-percent input[type="number"] {
@@ -324,16 +337,6 @@
       right: 40px;
       margin-top: -2px;
       color: var(--ct-text-color-weak);
-    }
-
-    .select {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-      background-position: right 8px center;
-      background-repeat: no-repeat;
-      background-size: 16px;
-      padding-right: 26px;
-      cursor: pointer;
     }
 
     textarea,
@@ -358,7 +361,7 @@
       box-shadow: 0 0 0 2px var(--ct-focus-shadow);
     }
 
-    .btn:focus {
+    .control-button:focus {
       outline: none;
       box-shadow: 0 0 0 2px var(--ct-focus-shadow);
     }
@@ -380,7 +383,7 @@
     .dropdown-button {
       border: none;
       border-radius: 8px;
-      padding: 8px 16px;
+      padding: 8px 26px 8px 16px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -394,11 +397,11 @@
     }
 
     .dropdown-button::after {
+      position: absolute;
+      right: 12px;
       content: '';
-      margin-left: 8px;
       border: solid white;
       border-width: 0 2px 2px 0;
-      display: inline-block;
       padding: 3px;
       transform: rotate(45deg);
       transition: transform 0.3s ease;
@@ -441,7 +444,7 @@
     .dropdown-item {
       display: block;
       width: 100%;
-      padding: 12px 16px;
+      padding: 8px 16px;
       border: none;
       background: none;
       color: var(--ct-text-color);
@@ -484,7 +487,7 @@
       left: 16px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 1.2em;
+      font-size: 1.3em;
     }
 
     .color-picker input[type="color"] {
@@ -1039,7 +1042,7 @@
                 ${Panel.randomColor.pure}
               </button>
               <button type="button" class="dropdown-item color-picker" title="${Panel.randomColor.specify}" name="randomColor.specify">
-                ${Panel.randomColor.specify}
+                <span>&nbsp;&nbsp;${Panel.randomColor.specify}</span>
                 <input type="color" class="control-input" name="randomColor.specify">
               </button>
             </div>
@@ -1061,6 +1064,18 @@
         </div>
         <div class="control-error" name="refresh"></div>
         <div class="control-succ" name="refresh"></div>
+      </div>
+
+      <div class="control-item">
+        <div class="control-label-group">
+          <div class="control-label">${Panel.projectIndicators.label}</div>
+          <div class="control-desc">${Panel.projectIndicators.description}</div>
+        </div>
+        <div class="control-input-group">
+          <textarea class="control-input textarea" name="projectIndicators"></textarea>
+        </div>
+        <div class="control-error" name="projectIndicators"></div>
+        <div class="control-succ" name="projectIndicators"></div>
       </div>
     </form>
   </div>
@@ -1154,6 +1169,7 @@
         find('gradientDarkness').value = '${gradientDarkness}';
         find('randomColor.specify', 'button').style.backgroundColor = '${currentColor}';
         find('randomColor.specify').value = '${currentColor}';
+        find('projectIndicators').value = '${projectIndicators}';
       } else {
         const testScript = document.createElement('script');
         testScript.src = './template-replacer.js';
@@ -1164,8 +1180,9 @@
         find('hashSource').value = '';
         find('gradientBrightness').value = '99';
         find('gradientDarkness').value = '12';
-        find('randomColor.specify', 'button').style.backgroundColor = '#007ACC';
-        find('randomColor.specify').value = '#007ACC';
+        find('randomColor.specify', 'button').style.backgroundColor = '#EE7ACC';
+        find('randomColor.specify').value = '#EE7ACC';
+        find('projectIndicators').value = '.git;Cargo.toml;README.md;package.json;pom.xml;build.gradle;Makefile';
       }
 
       // 初始化主题切换器
@@ -1181,12 +1198,20 @@
         textarea.style.height = textarea.scrollHeight + 'px';
       });
 
-
       // 初始化所有颜色选择器
       Array.from(document.querySelectorAll('button.color-picker')).forEach((picker) => {
         const colorInput = picker.querySelector('input[type="color"]');
-        colorInput.addEventListener('input', () => picker.style.backgroundColor = colorInput.value);
+        colorInput.addEventListener('input', () => {
+          const [r, g, b] = colorInput.value
+            .replace('#', '')
+            .match(/.{2}/g)
+            .map((hex) => parseInt(hex, 16));
+          const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
+          picker.style.color = brightness > 128 ? '#000' : '#fff';
+          picker.style.backgroundColor = colorInput.value
+        });
         picker.addEventListener('click', colorInput.click.bind(colorInput));
+
       });
 
       // 要推送到插件的事件

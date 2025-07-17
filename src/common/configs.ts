@@ -183,6 +183,11 @@ class Config {
       await Config.self.update(Prop.GradientDarkness, value, vscode.ConfigurationTarget.Global);
       Config.refresh();
     },
+
+    async [Prop.ProjectIndicators](value: string[]) {
+      await Config.self.update(Prop.ProjectIndicators, value, vscode.ConfigurationTarget.Global);
+      Config.refresh();
+    },
   };
 }
 
