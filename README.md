@@ -219,6 +219,25 @@ Issues and Pull Requests are welcome!
 
 ## 📝 Changelog
 
+### 1.2.2
+
+- **🔧 Bug Fixes**
+
+  - Automatic textarea height adjustment
+  - Fixed issue where version was incorrectly detected as new every time
+  - Fixed upgrade notification displaying function content instead of message
+
+- **🎨 New Random Color Feature**
+
+  - Random from palette: Pick random colors from configured color palette
+  - Pure random colors: Generate completely random RGB colors
+  - Manual color picker: Specify custom colors with visual picker
+
+- **🎯 UI/UX Enhancements**:
+
+  - Redesigned color picker with palette emoji button style
+  - Widened control panel for better layout### 1.2.1
+
 ### 1.2.1
 
 - **🔧 Bug Fixes**: Fixed control panel not responding to configuration changes
