@@ -69,6 +69,17 @@
           label: '项目指示器',
           description: `含有这些文件的文件夹会计算标题栏颜色`,
         },
+
+        colorPalette: {
+          label: '颜色套组',
+          description:
+            '编辑亮色和暗色主题的颜色套组，用于计算颜色生成。颜色的顺序会影响计算出的颜色',
+          lightColors: '亮色套组',
+          darkColors: '暗色套组',
+          addColor: '添加颜色',
+          removeColor: '删除',
+          dragHint: '拖拽重新排序',
+        },
       },
     },
 
@@ -135,6 +146,17 @@
         projectIndicators: {
           label: 'Project Indicators',
           description: `Folders containing these files will have their titlebar color calculated`,
+        },
+
+        colorPalette: {
+          label: 'Color Palette',
+          description:
+            'Edit light and dark theme color sets for random color functionality. Order of the colors will affect the generated results',
+          lightColors: 'Light Colors',
+          darkColors: 'Dark Colors',
+          addColor: 'Add Color',
+          removeColor: 'Remove',
+          dragHint: 'Drag to reorder',
         },
       },
     },
@@ -212,6 +234,11 @@
     gradientDarkness: '15',
     currentColor: '#007ACC',
     env: 'dev',
+    projectIndicators: '.git;Cargo.toml;README.md;package.json;pom.xml;build.gradle;Makefile',
+
+    // 颜色套组数据
+    lightColors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'],
+    darkColors: ['#E74C3C', '#1ABC9C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'],
   };
 
   /**

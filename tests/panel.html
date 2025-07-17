@@ -147,7 +147,7 @@
 
     .control-item {
       display: grid;
-      grid-template-columns: 1fr 210px;
+      grid-template-columns: 1fr 218px;
       grid-template-rows: auto auto auto;
       column-gap: 20px;
       margin-bottom: 10px;
@@ -498,6 +498,137 @@
       height: 100%;
       opacity: 0;
       cursor: pointer;
+    }
+  </style>
+
+  <style category="颜色套组编辑器样式">
+    /* 颜色套组编辑器样式 */
+    .color-palette-editor {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .color-set {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .color-set-label {
+      font-weight: 500;
+      color: var(--ct-text-color);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .color-set-hint {
+      font-size: 11px;
+      color: var(--ct-text-color-weak);
+      font-weight: normal;
+    }
+
+    .color-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 48px;
+      padding: 8px;
+      border: 2px dashed var(--ct-border-color);
+      border-radius: 8px;
+      background-color: rgba(0, 0, 0, 0.02);
+      transition: border-color 0.3s ease;
+    }
+
+    [theme="dark"] .color-list {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .color-list.drag-over {
+      border-color: var(--ct-primary);
+      background-color: rgba(34, 109, 231, 0.1);
+    }
+
+    .color-item {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .color-item:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .color-item.dragging {
+      opacity: 0.5;
+      transform: rotate(5deg);
+    }
+
+    .color-item .remove-btn {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 16px;
+      height: 16px;
+      background-color: var(--ct-danger);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 10px;
+      line-height: 1;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .color-item:hover .remove-btn {
+      opacity: 1;
+    }
+
+    .color-item .color-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .add-color-btn {
+      width: 32px;
+      height: 32px;
+      border: 2px dashed var(--ct-border-color);
+      background: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ct-text-color-weak);
+      font-size: 18px;
+      transition: all 0.2s ease;
+    }
+
+    .add-color-btn:hover {
+      border-color: var(--ct-primary);
+      color: var(--ct-primary);
+      background-color: rgba(34, 109, 231, 0.1);
     }
   </style>
   <style category="theme-switch">
@@ -1077,6 +1208,37 @@
         <div class="control-error" name="projectIndicators"></div>
         <div class="control-succ" name="projectIndicators"></div>
       </div>
+
+      <div class="control-item">
+        <div class="control-label-group">
+          <div class="control-label">${Panel.colorPalette.label}</div>
+          <div class="control-desc">${Panel.colorPalette.description}</div>
+        </div>
+        <div class="control-input-group">
+          <div class="color-palette-editor">
+            <div class="color-set">
+              <div class="color-set-label">
+                ${Panel.colorPalette.lightColors}
+                <span class="color-set-hint">${Panel.colorPalette.dragHint}</span>
+              </div>
+              <div class="color-list" data-theme="light">
+                <button type="button" class="add-color-btn" data-theme="light" title="${Panel.colorPalette.addColor}">+</button>
+              </div>
+            </div>
+            <div class="color-set">
+              <div class="color-set-label">
+                ${Panel.colorPalette.darkColors}
+                <span class="color-set-hint">${Panel.colorPalette.dragHint}</span>
+              </div>
+              <div class="color-list" data-theme="dark">
+                <button type="button" class="add-color-btn" data-theme="dark" title="${Panel.colorPalette.addColor}">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="control-error" name="colorPalette"></div>
+        <div class="control-succ" name="colorPalette"></div>
+      </div>
     </form>
   </div>
 
@@ -1170,6 +1332,9 @@
         find('randomColor.specify', 'button').style.backgroundColor = '${currentColor}';
         find('randomColor.specify').value = '${currentColor}';
         find('projectIndicators').value = '${projectIndicators}';
+
+        // 初始化颜色套组
+        initColorPalette();
       } else {
         const testScript = document.createElement('script');
         testScript.src = './template-replacer.js';
@@ -1183,6 +1348,9 @@
         find('randomColor.specify', 'button').style.backgroundColor = '#EE7ACC';
         find('randomColor.specify').value = '#EE7ACC';
         find('projectIndicators').value = '.git;Cargo.toml;README.md;package.json;pom.xml;build.gradle;Makefile';
+
+        // 初始化颜色套组
+        initColorPalette();
       }
 
       // 初始化主题切换器
@@ -1221,6 +1389,224 @@
           button.onclick = () => vspost({ name, value: find(name)?.value });
         }
       });
+
+      /**
+       * 初始化颜色套组编辑器
+       */
+      function initColorPalette() {
+        const lightColors = isProd ? JSON.parse('${lightColors}' || '[]') : ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+        const darkColors = isProd ? JSON.parse('${darkColors}' || '[]') : ['#E74C3C', '#1ABC9C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'];
+
+        renderColorList('light', lightColors);
+        renderColorList('dark', darkColors);
+
+        // 添加事件监听器
+        setupColorPaletteEvents();
+      }
+
+      /**
+       * 渲染颜色列表
+       * @param {string} theme - 'light' or 'dark'
+       * @param {string[]} colors - 颜色数组
+       */
+      function renderColorList(theme, colors) {
+        const colorList = document.querySelector(`.color-list[data-theme="${theme}"]`);
+        const addBtn = colorList.querySelector('.add-color-btn');
+
+        // 清空现有颜色项（保留添加按钮）
+        colorList.querySelectorAll('.color-item').forEach(item => item.remove());
+
+        // 添加颜色项
+        colors.forEach((color, index) => {
+          const colorItem = createColorItem(color, theme, index);
+          colorList.insertBefore(colorItem, addBtn);
+        });
+      }
+
+      /**
+       * 创建颜色项元素
+       * @param {string} color - 颜色值
+       * @param {string} theme - 主题类型
+       * @param {number} index - 索引
+       */
+      function createColorItem(color, theme, index) {
+        const item = document.createElement('div');
+        item.className = 'color-item';
+        item.style.backgroundColor = color;
+        item.draggable = true;
+        item.dataset.theme = theme;
+        item.dataset.index = index;
+
+        item.innerHTML = `
+          <button type="button" class="remove-btn" title="${isProd ? '${Panel.colorPalette.removeColor}' : '删除'}">&times;</button>
+          <input type="color" class="color-input" value="${color}">
+        `;
+
+        return item;
+      }
+
+      /**
+       * 设置颜色套组编辑器事件
+       */
+      function setupColorPaletteEvents() {
+        // 添加颜色按钮事件
+        document.querySelectorAll('.add-color-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const theme = e.target.dataset.theme;
+            const newColor = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+            addColor(theme, newColor);
+          });
+        });
+
+        // 颜色列表事件委托
+        document.querySelectorAll('.color-list').forEach(list => {
+          list.addEventListener('click', handleColorListClick);
+          list.addEventListener('dragstart', handleDragStart);
+          list.addEventListener('dragover', handleDragOver);
+          list.addEventListener('drop', handleDrop);
+          list.addEventListener('dragenter', handleDragEnter);
+          list.addEventListener('dragleave', handleDragLeave);
+        });
+      }
+
+      /**
+       * 处理颜色列表点击事件
+       */
+      function handleColorListClick(e) {
+        if (e.target.classList.contains('remove-btn')) {
+          const colorItem = e.target.closest('.color-item');
+          removeColor(colorItem);
+        }
+      }
+
+      /**
+       * 处理颜色输入变化
+       */
+      document.addEventListener('input', (e) => {
+        if (e.target.classList.contains('color-input')) {
+          const colorItem = e.target.closest('.color-item');
+          const newColor = e.target.value;
+          colorItem.style.backgroundColor = newColor;
+
+          // 发送更新事件
+          const theme = colorItem.dataset.theme;
+          updateColorPalette(theme);
+        }
+      });
+
+      /**
+       * 添加新颜色
+       */
+      function addColor(theme, color) {
+        const colorList = document.querySelector(`.color-list[data-theme="${theme}"]`);
+        const addBtn = colorList.querySelector('.add-color-btn');
+        const colors = getCurrentColors(theme);
+
+        const newIndex = colors.length;
+        const colorItem = createColorItem(color, theme, newIndex);
+        colorList.insertBefore(colorItem, addBtn);
+
+        updateColorPalette(theme);
+      }
+
+      /**
+       * 删除颜色
+       */
+      function removeColor(colorItem) {
+        const theme = colorItem.dataset.theme;
+        colorItem.remove();
+        updateColorPalette(theme);
+      }
+
+      /**
+       * 获取当前颜色数组
+       */
+      function getCurrentColors(theme) {
+        const colorList = document.querySelector(`.color-list[data-theme="${theme}"]`);
+        const colorItems = colorList.querySelectorAll('.color-item');
+        return Array.from(colorItems).map(item => item.querySelector('.color-input').value);
+      }
+
+      /**
+       * 更新颜色套组并发送到插件
+       */
+      function updateColorPalette(theme) {
+        const colors = getCurrentColors(theme);
+        const dataName = theme === 'light' ? 'lightColors' : 'darkColors';
+
+        // 重新编号
+        const colorItems = document.querySelectorAll(`.color-list[data-theme="${theme}"] .color-item`);
+        colorItems.forEach((item, index) => {
+          item.dataset.index = index;
+        });
+
+        if (isProd) {
+          vspost({ name: dataName, value: colors });
+        }
+      }
+
+      // 拖拽功能
+      let draggedElement = null;
+
+      function handleDragStart(e) {
+        if (e.target.classList.contains('color-item')) {
+          draggedElement = e.target;
+          e.target.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+        }
+      }
+
+      function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+      }
+
+      function handleDragEnter(e) {
+        if (e.target.classList.contains('color-list')) {
+          e.target.classList.add('drag-over');
+        }
+      }
+
+      function handleDragLeave(e) {
+        if (e.target.classList.contains('color-list') && !e.target.contains(e.relatedTarget)) {
+          e.target.classList.remove('drag-over');
+        }
+      }
+
+      function handleDrop(e) {
+        e.preventDefault();
+        const colorList = e.target.closest('.color-list');
+
+        if (colorList && draggedElement) {
+          colorList.classList.remove('drag-over');
+
+          const targetItem = e.target.closest('.color-item');
+          const addBtn = colorList.querySelector('.add-color-btn');
+
+          if (targetItem && targetItem !== draggedElement) {
+            // 插入到目标位置
+            const rect = targetItem.getBoundingClientRect();
+            const isAfter = e.clientX > rect.left + rect.width / 2;
+
+            if (isAfter) {
+              colorList.insertBefore(draggedElement, targetItem.nextSibling);
+            } else {
+              colorList.insertBefore(draggedElement, targetItem);
+            }
+          } else if (!targetItem) {
+            // 插入到最后（添加按钮前）
+            colorList.insertBefore(draggedElement, addBtn);
+          }
+
+          draggedElement.classList.remove('dragging');
+
+          // 更新数据
+          const theme = colorList.dataset.theme;
+          updateColorPalette(theme);
+        }
+
+        draggedElement = null;
+      }
 
       settings.addEventListener('change', function (event) {
         event.preventDefault();
