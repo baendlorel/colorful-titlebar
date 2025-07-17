@@ -64,7 +64,7 @@
       position: relative;
       padding: 30px;
       width: 100%;
-      max-width: 500px;
+      max-width: 540px;
       background-color: var(--ct-panel-bg);
       border-radius: 16px;
       box-shadow: 0 10px 30px var(--ct-shadow-color);
@@ -150,6 +150,7 @@
       display: grid;
       grid-template-columns: 1fr auto;
       grid-template-rows: auto auto auto;
+      column-gap: 20px;
       margin-bottom: 10px;
       padding-bottom: 10px;
       align-items: center;
@@ -160,8 +161,6 @@
       display: grid;
       grid-template-rows: auto auto;
       color: var(--ct-text-color);
-      font-weight: 500;
-      margin-right: 20px;
     }
 
     .control-desc {
@@ -266,6 +265,12 @@
       height: 0;
       opacity: 0;
       border: 0;
+    }
+
+    .picker-btn {
+      border-radius: 50%;
+      padding: 8px;
+      box-shadow: inset 0 0 0 2px #dfdfdf;
     }
 
     .select {
@@ -894,17 +899,23 @@
 
       <div class="control-item">
         <div class="control-label-group">
-          <div class="control-label">${Panel.pickColor.label}</div>
-          <div class="control-desc">${Panel.pickColor.description}</div>
+          <div class="control-label">${Panel.randomColor.label}</div>
+          <div class="control-desc">${Panel.randomColor.description}</div>
         </div>
         <div class="control-input">
-          <button type="button" class="btn" name="pickerBtn">
-            ${Panel.pickColor.button}
+          <button type="button" class="btn" name="randomColor.currentColorSet">
+            ${Panel.randomColor.currentColorSet}
+          </button>
+          <button type="button" class="btn" name="randomColor.pure" style="margin-left: 10px;">
+            ${Panel.randomColor.pure}
+          </button>
+          <button type="button" class="btn picker-btn" title="${Panel.randomColor.appoint}" name="pickerBtn" style="margin-left: 10px;">
+            🎨
           </button>
           <input type="color" class="picker" name="pickColor">
         </div>
-        <div class="control-error" name="pickColor"></div>
-        <div class="control-succ" name="pickColor"></div>
+        <div class="control-error" name="randomColor"></div>
+        <div class="control-succ" name="randomColor"></div>
       </div>
     </form>
   </div>
@@ -930,7 +941,7 @@
       let o = isProd ? acquireVsCodeApi() : {
         postMessage: (a) => console.log('vscode.postMessage', a)
       };
-      return (data) => {
+      return function (data) {
         freeze();
         o.postMessage({
           from: 'colorful-titlebar',
@@ -949,12 +960,12 @@
     const find = (name, tp = 'form') => {
       switch (tp) {
         case 'succ':
-          return document.querySelector(['.control-succ[name=', name, ']'].join(''));
+          return document.querySelector(['.control-succ[name="', name, '"]'].join(''));
         case 'error':
-          return document.querySelector(['.control-error[name=', name, ']'].join(''));
+          return document.querySelector(['.control-error[name="', name, '"]'].join(''));
         case 'form':
         default:
-          return document.querySelector(['[name=', name, ']:not(.control-error):not(.control-succ)'].join(''))
+          return document.querySelector(['[name="', name, '"]:not(.control-error):not(.control-succ)'].join(''))
       }
     };
 
@@ -1006,6 +1017,7 @@
     }
 
     // events
+    find('theme').addEventListener('change', theme);
 
     workbenchCssPath.addEventListener('input', () => {
       workbenchCssPath.style.height = 'auto';
@@ -1014,10 +1026,10 @@
     workbenchCssPath.style.height = 'auto';
     workbenchCssPath.style.height = workbenchCssPath.scrollHeight + 'px';
 
+    ['randomColor.currentColorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
+      find(name).onclick = vspost.bind(null, { name })
+    });
 
-    find('theme').addEventListener('change', theme);
-
-    refresh.onclick = () => vspost({ name: 'refresh', value: null })
 
     pickerBtn.onclick = pickColor.click.bind(pickColor);
     pickColor.addEventListener('input', function () {

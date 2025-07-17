@@ -161,10 +161,8 @@
     "check": "tsc -p tsconfig.build.json",
     "test": "tsx tests/index.test.ts",
     "lint": "eslint src --ext ts",
-    "package": "vsce package",
-    "publish": "vsce publish",
-    "prepackage": "npm run build",
-    "prepublish": "npm run build"
+    "package": "vsce package -o ./out",
+    "publish": "vsce publish"
   },
   "devDependencies": {
     "@babel/cli": "^7.27.2",

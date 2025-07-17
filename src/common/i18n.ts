@@ -58,17 +58,19 @@ export default (() => {
         [HashSource.ProjectNameDate]: '项目名 + Date.getDate()',
         success: '保存成功，点击"重新计算颜色"可以生效',
       },
-      pickColor: {
-        label: '指定当前颜色',
-        description: `直接指定当前打开的项目的标题栏颜色`,
-        button: '选择颜色',
-      },
       refresh: {
         label: '重新计算颜色',
         description: `再次让本插件自动计算颜色`,
         button: '开始计算',
         success: (token: string, color: string) =>
           `重新计算颜色成功，哈希入参：${token}，颜色：${color}`,
+      },
+      randomColor: {
+        label: '随机/指定颜色',
+        description: `可以选择用当前配置的颜色来随机、纯随机或者直接用调色盘🎨指定颜色`,
+        currentColorSet: '当前套组',
+        pure: '纯随机',
+        specify: '直接指定一个颜色',
       },
     },
 
@@ -190,17 +192,19 @@ export default (() => {
         [HashSource.ProjectNameDate]: 'Project Name + Date.getDate()',
         success: 'Saved successfully, click "Recalculate Color" to apply changes',
       },
-      pickColor: {
-        label: 'Specify Current Color',
-        description: `Specify the titlebar color for current project manually`,
-        button: 'Pick Color',
-      },
       refresh: {
         label: 'Recalculate Color',
         description: `Recalculate the titlebar color automatically`,
         button: 'Calculate',
         success: (token: string, color: string) =>
           `Recalculated color successfully, hash input: ${token}, color: ${color}`,
+      },
+      randomColor: {
+        label: 'Random/Specify Color',
+        description: `Choose to randomize within the current color set, pure random or directly specify a color using 🎨`,
+        currentColorSet: 'Current Color Set',
+        pure: 'Pure Random',
+        specify: 'Specify a color directly',
       },
     },
 

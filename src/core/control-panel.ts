@@ -9,7 +9,7 @@ import hacker from '@/features/gradient/hacker';
 import { AfterStyle } from '@/features/gradient/consts';
 import RGBA from '@/common/rgba';
 import style from './style';
-import { getColor, getHashSource } from './colors';
+import { getColor, getColorByK, getHashSource } from './colors';
 import version from './version';
 
 const enum ControlName {
@@ -21,6 +21,7 @@ const enum ControlName {
   HashSource = 'hashSource',
   Refresh = 'refresh',
   PickColor = 'pickColor',
+  RandomColor = 'randomColor',
 }
 
 let controlPanel: vscode.WebviewPanel | null = null;
@@ -117,7 +118,7 @@ export default async function (this: vscode.ExtensionContext) {
       position: relative;
       padding: 30px;
       width: 100%;
-      max-width: 500px;
+      max-width: 540px;
       background-color: var(--ct-panel-bg);
       border-radius: 16px;
       box-shadow: 0 10px 30px var(--ct-shadow-color);
@@ -203,6 +204,7 @@ export default async function (this: vscode.ExtensionContext) {
       display: grid;
       grid-template-columns: 1fr auto;
       grid-template-rows: auto auto auto;
+      column-gap: 20px;
       margin-bottom: 10px;
       padding-bottom: 10px;
       align-items: center;
@@ -213,8 +215,6 @@ export default async function (this: vscode.ExtensionContext) {
       display: grid;
       grid-template-rows: auto auto;
       color: var(--ct-text-color);
-      font-weight: 500;
-      margin-right: 20px;
     }
 
     .control-desc {
@@ -319,6 +319,11 @@ export default async function (this: vscode.ExtensionContext) {
       height: 0;
       opacity: 0;
       border: 0;
+    }
+
+    .picker-btn {
+      border-radius: 50%;
+      padding: 8px;
     }
 
     .select {
@@ -951,17 +956,25 @@ export default async function (this: vscode.ExtensionContext) {
 
       <div class="control-item">
         <div class="control-label-group">
-          <div class="control-label">${Panel.pickColor.label}</div>
-          <div class="control-desc">${Panel.pickColor.description}</div>
+          <div class="control-label">${Panel.randomColor.label}</div>
+          <div class="control-desc">${Panel.randomColor.description}</div>
         </div>
         <div class="control-input">
-          <button type="button" class="btn" name="pickerBtn">
-            ${Panel.pickColor.button}
+          <button type="button" class="btn" name="randomColor.currentColorSet">
+            ${Panel.randomColor.currentColorSet}
+          </button>
+          <button type="button" class="btn" name="randomColor.pure" style="margin-left: 10px;">
+            ${Panel.randomColor.pure}
+          </button>
+          <button type="button" class="btn picker-btn" title="${
+            Panel.randomColor.specify
+          }" name="pickerBtn" style="margin-left: 10px;">
+            🎨
           </button>
           <input type="color" class="picker" name="pickColor">
         </div>
-        <div class="control-error" name="pickColor"></div>
-        <div class="control-succ" name="pickColor"></div>
+        <div class="control-error" name="randomColor"></div>
+        <div class="control-succ" name="randomColor"></div>
       </div>
     </form>
   </div>
@@ -987,7 +1000,7 @@ export default async function (this: vscode.ExtensionContext) {
       let o = isProd ? acquireVsCodeApi() : {
         postMessage: (a) => console.log('vscode.postMessage', a)
       };
-      return (data) => {
+      return function (data) {
         freeze();
         o.postMessage({
           from: 'colorful-titlebar',
@@ -1006,12 +1019,12 @@ export default async function (this: vscode.ExtensionContext) {
     const find = (name, tp = 'form') => {
       switch (tp) {
         case 'succ':
-          return document.querySelector(['.control-succ[name=', name, ']'].join(''));
+          return document.querySelector(['.control-succ[name="', name, '"]'].join(''));
         case 'error':
-          return document.querySelector(['.control-error[name=', name, ']'].join(''));
+          return document.querySelector(['.control-error[name="', name, '"]'].join(''));
         case 'form':
         default:
-          return document.querySelector(['[name=', name, ']:not(.control-error):not(.control-succ)'].join(''))
+          return document.querySelector(['[name="', name, '"]:not(.control-error):not(.control-succ)'].join(''))
       }
     };
 
@@ -1063,6 +1076,7 @@ export default async function (this: vscode.ExtensionContext) {
     }
 
     // events
+    find('theme').addEventListener('change', theme);
 
     workbenchCssPath.addEventListener('input', () => {
       workbenchCssPath.style.height = 'auto';
@@ -1071,10 +1085,10 @@ export default async function (this: vscode.ExtensionContext) {
     workbenchCssPath.style.height = 'auto';
     workbenchCssPath.style.height = workbenchCssPath.scrollHeight + 'px';
 
+    ['randomColor.currentColorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
+      find(name).onclick = vspost.bind(null, { name })
+    });
 
-    find('theme').addEventListener('change', theme);
-
-    refresh.onclick = () => vspost({ name: 'refresh', value: null })
 
     pickerBtn.onclick = pickColor.click.bind(pickColor);
     pickColor.addEventListener('input', function () {
@@ -1152,7 +1166,7 @@ export default async function (this: vscode.ExtensionContext) {
       succ: true,
     };
     try {
-      // vscode.window.showInformationMessage(JSON.stringify(message));
+      vscode.window.showInformationMessage(JSON.stringify(message));
       const name = message.name as ControlName;
       const value = message.value;
       switch (name) {
@@ -1252,15 +1266,21 @@ export default async function (this: vscode.ExtensionContext) {
         }
 
         case ControlName.Refresh: {
-          await style.refresh(true);
           const token = getHashSource(configs.cwd);
           const color = getColor(configs.cwd);
+          await applyManualColor(color);
           result.msg = Panel.refresh.success(token, color.toString());
           break;
         }
 
         case ControlName.PickColor: {
           await applyManualColor(value);
+          break;
+        }
+
+        case ControlName.RandomColor: {
+          const color = getColorByK(Math.random());
+          await applyManualColor(color);
           break;
         }
 
@@ -1282,8 +1302,10 @@ export default async function (this: vscode.ExtensionContext) {
 /**
  * Apply manually selected color to titlebar
  */
-const applyManualColor = async (colorHex: string) => {
-  const color = new RGBA(colorHex);
+const applyManualColor = async (color: string | RGBA) => {
+  if (typeof color === 'string') {
+    color = new RGBA(color);
+  }
   const newStyle = {
     [TitleBarConsts.ActiveBg]: color.toString(),
     [TitleBarConsts.InactiveBg]: color.toGreyDarkenString(),

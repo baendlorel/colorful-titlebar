@@ -16,7 +16,7 @@ export const getColor = (fullPath: string): RGBA => {
   const hash = Array.from(createHash('md5').update(hashSource).digest());
   // const k = (hash[0] + hash[1] * 0xff) / 0xffff;
   const k = ((hash[0] << 8) | hash[hash.length - 1]) / 0xffff;
-  return getColorByK(k, configs.colorSet);
+  return getColorByK(k);
 };
 
 export const getHashSource = (fullPath: string) => {
@@ -32,7 +32,8 @@ export const getHashSource = (fullPath: string) => {
   }
 };
 
-const getColorByK = (k: number, colorSet: string[]) => {
+export const getColorByK = (k: number) => {
+  const colorSet = configs.colorSet;
   const n = colorSet.length;
   const a = Math.floor(k * n);
   const b = (a + 1) % n; // 如果不取余数，会在a=length-1时，b=length而提取到undefined，最终解析出黑色
