@@ -36,12 +36,12 @@
 
         gradientBrightness: {
           label: '渐变亮度',
-          description: '表示渐变较亮的地方有多亮',
+          description: '表示亮的地方有多亮',
         },
 
         gradientDarkness: {
           label: '渐变暗度',
-          description: '表示渐变较暗的地方有多暗',
+          description: '表示暗的地方有多暗',
         },
 
         hashSource: {
@@ -113,12 +113,12 @@
 
         gradientBrightness: {
           label: 'Gradient Brightness',
-          description: 'How bright the bright areas of the gradient are',
+          description: 'How bright the bright areas are',
         },
 
         gradientDarkness: {
           label: 'Gradient Darkness',
-          description: 'How dark the dark areas of the gradient are',
+          description: 'How dark the dark areas are',
         },
 
         hashSource: {
@@ -324,6 +324,7 @@
       }
     };
 
+    visit(document.querySelector('title'));
     visit(document.body);
   }
 

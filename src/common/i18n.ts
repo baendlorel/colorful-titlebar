@@ -42,12 +42,12 @@ export default (() => {
       },
       gradientBrightness: {
         label: '渐变亮度',
-        description: '表示渐变较亮的地方有多亮',
+        description: '表示亮的地方有多亮',
         success: '保存成功，重新选择渐变样式即可生效',
       },
       gradientDarkness: {
         label: '渐变暗度',
-        description: '表示渐变较暗的地方有多暗',
+        description: '表示暗的地方有多暗',
         success: '保存成功，重新选择渐变样式即可生效',
       },
       hashSource: {

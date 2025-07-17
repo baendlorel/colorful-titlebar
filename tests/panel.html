@@ -145,6 +145,12 @@
     }
 
 
+    .control-item-double {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 20px;
+    }
+
     .control-item {
       display: grid;
       grid-template-columns: 1fr 218px;
@@ -319,6 +325,18 @@
       cursor: pointer;
     }
 
+    .input-percent {
+      position: relative;
+    }
+
+    .input-percent::after {
+      position: absolute;
+      content: '%';
+      right: 8px;
+      margin-top: 0px;
+      color: var(--ct-text-color-weak);
+    }
+
     .input-percent input[type="number"] {
       position: relative;
       width: 75px;
@@ -329,14 +347,6 @@
     .input-percent input[type="number"]::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
-    }
-
-    .input-percent::after {
-      position: absolute;
-      content: '%';
-      right: 40px;
-      margin-top: -2px;
-      color: var(--ct-text-color-weak);
     }
 
     textarea,
@@ -1111,28 +1121,29 @@
         <div class="control-succ" name="gradient"></div>
       </div>
 
-      <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.gradientBrightness.label}</div>
-          <div class="control-desc">${Panel.gradientBrightness.description}</div>
+      <div class="control-item-double">
+        <div class="control-item" style="grid-template-columns: 1fr auto;">
+          <div class="control-label-group">
+            <div class="control-label">${Panel.gradientBrightness.label}</div>
+            <div class="control-desc">${Panel.gradientBrightness.description}</div>
+          </div>
+          <div class="control-input-group input-percent">
+            <input type="number" min="0" max="100" step="5" class="control-input" name="gradientBrightness" />
+          </div>
+          <div class="control-error" name="gradientBrightness"></div>
+          <div class="control-succ" name="gradientBrightness"></div>
         </div>
-        <div class="control-input-group input-percent">
-          <input type="number" min="0" max="100" step="5" class="control-input" name="gradientBrightness" />
+        <div class="control-item" style="grid-template-columns: 1fr auto;">
+          <div class="control-label-group">
+            <div class="control-label">${Panel.gradientDarkness.label}</div>
+            <div class="control-desc">${Panel.gradientDarkness.description}</div>
+          </div>
+          <div class="control-input-group input-percent">
+            <input type="number" min="0" max="100" step="5" class="control-input" name="gradientDarkness" />
+          </div>
+          <div class="control-error" name="gradientDarkness"></div>
+          <div class="control-succ" name="gradientDarkness"></div>
         </div>
-        <div class="control-error" name="gradientBrightness"></div>
-        <div class="control-succ" name="gradientBrightness"></div>
-      </div>
-
-      <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.gradientDarkness.label}</div>
-          <div class="control-desc">${Panel.gradientDarkness.description}</div>
-        </div>
-        <div class="control-input-group input-percent">
-          <input type="number" min="0" max="100" step="5" class="control-input" name="gradientDarkness" />
-        </div>
-        <div class="control-error" name="gradientDarkness"></div>
-        <div class="control-succ" name="gradientDarkness"></div>
       </div>
 
       <div class="control-item">
@@ -1396,8 +1407,8 @@
        * 初始化颜色套组编辑器
        */
       function initColorPalette() {
-        const lightColors = isProd ? JSON.parse('${lightThemeColors}' || '[]') : ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
-        const darkColors = isProd ? JSON.parse('${darkThemeColors}' || '[]') : ['#E74C3C', '#1ABC9C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'];
+        const lightColors = isProd ? JSON.parse('${lightThemeColors}') : ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+        const darkColors = isProd ? JSON.parse('${darkThemeColors}') : ['#E74C3C', '#1ABC9C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'];
 
         renderColorList('light', lightColors);
         renderColorList('dark', darkColors);
@@ -1412,7 +1423,7 @@
        * @param {string[]} colors - 颜色数组
        */
       function renderColorList(theme, colors) {
-        const colorList = document.querySelector(s('.color-list[data-', theme, '="${theme}"]'));
+        const colorList = document.querySelector(s('.color-list[data-theme="', theme, '"]'));
         const addBtn = colorList.querySelector('.add-color-btn');
 
         // 清空现有颜色项（保留添加按钮）
@@ -1548,9 +1559,7 @@
           item.dataset.index = index;
         });
 
-        if (isProd) {
-          vspost({ name: dataName, value: colors });
-        }
+        vspost({ name: dataName, value: colors });
       }
 
       // 拖拽功能
