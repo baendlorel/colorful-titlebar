@@ -68,7 +68,7 @@ export default (() => {
       randomColor: {
         label: '随机/指定颜色',
         description: `可以选择用当前配置的颜色来随机、纯随机或者直接用调色盘🎨指定颜色`,
-        currentColorSet: '当前套组',
+        colorSet: '当前套组',
         pure: '纯随机',
         specify: '直接指定一个颜色',
       },
@@ -202,7 +202,7 @@ export default (() => {
       randomColor: {
         label: 'Random/Specify Color',
         description: `Choose to randomize within the current color set, pure random or directly specify a color using 🎨`,
-        currentColorSet: 'Current Color Set',
+        colorSet: 'Current Color Set',
         pure: 'Pure Random',
         specify: 'Specify a color directly',
       },

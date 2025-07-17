@@ -296,7 +296,7 @@ export default async function (this: vscode.ExtensionContext) {
       background-color: var(--ct-primary);
     }
 
-    .btn {
+    .control-button {
       border: none;
       border-radius: 8px;
       padding: 8px 12px;
@@ -310,20 +310,21 @@ export default async function (this: vscode.ExtensionContext) {
       color: white;
     }
 
-    .btn:hover {
+    .control-button:hover {
       opacity: 0.9;
     }
 
-    .picker {
+    .picker input[type=color] {
       width: 0;
       height: 0;
       opacity: 0;
       border: 0;
     }
 
-    .picker-btn {
+    .picker {
       border-radius: 50%;
       padding: 8px;
+      box-shadow: inset 0 0 0 2px #dfdfdf;
     }
 
     .select {
@@ -813,7 +814,7 @@ export default async function (this: vscode.ExtensionContext) {
 
 <body>
   <div class="body" theme="${configs.theme}">
-    <form name="settings" class="control-panel">
+    <form id="settings" class="control-panel">
       <div class="header">
         <div>
           <h1><span class="colorful-title">${Consts.DisplayName}</span> ${
@@ -824,7 +825,7 @@ export default async function (this: vscode.ExtensionContext) {
         </div>
         <div>
           <label for="theme" class="kskb-theme-switch">
-            <input type="checkbox" id="theme" name="theme" class="kskb-dummy">
+            <input type="checkbox" id="theme" name="theme" class="control-input kskb-dummy">
             <div class="kskb-moon">
               <div class="kskb-icon"></div>
             </div>
@@ -846,6 +847,7 @@ export default async function (this: vscode.ExtensionContext) {
           </label>
         </div>
       </div>
+
       <div class="control-item">
         <div class="control-label-group">
           <div class="control-label">${Panel.showSuggest.label}</div>
@@ -853,7 +855,7 @@ export default async function (this: vscode.ExtensionContext) {
         </div>
         <div class="control-input">
           <label class="toggle-switch">
-            <input type="checkbox" name="showSuggest">
+            <input type="checkbox" class="control-input" name="showSuggest">
             <span class="slider"></span>
           </label>
         </div>
@@ -867,7 +869,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-desc">${Panel.workbenchCssPath.description}</div>
         </div>
         <div class="control-input">
-          <textarea class="textarea" name="workbenchCssPath"></textarea>
+          <textarea class="control-input textarea" name="workbenchCssPath"></textarea>
         </div>
         <div class="control-error" name="workbenchCssPath"></div>
         <div class="control-succ" name="workbenchCssPath"></div>
@@ -879,7 +881,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-desc">${Panel.gradient.description}</div>
         </div>
         <div class="control-input">
-          <select name="gradient" class="select">
+          <select name="gradient" class="control-input select">
             <option value="" selected>${Panel.gradient.empty}</option>
             <option value="${GradientStyle.BrightCenter}">${
     Panel.gradient[GradientStyle.BrightCenter]
@@ -902,7 +904,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-desc">${Panel.gradientBrightness.description}</div>
         </div>
         <div class="control-input input-percent">
-          <input type="number" min="0" max="100" step="5" class="" name="gradientBrightness" />
+          <input type="number" min="0" max="100" step="5" class="control-input" name="gradientBrightness" />
         </div>
         <div class="control-error" name="gradientBrightness"></div>
         <div class="control-succ" name="gradientBrightness"></div>
@@ -914,7 +916,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-desc">${Panel.gradientDarkness.description}</div>
         </div>
         <div class="control-input input-percent">
-          <input type="number" min="0" max="100" step="5" class="" name="gradientDarkness" />
+          <input type="number" min="0" max="100" step="5" class="control-input" name="gradientDarkness" />
         </div>
         <div class="control-error" name="gradientDarkness"></div>
         <div class="control-succ" name="gradientDarkness"></div>
@@ -926,7 +928,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-desc">${Panel.hashSource.description}</div>
         </div>
         <div class="control-input">
-          <select name="hashSource" class="select">
+          <select name="hashSource" class="control-input select">
             <option value="${HashSource.ProjectName}">${
     Panel.hashSource[HashSource.ProjectName]
   }</option>
@@ -946,7 +948,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-desc">${Panel.refresh.description}</div>
         </div>
         <div class="control-input">
-          <button type="button" class="btn" name="refresh">
+          <button type="button" class="control-button" name="refresh">
             <span>${Panel.refresh.button}</span>
           </button>
         </div>
@@ -959,19 +961,19 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.randomColor.label}</div>
           <div class="control-desc">${Panel.randomColor.description}</div>
         </div>
-        <div class="control-input">
-          <button type="button" class="btn" name="randomColor.currentColorSet">
-            ${Panel.randomColor.currentColorSet}
+        <div class="control-input" style="display: grid;grid-template-columns: auto auto auto;column-gap: 10px;">
+          <button type="button" class="control-button" name="randomColor.colorSet">
+            ${Panel.randomColor.colorSet}
           </button>
-          <button type="button" class="btn" name="randomColor.pure" style="margin-left: 10px;">
+          <button type="button" class="control-button" name="randomColor.pure">
             ${Panel.randomColor.pure}
           </button>
-          <button type="button" class="btn picker-btn" title="${
+          <button type="button" class="control-button picker" title="${
             Panel.randomColor.specify
-          }" name="pickerBtn" style="margin-left: 10px;">
+          }" name="randomColor.specify">
             🎨
+            <input type="color" class="control-input" name="randomColor.specify">
           </button>
-          <input type="color" class="picker" name="pickColor">
         </div>
         <div class="control-error" name="randomColor"></div>
         <div class="control-succ" name="randomColor"></div>
@@ -983,18 +985,6 @@ export default async function (this: vscode.ExtensionContext) {
     const isProd = '${env}' === 'prod';
 
     // functions
-    const freeze = () => {
-      document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
-      if (isProd) {
-        settings.classList.add('freeze');
-        Array.from(settings.elements).forEach((el) => el.disabled = true);
-      }
-    }
-
-    const unfreeze = () => {
-      setTimeout(() => settings.classList.remove('freeze'), 200);
-      Array.from(settings.elements).forEach((el) => el.disabled = false)
-    }
 
     const vspost = (() => {
       let o = isProd ? acquireVsCodeApi() : {
@@ -1015,16 +1005,22 @@ export default async function (this: vscode.ExtensionContext) {
       body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
     }
 
-    // tp = form | error | succ
-    const find = (name, tp = 'form') => {
+    /**
+     * 默认查找的是输入元素，可以指定查找类型
+     * @param {string} name - 元素的 name 属性
+     * @param {string} tp - 元素类型：input | button | error | succ
+     */
+    const find = (name, tp = 'input') => {
       switch (tp) {
         case 'succ':
           return document.querySelector(['.control-succ[name="', name, '"]'].join(''));
         case 'error':
           return document.querySelector(['.control-error[name="', name, '"]'].join(''));
-        case 'form':
+        case 'button':
+          return document.querySelector(['.control-button[name="', name, '"]'].join(''));
+        case 'input':
         default:
-          return document.querySelector(['[name="', name, '"]:not(.control-error):not(.control-succ)'].join(''))
+          return document.querySelector(['.control-input[name="', name, '"]'].join(''))
       }
     };
 
@@ -1048,55 +1044,68 @@ export default async function (this: vscode.ExtensionContext) {
     /**
      * @type {HTMLFormElement} 
      */
-    const settings = find('settings');
-    const pickColor = find('pickColor');
-    const pickerBtn = find('pickerBtn');
-    const refresh = find('refresh');
-    const workbenchCssPath = find('workbenchCssPath')
+    const settings = document.getElementById('settings');
+    const formInputs = Array.from(settings.elements);
+
+    const freeze = () => {
+      document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
+      if (isProd) {
+        settings.classList.add('freeze');
+        formInputs.forEach((el) => el.disabled = true);
+      }
+    }
+
+    const unfreeze = () => {
+      setTimeout(() => settings.classList.remove('freeze'), 200);
+      formInputs.forEach((el) => el.disabled = false)
+    }
 
     // init
     if (isProd) {
       find('theme').checked = "${configs.theme}" === 'light';
       find('showSuggest').checked = '${configs.showSuggest}' === 'true';
-      workbenchCssPath.value = '${configs.workbenchCssPath}';
+      find('workbenchCssPath').value = '${configs.workbenchCssPath}';
       find('hashSource').value = '${configs.hashSource}';
       find('gradientBrightness').value = '${gradientBrightness}';
       find('gradientDarkness').value = '${gradientDarkness}';
-      find('pickerBtn').style.backgroundColor = '${currentColor}';
-      pickColor.value = '${currentColor}';
+      find('randomColor.specify', 'button').style.backgroundColor = '${currentColor}';
+      find('randomColor.specify').value = '${currentColor}';
     } else {
       find('theme').checked = true;
       find('showSuggest').checked = false;
-      workbenchCssPath.value = '/d/work/ddddddddddd/fffffffff/44444444/222222222/44444444/aaa.css';
+      find('workbenchCssPath').value = '/d/work/ddddddddddd/fffffffff/44444444/222222222/44444444/aaa.css';
       find('hashSource').value = '';
       find('gradientBrightness').value = '99';
       find('gradientDarkness').value = '12';
-      find('pickerBtn').style.backgroundColor = '#007ACC';
-      pickColor.value = '#007ACC';
+      find('randomColor.specify', 'button').style.backgroundColor = '#007ACC';
+      find('randomColor.specify').value = '#007ACC';
     }
 
     // events
     find('theme').addEventListener('change', theme);
 
-    workbenchCssPath.addEventListener('input', () => {
-      workbenchCssPath.style.height = 'auto';
-      workbenchCssPath.style.height = workbenchCssPath.scrollHeight + 'px';
+    // 初始化所有textarea
+    Array.from(document.querySelectorAll('textarea')).forEach((textarea) => {
+      textarea.addEventListener('input', (event) => {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+      });
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
     });
-    workbenchCssPath.style.height = 'auto';
-    workbenchCssPath.style.height = workbenchCssPath.scrollHeight + 'px';
 
-    ['randomColor.currentColorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
-      find(name).onclick = vspost.bind(null, { name })
+    ['randomColor.colorSet', 'randomColor.pure', 'randomColor.specify', 'refresh'].forEach((name) => {
+      find(name, 'button').onclick = () => vspost({ name, value: find(name)?.value })
     });
 
-
-    pickerBtn.onclick = pickColor.click.bind(pickColor);
-    pickColor.addEventListener('input', function () {
-      const color = this.value;
-      const [r, g, b] = color.replace('#', '').match(/.{2}/g).map(hex => parseInt(hex, 16));
-      const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
-      pickerBtn.style.color = brightness > 128 ? '#000' : '#fff';
-      pickerBtn.style.backgroundColor = color;
+    // 初始化所有颜色选择器
+    Array.from(document.querySelectorAll('.picker')).forEach((picker) => {
+      const colorInput = find(picker.name);
+      picker.addEventListener('click', colorInput.click.bind(colorInput));
+      picker.addEventListener('input', (input) => {
+        const color = colorInput.value;
+        picker.style.backgroundColor = color;
+      });
     });
 
     settings.addEventListener('change', function (event) {
