@@ -838,12 +838,12 @@
         <div class="control-input-group">
           <select name="gradient" class="control-input select">
             <option value="" selected>${Panel.gradient.empty}</option>
-            <option value="${GradientStyle.BrightCenter}">${
-              Panel.gradient[GradientStyle.BrightCenter]
-              }</option>
-            <option value="${GradientStyle.BrightLeft}">${
-              Panel.gradient[GradientStyle.BrightLeft]
-              }</option>
+            <option value="${GradientStyle.BrightCenter}">
+              ${Panel.gradient[GradientStyle.BrightCenter]}
+            </option>
+            <option value="${GradientStyle.BrightLeft}">
+              ${Panel.gradient[GradientStyle.BrightLeft]}
+            </option>
             <option value="${GradientStyle.ArcLeft}">${Panel.gradient[GradientStyle.ArcLeft]}</option>
           </select>
         </div>
@@ -882,13 +882,13 @@
         </div>
         <div class="control-input-group">
           <select name="hashSource" class="control-input select">
-            <option value="${HashSource.ProjectName}">${
-              Panel.hashSource[HashSource.ProjectName]
-              }</option>
+            <option value="${HashSource.ProjectName}">
+              ${Panel.hashSource[HashSource.ProjectName]}
+            </option>
             <option value="${HashSource.FullPath}">${Panel.hashSource[HashSource.FullPath]}</option>
-            <option value="${HashSource.ProjectNameDate}">${
-              Panel.hashSource[HashSource.ProjectNameDate]
-              }</option>
+            <option value="${HashSource.ProjectNameDate}">
+              ${Panel.hashSource[HashSource.ProjectNameDate]}
+            </option>
           </select>
         </div>
         <div class="control-error" name="hashSource"></div>
@@ -933,187 +933,192 @@
   </div>
 
   <script>
-    const isProd = '${env}' === 'prod';
+    {
+      const isProd = '${env}' === 'prod';
 
-    // functions
+      // functions
 
-    const vspost = (() => {
-      let o = isProd ? acquireVsCodeApi() : {
-        postMessage: (a) => console.log('vscode.postMessage', a)
+      const vspost = (() => {
+        let o = isProd ? acquireVsCodeApi() : {
+          postMessage: (a) => console.log('vscode.postMessage', a)
+        };
+        return function (data) {
+          freeze();
+          o.postMessage({
+            from: 'colorful-titlebar',
+            ...data
+          });
+        }
+      })();
+
+      const theme = () => {
+        const body = document.querySelector('.body');
+        const currentTheme = body.getAttribute('theme');
+        body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
+      }
+
+      /**
+       * 默认查找的是输入元素，可以指定查找类型
+       * @param {string} name - 元素的 name 属性
+       * @param {string} tp - 元素类型：input | button | error | succ
+       */
+      const find = (name, tp = 'input') => {
+        switch (tp) {
+          case 'succ':
+            return document.querySelector(['.control-succ[name="', name, '"]'].join(''));
+          case 'error':
+            return document.querySelector(['.control-error[name="', name, '"]'].join(''));
+          case 'button':
+            return document.querySelector(['.control-button[name="', name, '"]'].join(''));
+          case 'input':
+          default:
+            return document.querySelector(['.control-input[name="', name, '"]'].join(''))
+        }
       };
-      return function (data) {
-        freeze();
-        o.postMessage({
-          from: 'colorful-titlebar',
-          ...data
-        });
-      }
-    })();
 
-    const theme = () => {
-      const body = document.querySelector('.body');
-      const currentTheme = body.getAttribute('theme');
-      body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
-    }
+      const i18n = (() => {
+        const zh = {
+          NumberLimit: (min, max, isInt = true) => ['请输入', min, '到', max, '之间的', isInt ? '整数' : '数'].join('')
+        }
+        const en = {
+          NumberLimit: (min, max, isInt = true) => ['Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max].join(' ')
+        }
+        switch ('${configs.lang}') {
+          case 'zh':
+            return zh;
+          case 'en':
+            return en;
+          default:
+            return zh;
+        }
+      })()
 
-    /**
-     * 默认查找的是输入元素，可以指定查找类型
-     * @param {string} name - 元素的 name 属性
-     * @param {string} tp - 元素类型：input | button | error | succ
-     */
-    const find = (name, tp = 'input') => {
-      switch (tp) {
-        case 'succ':
-          return document.querySelector(['.control-succ[name="', name, '"]'].join(''));
-        case 'error':
-          return document.querySelector(['.control-error[name="', name, '"]'].join(''));
-        case 'button':
-          return document.querySelector(['.control-button[name="', name, '"]'].join(''));
-        case 'input':
-        default:
-          return document.querySelector(['.control-input[name="', name, '"]'].join(''))
-      }
-    };
+      /**
+       * @type {HTMLFormElement} 
+       */
+      const settings = document.getElementById('settings');
+      const formInputs = Array.from(settings.elements);
 
-    const i18n = (() => {
-      const zh = {
-        NumberLimit: (min, max, isInt = true) => ['请输入', min, '到', max, '之间的', isInt ? '整数' : '数'].join('')
+      const freeze = () => {
+        document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
+        if (isProd) {
+          settings.classList.add('freeze');
+          formInputs.forEach((el) => el.disabled = true);
+        }
       }
-      const en = {
-        NumberLimit: (min, max, isInt = true) => ['Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max].join(' ')
-      }
-      switch ('${configs.lang}') {
-        case 'zh':
-          return zh;
-        case 'en':
-          return en;
-        default:
-          return zh;
-      }
-    })()
 
-    /**
-     * @type {HTMLFormElement} 
-     */
-    const settings = document.getElementById('settings');
-    const formInputs = Array.from(settings.elements);
+      const unfreeze = () => {
+        setTimeout(() => settings.classList.remove('freeze'), 200);
+        formInputs.forEach((el) => el.disabled = false)
+      }
 
-    const freeze = () => {
-      document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
+      // init
       if (isProd) {
-        settings.classList.add('freeze');
-        formInputs.forEach((el) => el.disabled = true);
+        find('theme').checked = "${configs.theme}" === 'light';
+        find('showSuggest').checked = '${configs.showSuggest}' === 'true';
+        find('workbenchCssPath').value = '${configs.workbenchCssPath}';
+        find('hashSource').value = '${configs.hashSource}';
+        find('gradientBrightness').value = '${gradientBrightness}';
+        find('gradientDarkness').value = '${gradientDarkness}';
+        find('randomColor.specify', 'button').style.backgroundColor = '${currentColor}';
+        find('randomColor.specify').value = '${currentColor}';
+      } else {
+        const testScript = document.createElement('script');
+        testScript.src = './template-replacer.js';
+        document.body.appendChild(testScript);
+        find('theme').checked = true;
+        find('showSuggest').checked = false;
+        find('workbenchCssPath').value = '/d/work/ddddddddddd/fffffffff/44444444/222222222/44444444/aaa.css';
+        find('hashSource').value = '';
+        find('gradientBrightness').value = '99';
+        find('gradientDarkness').value = '12';
+        find('randomColor.specify', 'button').style.backgroundColor = '#007ACC';
+        find('randomColor.specify').value = '#007ACC';
       }
-    }
 
-    const unfreeze = () => {
-      setTimeout(() => settings.classList.remove('freeze'), 200);
-      formInputs.forEach((el) => el.disabled = false)
-    }
+      // events
+      find('theme').addEventListener('change', theme);
 
-    // init
-    if (isProd) {
-      find('theme').checked = "${configs.theme}" === 'light';
-      find('showSuggest').checked = '${configs.showSuggest}' === 'true';
-      find('workbenchCssPath').value = '${configs.workbenchCssPath}';
-      find('hashSource').value = '${configs.hashSource}';
-      find('gradientBrightness').value = '${gradientBrightness}';
-      find('gradientDarkness').value = '${gradientDarkness}';
-      find('randomColor.specify', 'button').style.backgroundColor = '${currentColor}';
-      find('randomColor.specify').value = '${currentColor}';
-    } else {
-      find('theme').checked = true;
-      find('showSuggest').checked = false;
-      find('workbenchCssPath').value = '/d/work/ddddddddddd/fffffffff/44444444/222222222/44444444/aaa.css';
-      find('hashSource').value = '';
-      find('gradientBrightness').value = '99';
-      find('gradientDarkness').value = '12';
-      find('randomColor.specify', 'button').style.backgroundColor = '#007ACC';
-      find('randomColor.specify').value = '#007ACC';
-    }
-
-    // events
-    find('theme').addEventListener('change', theme);
-
-    // 初始化所有textarea
-    Array.from(document.querySelectorAll('textarea')).forEach((textarea) => {
-      textarea.addEventListener('input', (event) => {
+      // 初始化所有textarea
+      Array.from(document.querySelectorAll('textarea')).forEach((textarea) => {
+        textarea.addEventListener('input', (event) => {
+          textarea.style.height = 'auto';
+          textarea.style.height = textarea.scrollHeight + 'px';
+        });
         textarea.style.height = 'auto';
         textarea.style.height = textarea.scrollHeight + 'px';
       });
-      textarea.style.height = 'auto';
-      textarea.style.height = textarea.scrollHeight + 'px';
-    });
 
-    ['randomColor.colorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
-      find(name, 'button').onclick = () => vspost({ name, value: find(name)?.value })
-    });
-
-    // 初始化所有颜色选择器
-    Array.from(document.querySelectorAll('.picker')).forEach((picker) => {
-      const colorInput = find(picker.name);
-      picker.addEventListener('click', colorInput.click.bind(colorInput));
-      picker.addEventListener('input', (input) => {
-        const color = colorInput.value;
-        picker.style.backgroundColor = color;
+      ['randomColor.colorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
+        find(name, 'button').onclick = () => vspost({ name, value: find(name)?.value })
       });
-    });
 
-    settings.addEventListener('change', function (event) {
-      event.preventDefault();
-      const input = event.target;
-      // 控制面板的主题变更不需要推送给插件
-      if (input.name === 'theme') {
-        return;
-      }
+      // 初始化所有颜色选择器
+      Array.from(document.querySelectorAll('.picker')).forEach((picker) => {
+        const colorInput = find(picker.name);
+        picker.addEventListener('click', colorInput.click.bind(colorInput));
+        picker.addEventListener('input', (input) => {
+          const color = colorInput.value;
+          picker.style.backgroundColor = color;
+        });
+      });
 
-      const data = {
-        name: input.name,
-        value: input.value
-      };
-
-      // 如果数字类不符合要求，则返回并提示
-      if (input.type === 'number') {
-        const value = parseInt(input.value, 10);
-        let max = parseInt(input.max, 10);
-        let min = parseInt(input.min, 10);
-        max = Number.isNaN(max) ? Infinity : max;
-        min = Number.isNaN(min) ? Infinity : min;
-
-        if (Number.isNaN(value) || value < min || value > max) {
-          find(input.name, 'error').innerText = i18n.NumberLimit(min, max, true);
-          input.value = input.defaultValue; // 恢复默认值
+      settings.addEventListener('change', function (event) {
+        event.preventDefault();
+        const input = event.target;
+        // 控制面板的主题变更不需要推送给插件
+        if (input.name === 'theme') {
           return;
         }
-        data.value = value;
-      } else if (input.type === 'checkbox') {
-        data.value = input.checked;
-      }
 
-      vspost(data);
-    });
+        const data = {
+          name: input.name,
+          value: input.value
+        };
 
-    window.addEventListener('message', (event) => {
-      const resp = event.data;
-      if (resp.from !== 'colorful-titlebar') {
-        return;
-      }
-      unfreeze();
+        // 如果数字类不符合要求，则返回并提示
+        if (input.type === 'number') {
+          const value = parseInt(input.value, 10);
+          let max = parseInt(input.max, 10);
+          let min = parseInt(input.min, 10);
+          max = Number.isNaN(max) ? Infinity : max;
+          min = Number.isNaN(min) ? Infinity : min;
 
-      if (!resp.succ) {
-        find(resp.name, 'error').textContent = resp.msg;
-        return;
-      }
-
-      if (resp.msg) {
-        find(resp.name, 'succ').textContent = resp.msg;
-
-        // 如果调整了渐变配置，那么置空渐变选项以备重新选择
-        if (resp.name === 'gradientBrightness' || resp.name === 'gradientDarkness') {
-          find('gradient').value = '';
+          if (Number.isNaN(value) || value < min || value > max) {
+            find(input.name, 'error').innerText = i18n.NumberLimit(min, max, true);
+            input.value = input.defaultValue; // 恢复默认值
+            return;
+          }
+          data.value = value;
+        } else if (input.type === 'checkbox') {
+          data.value = input.checked;
         }
-      }
-    });
+
+        vspost(data);
+      });
+
+      window.addEventListener('message', (event) => {
+        const resp = event.data;
+        if (resp.from !== 'colorful-titlebar') {
+          return;
+        }
+        unfreeze();
+
+        if (!resp.succ) {
+          find(resp.name, 'error').textContent = resp.msg;
+          return;
+        }
+
+        if (resp.msg) {
+          find(resp.name, 'succ').textContent = resp.msg;
+
+          // 如果调整了渐变配置，那么置空渐变选项以备重新选择
+          if (resp.name === 'gradientBrightness' || resp.name === 'gradientDarkness') {
+            find('gradient').value = '';
+          }
+        }
+      });
+    } 
   </script>
 </body>
 

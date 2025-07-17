@@ -56,6 +56,11 @@
           "default": true,
           "description": "%configuration.showSuggest.description%"
         },
+        "colorful-titlebar.workbenchCssPath": {
+          "type": "string",
+          "default": "",
+          "description": "%configuration.workbenchCssPath.description%"
+        },
         "colorful-titlebar.gradientBrightness": {
           "type": "number",
           "default": 0.72,
@@ -146,11 +151,6 @@
           "items": {
             "type": "string"
           }
-        },
-        "colorful-titlebar.workbenchCssPath": {
-          "type": "string",
-          "default": "",
-          "description": "%configuration.workbenchCssPath.description%"
         }
       }
     }

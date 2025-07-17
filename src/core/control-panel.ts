@@ -11,7 +11,6 @@ import { AfterStyle } from '@/features/gradient/consts';
 import { getColor, getColorByK, getHashSource } from './colors';
 import version from './version';
 
-// todo 事件switch改为map版？
 // todo 增加更多配置项？
 const enum ControlName {
   ShowSuggest = 'showSuggest',
