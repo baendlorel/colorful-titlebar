@@ -1219,7 +1219,7 @@
         <div class="control-succ" name="projectIndicators"></div>
       </div>
 
-      <div class="control-item">
+      <div class="control-item" style="grid-template-columns: 1fr 1.5fr;">
         <div class="control-label-group">
           <div class="control-label">${Panel.colorPalette.label}</div>
           <div class="control-desc">${Panel.colorPalette.description}</div>
@@ -1256,27 +1256,27 @@
     /**
      * # utils
      */
-    const vspost = (() => {
+    function vspost(data) {
       let o = isProd ? acquireVsCodeApi() : {
         postMessage: (a) => console.trace('vscode.postMessage', a)
       };
-      return function (data) {
-        freeze();
-        o.postMessage({
-          from: 'colorful-titlebar',
-          ...data
-        });
-      }
-    })();
+      freeze();
+      o.postMessage({
+        from: 'colorful-titlebar',
+        ...data
+      });
+    }
 
-    const s = (...strings) => ''.concat(...strings);
+    function s(...strings) {
+      return ''.concat(...strings);
+    }
 
     /**
      * 默认查找的是输入元素，可以指定查找类型
      * @param {string} name - 元素的 name 属性
      * @param {string} tp - 元素类型：input | button | error | succ
      */
-    const find = (name, tp = 'input') => {
+    function find(name, tp = 'input') {
       switch (tp) {
         case 'succ':
           return document.querySelector(s('.control-succ[name="', name, '"]'));
@@ -1288,17 +1288,19 @@
         default:
           return document.querySelector(s('.control-input[name="', name, '"]'))
       }
-    };
+    }
 
     /**
      * @type {(selectors: keyof HTMLElementTagNameMap)=>HTMLElement[]}
      */
-    const $ = (...args) => Array.from(document.querySelectorAll(...args));
+    function $(...args) {
+      return Array.from(document.querySelectorAll(...args));
+    }
 
     /**
      * # vars 
      */
-    const i18n = (() => {
+    function getI18n() {
       const zh = {
         NumberLimit: (min, max, isInt = true) => s('请输入', min, '到', max, '之间的', isInt ? '整数' : '数')
       }
@@ -1313,7 +1315,9 @@
         default:
           return zh;
       }
-    })()
+    }
+
+    const i18n = getI18n();
 
     /**
      * @type {HTMLFormElement} 
@@ -1321,7 +1325,7 @@
     const settings = document.getElementById('settings');
     const controlInputs = $('.control-input');
 
-    const freeze = () => {
+    function freeze() {
       $('.control-error,.control-succ').forEach(el => el.textContent = '');
       if (isProd) {
         settings.classList.add('freeze');
@@ -1329,7 +1333,7 @@
       }
     }
 
-    const unfreeze = () => {
+    function unfreeze() {
       setTimeout(() => settings.classList.remove('freeze'), 200);
       controlInputs.forEach((el) => el.disabled = false)
     }
@@ -1366,7 +1370,7 @@
     }
 
     // 初始化主题切换器
-    document.getElementById('theme').addEventListener('change', () => {
+    document.getElementById('theme').addEventListener('change', function () {
       const body = document.querySelector('.body');
       const currentTheme = body.getAttribute('theme');
       body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
@@ -1374,7 +1378,7 @@
 
     // 初始化所有textarea
     $('textarea').forEach((textarea) => {
-      textarea.addEventListener('input', (event) => {
+      textarea.addEventListener('input', function (event) {
         textarea.style.height = 'auto';
         textarea.style.height = textarea.scrollHeight + 'px';
       });
@@ -1385,16 +1389,18 @@
     // 初始化单独的颜色选择器
     $('button.color-picker').forEach((picker) => {
       const colorInput = picker.querySelector('input[type="color"]');
-      colorInput.addEventListener('input', () => {
+      colorInput.addEventListener('input', function () {
         const [r, g, b] = colorInput.value
           .replace('#', '')
           .match(/.{2}/g)
           .map((hex) => parseInt(hex, 16));
         const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
         picker.style.color = brightness > 128 ? '#000' : '#fff';
-        picker.style.backgroundColor = colorInput.value
+        picker.style.backgroundColor = colorInput.value;
+        picker.title = colorInput.value;
       });
       picker.addEventListener('click', colorInput.click.bind(colorInput));
+      picker.title = colorInput.value;
     });
 
     // 要推送到插件的事件
@@ -1405,12 +1411,15 @@
     /**
      * # 颜色套组编辑器
      */
-    const initColorPalette = () => {
+    function initColorPalette() {
       $('.palette').forEach((palette) => {
         const name = palette.getAttribute('name')
         // 因为color-list的元素是不断变化的，因此事件只能注册在div上
         const colorList = palette.querySelector('.color-list');
-        const is = (e, className) => e.target.classList.contains(className);
+
+        function is(e, className) {
+          return e.target.classList.contains(className);
+        }
 
         colorList.addEventListener('click', (e) => {
           // 如果点击了添加按钮，则添加新颜色
@@ -1436,8 +1445,6 @@
         })
       });
 
-
-
       const lightColors = isProd ? '${lightThemeColors}'.split(';') : ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
       const darkColors = isProd ? '${darkThemeColors}'.split(';') : ['#E74C3C', '#1ABC9C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'];
 
@@ -1445,7 +1452,7 @@
       renderColorList('darkThemeColors', darkColors);
 
       // 添加事件监听器
-      $('.color-list').forEach(list => {
+      $('.color-list').forEach((list) => {
         list.addEventListener('dragstart', handleDragStart);
         list.addEventListener('dragover', handleDragOver);
         list.addEventListener('drop', handleDrop);
@@ -1454,7 +1461,7 @@
       });
     }
 
-    const renderColorList = (name, colors) => {
+    function renderColorList(name, colors) {
       const palette = document.querySelector(s('.palette[name="', name, '"]'));
       const colorList = palette.querySelector('.color-list');
       const addBtn = palette.querySelector('.palette-add-color');
@@ -1473,10 +1480,11 @@
      * 创建颜色项元素
      * - 加颜色要用，渲染要用，是个常用的函数
      */
-    const createPaletteItem = (name, color) => {
+    function createPaletteItem(name, color) {
       const item = document.createElement('div');
       item.className = 'palette-item';
       item.style.backgroundColor = color;
+      item.title = color.toLowerCase();
       item.draggable = true;
 
       const remover = document.createElement('button');
@@ -1490,28 +1498,31 @@
       input.setAttribute('belong', name);
       input.value = color;
 
-      input.addEventListener('input', () => {
+      input.addEventListener('input', function () {
         item.style.backgroundColor = input.value;
+        item.title = input.value;
       });
 
       item.append(remover, input);
       return item;
     }
 
-    const getPalleteColors = (name) =>
-      $('.palette-input[belong="' + name + '"]').map((input) => input.value);
+    function getPalleteColors(name) {
+      return $('.palette-input[belong="' + name + '"]').map((input) => input.value);
+    }
 
     /**
      * 更新颜色套组并发送到插件
      * @param {HTMLElement}
      */
-    const onPaletteChange = (name) =>
+    function onPaletteChange(name) {
       vspost({ name, value: getPalleteColors(name) });
+    }
 
     // 拖拽功能
     let draggedElement = null;
 
-    const handleDragStart = (e) => {
+    function handleDragStart(e) {
       if (e.target.classList.contains('palette-item')) {
         draggedElement = e.target;
         e.target.classList.add('dragging');
@@ -1519,24 +1530,24 @@
       }
     }
 
-    const handleDragOver = (e) => {
+    function handleDragOver(e) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
     }
 
-    const handleDragEnter = (e) => {
+    function handleDragEnter(e) {
       if (e.target.classList.contains('color-list')) {
         e.target.classList.add('drag-over');
       }
     }
 
-    const handleDragLeave = (e) => {
+    function handleDragLeave(e) {
       if (e.target.classList.contains('color-list') && !e.target.contains(e.relatedTarget)) {
         e.target.classList.remove('drag-over');
       }
     }
 
-    const handleDrop = (e) => {
+    function handleDrop(e) {
       e.preventDefault();
       const colorList = e.target.closest('.color-list');
 
