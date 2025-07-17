@@ -4,14 +4,14 @@ import { existsSync } from 'node:fs';
 import { Consts, GradientStyle, HashSource, TitleBarConsts } from '@/common/consts';
 import i18n from '@/common/i18n';
 import configs from '@/common/configs';
-
+import RGBA from '@/common/rgba';
 import hacker from '@/features/gradient/hacker';
 import { AfterStyle } from '@/features/gradient/consts';
-import RGBA from '@/common/rgba';
-import style from './style';
+
 import { getColor, getColorByK, getHashSource } from './colors';
 import version from './version';
 
+// todo 事件switch改为map版？
 const enum ControlName {
   ShowSuggest = 'showSuggest',
   WorkbenchCssPath = 'workbenchCssPath',
@@ -20,34 +20,27 @@ const enum ControlName {
   GradientDarkness = 'gradientDarkness',
   HashSource = 'hashSource',
   Refresh = 'refresh',
-  PickColor = 'pickColor',
-  RandomColor = 'randomColor',
+  'RandomColor.colorSet' = 'randomColor.colorSet',
+  'RandomColor.pure' = 'randomColor.pure',
+  'RandomColor.specify' = 'randomColor.specify',
 }
 
 let controlPanel: vscode.WebviewPanel | null = null;
 
 export default async function (this: vscode.ExtensionContext) {
-  // 防止创建多个设置页面
   if (controlPanel !== null) {
-    return;
+    return; // 防止创建多个设置页面
   }
-
   const Panel = i18n.ControlPanel;
-  controlPanel = vscode.window.createWebviewPanel(
+  (controlPanel = vscode.window.createWebviewPanel(
     'controllPanel',
     Panel.title,
     vscode.ViewColumn.One,
     { enableScripts: true, retainContextWhenHidden: true }
-  );
-
-  controlPanel.onDidDispose(() => {
-    controlPanel = null;
-  });
+  )).onDidDispose(() => (controlPanel = null));
 
   // 准备一些数据
   const env = 'prod';
-  const lang = configs.lang;
-  const ver = version.get(this);
   const currentColor = configs.currentColor ?? '#007ACC';
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
   const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
@@ -234,9 +227,10 @@ export default async function (this: vscode.ExtensionContext) {
       color: var(--ct-success);
     }
 
-    .control-input {
+    .control-input-group {
       display: flex;
       align-items: center;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
     .toggle-switch {
@@ -322,9 +316,20 @@ export default async function (this: vscode.ExtensionContext) {
     }
 
     .picker {
+      position: relative;
       border-radius: 50%;
-      padding: 8px;
+      color: transparent;
       box-shadow: inset 0 0 0 2px #dfdfdf;
+    }
+
+    .picker::before {
+      position: absolute;
+      content: '🎨';
+      color: white;
+      left: 52%;
+      top: 47%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5em;
     }
 
     .select {
@@ -819,7 +824,7 @@ export default async function (this: vscode.ExtensionContext) {
         <div>
           <h1><span class="colorful-title">${Consts.DisplayName}</span> ${
     Panel.title
-  }<span class="version">v${ver}</span></h1>
+  }<span class="version">v${version.get(this)}</span></h1>
           <p>by<a href="https://github.com/baendlorel">Kasukabe Tsumugi</a></p>
           <p>${Panel.description}</p>
         </div>
@@ -853,7 +858,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.showSuggest.label}</div>
           <div class="control-desc">${Panel.showSuggest.description}</div>
         </div>
-        <div class="control-input">
+        <div class="control-input-group">
           <label class="toggle-switch">
             <input type="checkbox" class="control-input" name="showSuggest">
             <span class="slider"></span>
@@ -868,7 +873,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.workbenchCssPath.label}</div>
           <div class="control-desc">${Panel.workbenchCssPath.description}</div>
         </div>
-        <div class="control-input">
+        <div class="control-input-group">
           <textarea class="control-input textarea" name="workbenchCssPath"></textarea>
         </div>
         <div class="control-error" name="workbenchCssPath"></div>
@@ -880,7 +885,7 @@ export default async function (this: vscode.ExtensionContext) {
           <label class="control-label">${Panel.gradient.label}</label>
           <div class="control-desc">${Panel.gradient.description}</div>
         </div>
-        <div class="control-input">
+        <div class="control-input-group">
           <select name="gradient" class="control-input select">
             <option value="" selected>${Panel.gradient.empty}</option>
             <option value="${GradientStyle.BrightCenter}">${
@@ -903,7 +908,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.gradientBrightness.label}</div>
           <div class="control-desc">${Panel.gradientBrightness.description}</div>
         </div>
-        <div class="control-input input-percent">
+        <div class="control-input-group input-percent">
           <input type="number" min="0" max="100" step="5" class="control-input" name="gradientBrightness" />
         </div>
         <div class="control-error" name="gradientBrightness"></div>
@@ -915,7 +920,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.gradientDarkness.label}</div>
           <div class="control-desc">${Panel.gradientDarkness.description}</div>
         </div>
-        <div class="control-input input-percent">
+        <div class="control-input-group input-percent">
           <input type="number" min="0" max="100" step="5" class="control-input" name="gradientDarkness" />
         </div>
         <div class="control-error" name="gradientDarkness"></div>
@@ -927,7 +932,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.hashSource.label}</div>
           <div class="control-desc">${Panel.hashSource.description}</div>
         </div>
-        <div class="control-input">
+        <div class="control-input-group">
           <select name="hashSource" class="control-input select">
             <option value="${HashSource.ProjectName}">${
     Panel.hashSource[HashSource.ProjectName]
@@ -947,7 +952,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.refresh.label}</div>
           <div class="control-desc">${Panel.refresh.description}</div>
         </div>
-        <div class="control-input">
+        <div class="control-input-group">
           <button type="button" class="control-button" name="refresh">
             <span>${Panel.refresh.button}</span>
           </button>
@@ -961,7 +966,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.randomColor.label}</div>
           <div class="control-desc">${Panel.randomColor.description}</div>
         </div>
-        <div class="control-input" style="display: grid;grid-template-columns: auto auto auto;column-gap: 10px;">
+        <div class="control-input-group" style="display: grid;grid-template-columns: auto auto auto;column-gap: 10px;">
           <button type="button" class="control-button" name="randomColor.colorSet">
             ${Panel.randomColor.colorSet}
           </button>
@@ -971,7 +976,7 @@ export default async function (this: vscode.ExtensionContext) {
           <button type="button" class="control-button picker" title="${
             Panel.randomColor.specify
           }" name="randomColor.specify">
-            🎨
+            选
             <input type="color" class="control-input" name="randomColor.specify">
           </button>
         </div>
@@ -1031,7 +1036,7 @@ export default async function (this: vscode.ExtensionContext) {
       const en = {
         NumberLimit: (min, max, isInt = true) => ['Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max].join(' ')
       }
-      switch ('${lang}') {
+      switch ('${configs.lang}') {
         case 'zh':
           return zh;
         case 'en':
@@ -1094,7 +1099,7 @@ export default async function (this: vscode.ExtensionContext) {
       textarea.style.height = textarea.scrollHeight + 'px';
     });
 
-    ['randomColor.colorSet', 'randomColor.pure', 'randomColor.specify', 'refresh'].forEach((name) => {
+    ['randomColor.colorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
       find(name, 'button').onclick = () => vspost({ name, value: find(name)?.value })
     });
 
@@ -1120,6 +1125,7 @@ export default async function (this: vscode.ExtensionContext) {
         name: input.name,
         value: input.value
       };
+
       // 如果数字类不符合要求，则返回并提示
       if (input.type === 'number') {
         const value = parseInt(input.value, 10);
@@ -1175,7 +1181,7 @@ export default async function (this: vscode.ExtensionContext) {
       succ: true,
     };
     try {
-      vscode.window.showInformationMessage(JSON.stringify(message));
+      // vscode.window.showInformationMessage(JSON.stringify(message));
       const name = message.name as ControlName;
       const value = message.value;
       switch (name) {
@@ -1282,14 +1288,20 @@ export default async function (this: vscode.ExtensionContext) {
           break;
         }
 
-        case ControlName.PickColor: {
-          await applyManualColor(value);
+        case ControlName['RandomColor.colorSet']: {
+          const color = getColorByK(Math.random());
+          await applyManualColor(color);
           break;
         }
 
-        case ControlName.RandomColor: {
-          const color = getColorByK(Math.random());
+        case ControlName['RandomColor.pure']: {
+          const color = RGBA.uniformRandom();
           await applyManualColor(color);
+          break;
+        }
+
+        case ControlName['RandomColor.specify']: {
+          await applyManualColor(value);
           break;
         }
 

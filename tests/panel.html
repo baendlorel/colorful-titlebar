@@ -180,9 +180,10 @@
       color: var(--ct-success);
     }
 
-    .control-input {
+    .control-input-group {
       display: flex;
       align-items: center;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
     .toggle-switch {
@@ -268,9 +269,20 @@
     }
 
     .picker {
+      position: relative;
       border-radius: 50%;
-      padding: 8px;
+      color: transparent;
       box-shadow: inset 0 0 0 2px #dfdfdf;
+    }
+
+    .picker::before {
+      position: absolute;
+      content: '🎨';
+      color: white;
+      left: 52%;
+      top: 47%;
+      transform: translate(-50%, -50%);
+      font-size: 1.5em;
     }
 
     .select {
@@ -763,7 +775,7 @@
     <form id="settings" class="control-panel">
       <div class="header">
         <div>
-          <h1><span class="colorful-title">${Consts.DisplayName}</span> ${Panel.title}<span class="version">v${ver}</span></h1>
+          <h1><span class="colorful-title">${Consts.DisplayName}</span> ${Panel.title}<span class="version">v${version.get(this)}</span></h1>
           <p>by<a href="https://github.com/baendlorel">Kasukabe Tsumugi</a></p>
           <p>${Panel.description}</p>
         </div>
@@ -797,7 +809,7 @@
           <div class="control-label">${Panel.showSuggest.label}</div>
           <div class="control-desc">${Panel.showSuggest.description}</div>
         </div>
-        <div class="control-input">
+        <div class="control-input-group">
           <label class="toggle-switch">
             <input type="checkbox" class="control-input" name="showSuggest">
             <span class="slider"></span>
@@ -812,7 +824,7 @@
           <div class="control-label">${Panel.workbenchCssPath.label}</div>
           <div class="control-desc">${Panel.workbenchCssPath.description}</div>
         </div>
-        <div class="control-input">
+        <div class="control-input-group">
           <textarea class="control-input textarea" name="workbenchCssPath"></textarea>
         </div>
         <div class="control-error" name="workbenchCssPath"></div>
@@ -824,7 +836,7 @@
           <label class="control-label">${Panel.gradient.label}</label>
           <div class="control-desc">${Panel.gradient.description}</div>
         </div>
-        <div class="control-input">
+        <div class="control-input-group">
           <select name="gradient" class="control-input select">
             <option value="" selected>${Panel.gradient.empty}</option>
             <option value="${GradientStyle.BrightCenter}">${
@@ -845,7 +857,7 @@
           <div class="control-label">${Panel.gradientBrightness.label}</div>
           <div class="control-desc">${Panel.gradientBrightness.description}</div>
         </div>
-        <div class="control-input input-percent">
+        <div class="control-input-group input-percent">
           <input type="number" min="0" max="100" step="5" class="control-input" name="gradientBrightness" />
         </div>
         <div class="control-error" name="gradientBrightness"></div>
@@ -857,7 +869,7 @@
           <div class="control-label">${Panel.gradientDarkness.label}</div>
           <div class="control-desc">${Panel.gradientDarkness.description}</div>
         </div>
-        <div class="control-input input-percent">
+        <div class="control-input-group input-percent">
           <input type="number" min="0" max="100" step="5" class="control-input" name="gradientDarkness" />
         </div>
         <div class="control-error" name="gradientDarkness"></div>
@@ -869,7 +881,7 @@
           <div class="control-label">${Panel.hashSource.label}</div>
           <div class="control-desc">${Panel.hashSource.description}</div>
         </div>
-        <div class="control-input">
+        <div class="control-input-group">
           <select name="hashSource" class="control-input select">
             <option value="${HashSource.ProjectName}">${
               Panel.hashSource[HashSource.ProjectName]
@@ -889,7 +901,7 @@
           <div class="control-label">${Panel.refresh.label}</div>
           <div class="control-desc">${Panel.refresh.description}</div>
         </div>
-        <div class="control-input">
+        <div class="control-input-group">
           <button type="button" class="control-button" name="refresh">
             <span>${Panel.refresh.button}</span>
           </button>
@@ -903,7 +915,7 @@
           <div class="control-label">${Panel.randomColor.label}</div>
           <div class="control-desc">${Panel.randomColor.description}</div>
         </div>
-        <div class="control-input" style="display: grid;grid-template-columns: auto auto auto;column-gap: 10px;">
+        <div class="control-input-group" style="display: grid;grid-template-columns: auto auto auto;column-gap: 10px;">
           <button type="button" class="control-button" name="randomColor.colorSet">
             ${Panel.randomColor.colorSet}
           </button>
@@ -911,7 +923,7 @@
             ${Panel.randomColor.pure}
           </button>
           <button type="button" class="control-button picker" title="${Panel.randomColor.specify}" name="randomColor.specify">
-            🎨
+            选
             <input type="color" class="control-input" name="randomColor.specify">
           </button>
         </div>
@@ -971,7 +983,7 @@
       const en = {
         NumberLimit: (min, max, isInt = true) => ['Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max].join(' ')
       }
-      switch ('${lang}') {
+      switch ('${configs.lang}') {
         case 'zh':
           return zh;
         case 'en':
@@ -1034,7 +1046,7 @@
       textarea.style.height = textarea.scrollHeight + 'px';
     });
 
-    ['randomColor.colorSet', 'randomColor.pure', 'randomColor.specify', 'refresh'].forEach((name) => {
+    ['randomColor.colorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
       find(name, 'button').onclick = () => vspost({ name, value: find(name)?.value })
     });
 
@@ -1060,6 +1072,7 @@
         name: input.name,
         value: input.value
       };
+
       // 如果数字类不符合要求，则返回并提示
       if (input.type === 'number') {
         const value = parseInt(input.value, 10);

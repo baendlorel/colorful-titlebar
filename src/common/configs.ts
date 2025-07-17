@@ -101,12 +101,6 @@ class Config {
 
   readonly setWorkspace = {
     async [TitleBarConsts.WorkbenchSection](value: Partial<TitleBarStyleCustomization>) {
-      vscode.window.showInformationMessage(
-        `开始保存${JSON.stringify(value)}，到${TitleBarConsts.WorkbenchSection}  ${
-          vscode.ConfigurationTarget.Global
-        }`
-      );
-
       await Config.global.update(
         TitleBarConsts.WorkbenchSection,
         value,
