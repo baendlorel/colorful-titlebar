@@ -182,6 +182,8 @@ export default async function (this: vscode.ExtensionContext) {
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
   const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
   const projectIndicators = configs.projectIndicators.join(';');
+  const lightThemeColors = configs.lightThemeColors.join(';');
+  const darkThemeColors = configs.darkThemeColors.join(';');
 
   controlPanel.webview.html = `<!DOCTYPE html>
 <html lang="zh-CN">

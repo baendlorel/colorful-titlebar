@@ -138,14 +138,14 @@
 - **类型**: 字符串数组
 - **默认值**: `["rgb(167, 139, 250)", "rgb(147, 197, 253)", ...]`
 - **描述**: 浅色主题的调色板
-- **支持格式**: `#RRGGBB`, `#RRGGBBAA`, `rgb()`, `rgba()`, `hsl()`, `hsla()`
+- **支持格式**: `#RRGGBB`, `#RRGGBBAA`, `rgb()`, `rgba()`
 
 ### `colorful-titlebar.darkThemeColors`
 
 - **类型**: 字符串数组
 - **默认值**: `["rgb(68, 0, 116)", "rgb(0, 47, 85)", ...]`
 - **描述**: 深色主题的调色板
-- **支持格式**: `#RRGGBB`, `#RRGGBBAA`, `rgb()`, `rgba()`, `hsl()`, `hsla()`
+- **支持格式**: `#RRGGBB`, `#RRGGBBAA`, `rgb()`, `rgba()`
 
 ### `colorful-titlebar.projectIndicators`
 

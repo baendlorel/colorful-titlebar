@@ -1298,12 +1298,17 @@
         }
       };
 
+      /**
+       * @type {typeof document.querySelectorAll}
+       */
+      const $ = document.querySelectorAll.bind(document);
+
       const i18n = (() => {
         const zh = {
-          NumberLimit: (min, max, isInt = true) => ['请输入', min, '到', max, '之间的', isInt ? '整数' : '数'].join('')
+          NumberLimit: (min, max, isInt = true) => s('请输入', min, '到', max, '之间的', isInt ? '整数' : '数')
         }
         const en = {
-          NumberLimit: (min, max, isInt = true) => ['Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max].join(' ')
+          NumberLimit: (min, max, isInt = true) => s('Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max)
         }
         switch ('${configs.lang}') {
           case 'zh':
@@ -1322,7 +1327,7 @@
       const formInputs = Array.from(settings.elements);
 
       const freeze = () => {
-        document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
+        $('.control-error,.control-succ').forEach(el => el.textContent = '');
         if (isProd) {
           settings.classList.add('freeze');
           formInputs.forEach((el) => el.disabled = true);
@@ -1370,7 +1375,7 @@
       find('theme').addEventListener('change', theme);
 
       // 初始化所有textarea
-      Array.from(document.querySelectorAll('textarea')).forEach((textarea) => {
+      $('textarea').forEach((textarea) => {
         textarea.addEventListener('input', (event) => {
           textarea.style.height = 'auto';
           textarea.style.height = textarea.scrollHeight + 'px';
@@ -1380,7 +1385,7 @@
       });
 
       // 初始化所有颜色选择器
-      Array.from(document.querySelectorAll('button.color-picker')).forEach((picker) => {
+      $('button.color-picker').forEach((picker) => {
         const colorInput = picker.querySelector('input[type="color"]');
         colorInput.addEventListener('input', () => {
           const [r, g, b] = colorInput.value
@@ -1397,24 +1402,37 @@
 
       // 要推送到插件的事件
       ['randomColor.colorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
-        const button = find(name, 'button');
-        if (button) {
-          button.onclick = () => vspost({ name, value: find(name)?.value });
-        }
+        find(name, 'button').onclick = () => vspost({ name, value: find(name)?.value });
       });
 
       /**
        * 初始化颜色套组编辑器
        */
       function initColorPalette() {
-        const lightColors = isProd ? JSON.parse('${lightThemeColors}') : ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
-        const darkColors = isProd ? JSON.parse('${darkThemeColors}') : ['#E74C3C', '#1ABC9C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'];
+        const lightColors = isProd ? '${lightThemeColors}'.split(';') : ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+        const darkColors = isProd ? '${darkThemeColors}'.split(';') : ['#E74C3C', '#1ABC9C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'];
 
         renderColorList('light', lightColors);
         renderColorList('dark', darkColors);
 
         // 添加事件监听器
-        setupColorPaletteEvents();
+        // 添加颜色按钮事件
+        $('.add-color-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const theme = e.target.dataset.theme;
+            const newColor = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+            addColor(theme, newColor);
+          });
+        });
+        // 颜色列表事件委托
+        $('.color-list').forEach(list => {
+          list.addEventListener('click', handleColorListClick);
+          list.addEventListener('dragstart', handleDragStart);
+          list.addEventListener('dragover', handleDragOver);
+          list.addEventListener('drop', handleDrop);
+          list.addEventListener('dragenter', handleDragEnter);
+          list.addEventListener('dragleave', handleDragLeave);
+        });
       }
 
       /**
@@ -1465,30 +1483,6 @@
       }
 
       /**
-       * 设置颜色套组编辑器事件
-       */
-      function setupColorPaletteEvents() {
-        // 添加颜色按钮事件
-        document.querySelectorAll('.add-color-btn').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            const theme = e.target.dataset.theme;
-            const newColor = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
-            addColor(theme, newColor);
-          });
-        });
-
-        // 颜色列表事件委托
-        document.querySelectorAll('.color-list').forEach(list => {
-          list.addEventListener('click', handleColorListClick);
-          list.addEventListener('dragstart', handleDragStart);
-          list.addEventListener('dragover', handleDragOver);
-          list.addEventListener('drop', handleDrop);
-          list.addEventListener('dragenter', handleDragEnter);
-          list.addEventListener('dragleave', handleDragLeave);
-        });
-      }
-
-      /**
        * 处理颜色列表点击事件
        */
       function handleColorListClick(e) {
@@ -1501,8 +1495,8 @@
       /**
        * 处理颜色输入变化
        */
-      document.addEventListener('input', (e) => {
-        if (e.target.classList.contains('color-input')) {
+      $('.color-input').forEach(input => {
+        input.addEventListener('input', (e) => {
           const colorItem = e.target.closest('.color-item');
           const newColor = e.target.value;
           colorItem.style.backgroundColor = newColor;
@@ -1510,7 +1504,7 @@
           // 发送更新事件
           const theme = colorItem.dataset.theme;
           updateColorPalette(theme);
-        }
+        });
       });
 
       /**
@@ -1554,7 +1548,7 @@
         const dataName = theme === 'light' ? 'lightColors' : 'darkColors';
 
         // 重新编号
-        const colorItems = document.querySelectorAll(s('.color-list[data-theme="', theme, '"] .color-item'));
+        const colorItems = $(s('.color-list[data-theme="', theme, '"] .color-item'));
         colorItems.forEach((item, index) => {
           item.dataset.index = index;
         });

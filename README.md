@@ -136,14 +136,14 @@ Open VS Code settings and configure the following options:
 - **Type**: array of strings
 - **Default**: `["rgb(167, 139, 250)", "rgb(147, 197, 253)", ...]`
 - **Description**: Color palette for light themes
-- **Supports**: `#RRGGBB`, `#RRGGBBAA`, `rgb()`, `rgba()`, `hsl()`, `hsla()`
+- **Supports**: `#RRGGBB`, `#RRGGBBAA`, `rgb()`, `rgba()`
 
 ### `colorful-titlebar.darkThemeColors`
 
 - **Type**: array of strings
 - **Default**: `["rgb(68, 0, 116)", "rgb(0, 47, 85)", ...]`
 - **Description**: Color palette for dark themes
-- **Supports**: `#RRGGBB`, `#RRGGBBAA`, `rgb()`, `rgba()`, `hsl()`, `hsla()`
+- **Supports**: `#RRGGBB`, `#RRGGBBAA`, `rgb()`, `rgba()`
 
 ### `colorful-titlebar.projectIndicators`
 

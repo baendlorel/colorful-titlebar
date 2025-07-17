@@ -1,30 +1,3 @@
-const hslaToRgba = (h: number, s: number, l: number): [number, number, number] => {
-  const C = (1 - Math.abs(2 * l - 1)) * s;
-  const X = C * (1 - Math.abs(((h / 60) % 2) - 1));
-  const m = l - C / 2;
-
-  let r1 = 0,
-    g1 = 0,
-    b1 = 0;
-
-  if (h < 60) {
-    [r1, g1, b1] = [C, X, 0];
-  } else if (h < 120) {
-    [r1, g1, b1] = [X, C, 0];
-  } else if (h < 180) {
-    [r1, g1, b1] = [0, C, X];
-  } else if (h < 240) {
-    [r1, g1, b1] = [0, X, C];
-  } else if (h < 300) {
-    [r1, g1, b1] = [X, 0, C];
-  } else {
-    [r1, g1, b1] = [C, 0, X];
-  }
-
-  // 转换到 [0, 255] 并取整
-  return [Math.round((r1 + m) * 255), Math.round((g1 + m) * 255), Math.round((b1 + m) * 255)];
-};
-
 const parseRgba = (s: string | undefined) => {
   s = s?.replace(/\s/g, '') || '';
 
@@ -44,16 +17,6 @@ const parseRgba = (s: string | undefined) => {
     const g = parseInt(rgbaMatch[2], 10);
     const b = parseInt(rgbaMatch[3], 10);
     const a = rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1;
-    return [r, g, b, a];
-  }
-
-  const hslaMatch = s.match(/hsla?\((\d+),\s*(\d+)%?,\s*(\d+)%?(?:,\s*([\d.]+))?\)/);
-  if (hslaMatch) {
-    const h = parseInt(hslaMatch[1], 10);
-    const s = parseInt(hslaMatch[2], 10) / 100;
-    const l = parseInt(hslaMatch[3], 10) / 100;
-    const a = hslaMatch[4] ? parseFloat(hslaMatch[4]) : 1;
-    const [r, g, b] = hslaToRgba(h, s, l);
     return [r, g, b, a];
   }
 

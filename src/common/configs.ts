@@ -128,9 +128,21 @@ class Config {
   }
 
   get [Prop.ProjectIndicators]() {
-    const indicators = Defaults.ProjectIndicators.split(';');
+    const list = Defaults.ProjectIndicators.split(';');
     // * 此处配置和package.json保持一致
-    return Config.self.get<string[]>(Prop.ProjectIndicators, indicators);
+    return Config.self.get<string[]>(Prop.ProjectIndicators, list);
+  }
+
+  get [Prop.LightThemeColors]() {
+    const list = Defaults.LightThemeColors.split(';');
+    // * 此处配置和package.json保持一致
+    return Config.self.get<string[]>(Prop.LightThemeColors, list);
+  }
+
+  get [Prop.DarkThemeColors]() {
+    const list = Defaults.DarkThemeColors.split(';');
+    // * 此处配置和package.json保持一致
+    return Config.self.get<string[]>(Prop.DarkThemeColors, list);
   }
 
   get [Prop.HashSource]() {
