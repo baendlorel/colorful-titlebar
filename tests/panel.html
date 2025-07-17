@@ -281,7 +281,7 @@
       left: 52%;
       top: 47%;
       transform: translate(-50%, -50%);
-      font-size: 1.5em;
+      font-size: 1.2em;
     }
 
     .select {
@@ -937,7 +937,6 @@
       const isProd = '${env}' === 'prod';
 
       // functions
-
       const vspost = (() => {
         let o = isProd ? acquireVsCodeApi() : {
           postMessage: (a) => console.log('vscode.postMessage', a)

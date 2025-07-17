@@ -23,6 +23,9 @@ const enum ControlName {
   'RandomColor.colorSet' = 'randomColor.colorSet',
   'RandomColor.pure' = 'randomColor.pure',
   'RandomColor.specify' = 'randomColor.specify',
+  LightThemeColors = 'lightThemeColors',
+  DarkThemeColors = 'darkThemeColors',
+  ProjectIndicators = 'projectIndicators',
 }
 
 interface HandelResult {
@@ -144,9 +147,9 @@ const handlerMap = {
     }
     await applyManualColor(value);
   },
-  default: () => {
-    throw new Error('Unknown control name: ' + name);
-  },
+  [ControlName.LightThemeColors]: async (result: HandelResult, value: PostedValue) => {},
+  [ControlName.DarkThemeColors]: async (result: HandelResult, value: PostedValue) => {},
+  [ControlName.ProjectIndicators]: async (result: HandelResult, value: PostedValue) => {},
 };
 
 let controlPanel: vscode.WebviewPanel | null = null;
@@ -1311,7 +1314,10 @@ export default async function (this: vscode.ExtensionContext) {
     // vscode.window.showInformationMessage(JSON.stringify(message));
 
     try {
-      const handler = handlerMap[result.name] ?? handlerMap.default;
+      const handler = handlerMap[result.name];
+      if (!handler) {
+        throw new Error('居然未找到处理函数：' + JSON.stringify(result));
+      }
       await handler(result, message.value);
     } catch (error) {
       if (error instanceof Error) {
