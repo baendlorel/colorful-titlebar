@@ -370,6 +370,132 @@
     [theme="dark"] .select {
       background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23abadb4' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
     }
+
+    /* 下拉菜单样式 */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-button {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--ct-primary);
+      color: white;
+      min-width: 120px;
+      position: relative;
+    }
+
+    .dropdown-button::after {
+      content: '';
+      margin-left: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      display: inline-block;
+      padding: 3px;
+      transform: rotate(45deg);
+      transition: transform 0.3s ease;
+    }
+
+    .dropdown:hover .dropdown-button::after,
+    .dropdown:focus-within .dropdown-button::after {
+      transform: rotate(-135deg);
+    }
+
+    .dropdown-button:hover {
+      opacity: 0.9;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: var(--ct-panel-bg);
+      border: 1px solid var(--ct-border-color);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px var(--ct-shadow-color);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .dropdown:hover .dropdown-menu,
+    .dropdown:focus-within .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      background: none;
+      color: var(--ct-text-color);
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      border-bottom: 1px solid var(--ct-border-color);
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    /* .dropdown-item:focus  */
+    .dropdown-item:hover {
+      background-color: var(--ct-primary);
+      color: white;
+      outline: none;
+    }
+
+    .dropdown-item:active {
+      opacity: 0.9;
+    }
+
+    /* 防止下拉菜单在悬停时闪烁 */
+    .dropdown:hover,
+    .dropdown:focus-within {
+      z-index: 11;
+    }
+
+    .color-picker {
+      position: relative;
+      padding-left: 40px;
+    }
+
+    .color-picker::before {
+      content: '🎨';
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2em;
+    }
+
+    .color-picker input[type="color"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
   </style>
   <style category="theme-switch">
     .kskb-theme-switch {
@@ -897,6 +1023,34 @@
 
       <div class="control-item">
         <div class="control-label-group">
+          <div class="control-label">${Panel.randomColor.label}</div>
+          <div class="control-desc">${Panel.randomColor.description}</div>
+        </div>
+        <div class="control-input-group">
+          <div class="dropdown">
+            <button type="button" class="dropdown-button" tabindex="0">
+              ${Panel.randomColor.label}
+            </button>
+            <div class="dropdown-menu">
+              <button type="button" class="dropdown-item" name="randomColor.colorSet">
+                ${Panel.randomColor.colorSet}
+              </button>
+              <button type="button" class="dropdown-item" name="randomColor.pure">
+                ${Panel.randomColor.pure}
+              </button>
+              <button type="button" class="dropdown-item color-picker" title="${Panel.randomColor.specify}" name="randomColor.specify">
+                ${Panel.randomColor.specify}
+                <input type="color" class="control-input" name="randomColor.specify">
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="control-error" name="randomColor"></div>
+        <div class="control-succ" name="randomColor"></div>
+      </div>
+
+      <div class="control-item">
+        <div class="control-label-group">
           <div class="control-label">${Panel.refresh.label}</div>
           <div class="control-desc">${Panel.refresh.description}</div>
         </div>
@@ -907,27 +1061,6 @@
         </div>
         <div class="control-error" name="refresh"></div>
         <div class="control-succ" name="refresh"></div>
-      </div>
-
-      <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.randomColor.label}</div>
-          <div class="control-desc">${Panel.randomColor.description}</div>
-        </div>
-        <div class="control-input-group" style="display: grid;grid-template-columns: auto auto auto;column-gap: 10px;">
-          <button type="button" class="control-button" name="randomColor.colorSet">
-            ${Panel.randomColor.colorSet}
-          </button>
-          <button type="button" class="control-button" name="randomColor.pure">
-            ${Panel.randomColor.pure}
-          </button>
-          <button type="button" class="control-button picker" title="${Panel.randomColor.specify}" name="randomColor.specify">
-            选
-            <input type="color" class="control-input" name="randomColor.specify">
-          </button>
-        </div>
-        <div class="control-error" name="randomColor"></div>
-        <div class="control-succ" name="randomColor"></div>
       </div>
     </form>
   </div>
@@ -968,7 +1101,7 @@
           case 'error':
             return document.querySelector(['.control-error[name="', name, '"]'].join(''));
           case 'button':
-            return document.querySelector(['.control-button[name="', name, '"]'].join(''));
+            return document.querySelector(['button[name="', name, '"]', ',.control-button[name="', name, '"]'].join(''));
           case 'input':
           default:
             return document.querySelector(['.control-input[name="', name, '"]'].join(''))
@@ -1035,7 +1168,7 @@
         find('randomColor.specify').value = '#007ACC';
       }
 
-      // events
+      // 初始化主题切换器
       find('theme').addEventListener('change', theme);
 
       // 初始化所有textarea
@@ -1048,18 +1181,20 @@
         textarea.style.height = textarea.scrollHeight + 'px';
       });
 
-      ['randomColor.colorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
-        find(name, 'button').onclick = () => vspost({ name, value: find(name)?.value })
-      });
 
       // 初始化所有颜色选择器
-      Array.from(document.querySelectorAll('.picker')).forEach((picker) => {
-        const colorInput = find(picker.name);
+      Array.from(document.querySelectorAll('button.color-picker')).forEach((picker) => {
+        const colorInput = picker.querySelector('input[type="color"]');
+        colorInput.addEventListener('input', () => picker.style.backgroundColor = colorInput.value);
         picker.addEventListener('click', colorInput.click.bind(colorInput));
-        picker.addEventListener('input', (input) => {
-          const color = colorInput.value;
-          picker.style.backgroundColor = color;
-        });
+      });
+
+      // 要推送到插件的事件
+      ['randomColor.colorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
+        const button = find(name, 'button');
+        if (button) {
+          button.onclick = () => vspost({ name, value: find(name)?.value });
+        }
       });
 
       settings.addEventListener('change', function (event) {
@@ -1096,6 +1231,7 @@
         vspost(data);
       });
 
+      // 插件回馈的结果
       window.addEventListener('message', (event) => {
         const resp = event.data;
         if (resp.from !== 'colorful-titlebar') {

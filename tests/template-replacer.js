@@ -212,6 +212,18 @@
    */
   const replace = (text) => {
     return text
+      .replace(
+        '${Panel.hashSource[HashSource.ProjectName]}',
+        mockData.Panel.hashSource[mockData.HashSource.ProjectName]
+      )
+      .replace(
+        '${Panel.hashSource[HashSource.FullPath]}',
+        mockData.Panel.hashSource[mockData.HashSource.FullPath]
+      )
+      .replace(
+        '${Panel.hashSource[HashSource.ProjectNameDate]}',
+        mockData.Panel.hashSource[mockData.HashSource.ProjectNameDate]
+      )
       .replace('${version.get(this)}', '13.34.2')
       .replace(/\$\{([\w\.]+\w+)\}/g, ($0, $1) => {
         const props = $1.split('.');

@@ -70,7 +70,7 @@ export default (() => {
         description: `可以选择用当前配置的颜色来随机、纯随机或者直接用调色盘🎨指定颜色`,
         colorSet: '当前套组',
         pure: '纯随机',
-        specify: '直接指定一个颜色',
+        specify: '调色盘',
       },
     },
 
@@ -204,7 +204,7 @@ export default (() => {
         description: `Choose to randomize within the current color set, pure random or directly specify a color using 🎨`,
         colorSet: 'Current Color Set',
         pure: 'Pure Random',
-        specify: 'Specify a color directly',
+        specify: 'Palette',
       },
     },
 
