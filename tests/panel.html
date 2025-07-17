@@ -1266,6 +1266,8 @@
         body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
       }
 
+      const s = (...strings) => ''.concat(...strings);
+
       /**
        * 默认查找的是输入元素，可以指定查找类型
        * @param {string} name - 元素的 name 属性
@@ -1274,14 +1276,14 @@
       const find = (name, tp = 'input') => {
         switch (tp) {
           case 'succ':
-            return document.querySelector(['.control-succ[name="', name, '"]'].join(''));
+            return document.querySelector(s('.control-succ[name="', name, '"]'));
           case 'error':
-            return document.querySelector(['.control-error[name="', name, '"]'].join(''));
+            return document.querySelector(s('.control-error[name="', name, '"]'));
           case 'button':
-            return document.querySelector(['button[name="', name, '"]', ',.control-button[name="', name, '"]'].join(''));
+            return document.querySelector(s('button[name="', name, '"]', ',.control-button[name="', name, '"]'));
           case 'input':
           default:
-            return document.querySelector(['.control-input[name="', name, '"]'].join(''))
+            return document.querySelector(s('.control-input[name="', name, '"]'))
         }
       };
 
@@ -1394,8 +1396,8 @@
        * 初始化颜色套组编辑器
        */
       function initColorPalette() {
-        const lightColors = isProd ? JSON.parse('${lightColors}' || '[]') : ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
-        const darkColors = isProd ? JSON.parse('${darkColors}' || '[]') : ['#E74C3C', '#1ABC9C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'];
+        const lightColors = isProd ? JSON.parse('${lightThemeColors}' || '[]') : ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+        const darkColors = isProd ? JSON.parse('${darkThemeColors}' || '[]') : ['#E74C3C', '#1ABC9C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'];
 
         renderColorList('light', lightColors);
         renderColorList('dark', darkColors);
@@ -1410,7 +1412,7 @@
        * @param {string[]} colors - 颜色数组
        */
       function renderColorList(theme, colors) {
-        const colorList = document.querySelector(`.color-list[data-theme="${theme}"]`);
+        const colorList = document.querySelector(s('.color-list[data-', theme, '="${theme}"]'));
         const addBtn = colorList.querySelector('.add-color-btn');
 
         // 清空现有颜色项（保留添加按钮）
@@ -1437,11 +1439,17 @@
         item.dataset.theme = theme;
         item.dataset.index = index;
 
-        item.innerHTML = `
-          <button type="button" class="remove-btn" title="${isProd ? '${Panel.colorPalette.removeColor}' : '删除'}">&times;</button>
-          <input type="color" class="color-input" value="${color}">
-        `;
+        const remover = document.createElement('button');
+        remover.type = 'button';
+        remover.className = 'remove-btn';
+        remover.innerHTML = '&times;';
 
+        const colorInput = document.createElement('input');
+        colorInput.type = 'color';
+        colorInput.className = 'color-input';
+        colorInput.value = color;
+
+        item.append(remover, colorInput);
         return item;
       }
 
@@ -1498,7 +1506,7 @@
        * 添加新颜色
        */
       function addColor(theme, color) {
-        const colorList = document.querySelector(`.color-list[data-theme="${theme}"]`);
+        const colorList = document.querySelector(s('.color-list[data-theme="', theme, '"]'));
         const addBtn = colorList.querySelector('.add-color-btn');
         const colors = getCurrentColors(theme);
 
@@ -1522,7 +1530,7 @@
        * 获取当前颜色数组
        */
       function getCurrentColors(theme) {
-        const colorList = document.querySelector(`.color-list[data-theme="${theme}"]`);
+        const colorList = document.querySelector(s('.color-list[data-theme="', theme, '"]'));
         const colorItems = colorList.querySelectorAll('.color-item');
         return Array.from(colorItems).map(item => item.querySelector('.color-input').value);
       }
@@ -1535,7 +1543,7 @@
         const dataName = theme === 'light' ? 'lightColors' : 'darkColors';
 
         // 重新编号
-        const colorItems = document.querySelectorAll(`.color-list[data-theme="${theme}"] .color-item`);
+        const colorItems = document.querySelectorAll(s('.color-list[data-theme="', theme, '"] .color-item'));
         colorItems.forEach((item, index) => {
           item.dataset.index = index;
         });
