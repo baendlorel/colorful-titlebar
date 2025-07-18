@@ -85,22 +85,17 @@
         };
 
   function freeze() {
-    freeze = isProd
-      ? function () {
-          $('.control-error,.control-succ').forEach((el) => (el.textContent = ''));
-          $('.control-input').forEach((el) => (el.disabled = true));
-          q('#settings').classList.add('freeze');
-        }
-      : function () {
-          $('.control-error,.control-succ').forEach((el) => (el.textContent = ''));
-        };
-    freeze();
+    $('.control-error,.control-succ').forEach((el) => (el.textContent = ''));
+    $('.control-input').forEach((el) => (el.disabled = true));
+    $('.palette-input').forEach((el) => (el.disabled = true));
+    q('#settings').classList.add('freeze');
   }
 
   function unfreeze() {
     setTimeout(() => {
       q('#settings').classList.remove('freeze');
       $('.control-input').forEach((el) => (el.disabled = false));
+      $('.palette-input').forEach((el) => (el.disabled = false));
     }, 200);
   }
 
@@ -274,8 +269,11 @@
         }
         // 如果点击的是色块，那么开始编辑它
         else if (is(e, 'palette-item')) {
-          const paletteItem = e.target;
-          paletteItem.querySelector('.palette-input').click();
+          const paletteInput = e.target.querySelector('.palette-input');
+          if (paletteInput.disabled) {
+            return; // 如果输入框被禁用，则不处理
+          }
+          paletteInput.click();
         }
       });
     });
@@ -442,4 +440,6 @@
   q('.body').addEventListener('transitionstart', initAutoHeightTextarea, { once: true });
 
   setTimeout(() => (q('.body').style.opacity = '1'), 100);
+  window.freeze = freeze;
+  window.unfreeze = unfreeze;
 })();

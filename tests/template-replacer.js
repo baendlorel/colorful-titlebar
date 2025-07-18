@@ -174,7 +174,7 @@
   })(location.href.match(/\?lang=([a-z]+)/g));
 
   const langToggler = document.createElement('button');
-  langToggler.textContent = '切换语言 / Toggle Language';
+  langToggler.textContent = '切换语言';
   langToggler.style.position = 'fixed';
   langToggler.style.top = '10px';
   langToggler.style.right = '10px';
@@ -184,6 +184,23 @@
     window.location.href = window.location.href.split('?')[0] + '?lang=' + newLang;
   };
   document.body.appendChild(langToggler);
+
+  const freezer = document.createElement('button');
+  freezer.textContent = '冻结/解冻';
+  freezer.style.position = 'fixed';
+  freezer.style.top = '50px';
+  freezer.style.right = '10px';
+  freezer.style.zIndex = '1000';
+  freezer.frozen = false;
+  freezer.onclick = () => {
+    if (freezer.frozen) {
+      window.unfreeze();
+    } else {
+      window.freeze();
+    }
+    freezer.frozen = !freezer.frozen;
+  };
+  document.body.appendChild(freezer);
 
   // 测试数据定义
   const mockData = {
