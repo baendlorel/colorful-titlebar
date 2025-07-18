@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${Panel.title}</title>
-  <script consts="常量套组">
+  <script purpose="常量套组">
     const isProd = '${env}' === 'prod';
     const lang = '${configs.lang}';
     const configs = {
@@ -13,15 +13,16 @@
       showSuggest: '${configs.showSuggest}' === 'true',
       workbenchCssPath: '${configs.workbenchCssPath}',
       hashSource: '${configs.hashSource}',
-      gradientBrightness: '${configs.gradientBrightness}',
-      gradientDarkness: '${configs.gradientDarkness}',
-      currentColor: '${configs.currentColor}',
-      projectIndicators: '${configs.projectIndicators}',
+      gradientBrightness: '${gradientBrightness}',
+      gradientDarkness: '${gradientDarkness}',
+      currentColor: '${currentColor}',
+      projectIndicators: '${projectIndicators}',
       lightThemeColors: '${lightThemeColors}',
       darkThemeColors: '${darkThemeColors}',
     }
   </script>
-  <script>
+
+  <script purpose="加载css">
     function loadCss() {
       const css = document.createElement('link');
       css.href = isProd ? '${cssUri}' : './style.css';
@@ -121,7 +122,9 @@
             <option value="${GradientStyle.BrightLeft}">
               ${Panel.gradient[GradientStyle.BrightLeft]}
             </option>
-            <option value="${GradientStyle.ArcLeft}">${Panel.gradient[GradientStyle.ArcLeft]}</option>
+            <option value="${GradientStyle.ArcLeft}">${
+              Panel.gradient[GradientStyle.ArcLeft]
+              }</option>
           </select>
         </div>
         <div class="control-error" name="gradient"></div>
@@ -188,7 +191,9 @@
                 ${Panel.randomColor.pure}
               </button>
               <!--control-input 不需要，因为这个按钮是靠选颜色来变更的-->
-              <button type="button" class="dropdown-item color-picker" title="${Panel.randomColor.specify}" name="randomColor.specify">
+              <button type="button" class="dropdown-item color-picker" title="${
+                Panel.randomColor.specify
+              }" name="randomColor.specify">
                 <span>&nbsp;&nbsp;${Panel.randomColor.specify}</span>
                 <input type="color" class="control-input" name="randomColor.specify">
               </button>
@@ -234,7 +239,9 @@
               <span class="palette-hint">${Panel.themeColors.dragHint}</span>
             </div>
             <div class="color-list">
-              <button type="button" class="palette-add-color" title="${Panel.themeColors.addColor}">+</button>
+              <button type="button" class="palette-add-color" title="${
+                Panel.themeColors.addColor
+              }">+</button>
             </div>
           </div>
           <div class="palette" name="darkThemeColors">
@@ -243,7 +250,9 @@
               <span class="palette-hint">${Panel.themeColors.dragHint}</span>
             </div>
             <div class="color-list">
-              <button type="button" class="palette-add-color" title="${Panel.themeColors.addColor}">+</button>
+              <button type="button" class="palette-add-color" title="${
+                Panel.themeColors.addColor
+              }">+</button>
             </div>
           </div>
         </div>
@@ -253,10 +262,10 @@
     </form>
   </div>
 
-  <script>
+  <script purpose="加载js">
     function loadJS() {
       const script = document.createElement('script');
-      script.src = isProd ? '${scriptUri}' : './main.js';
+      script.src = isProd ? '${scriptUri}' : './control-panel.js';
       document.body.appendChild(script);
     }
     loadJS();
