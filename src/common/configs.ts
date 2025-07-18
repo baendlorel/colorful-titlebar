@@ -2,7 +2,7 @@ import vscode from 'vscode';
 
 import { Consts, HashSource, TitleBarConsts } from './consts';
 
-const enum Prop {
+export const enum ConfigProp {
   CurrentVersion = 'currentVersion',
   ShowSuggest = 'showSuggest',
   LightThemeColors = 'lightThemeColors',
@@ -70,7 +70,7 @@ class Config {
         colors = Defaults.LightThemeColors.split(';');
         break;
     }
-    return Config.self.get<string[]>(Prop.DarkThemeColors, colors);
+    return Config.self.get<string[]>(ConfigProp.DarkThemeColors, colors);
   }
 
   // # 全局的设定
@@ -119,46 +119,46 @@ class Config {
 
   // # 本插件的设定
 
-  get [Prop.CurrentVersion]() {
-    return Config.self.get<string>(Prop.CurrentVersion, 'outdated');
+  get [ConfigProp.CurrentVersion]() {
+    return Config.self.get<string>(ConfigProp.CurrentVersion, 'outdated');
   }
 
-  get [Prop.ShowSuggest]() {
-    return Config.self.get<boolean>(Prop.ShowSuggest, true);
+  get [ConfigProp.ShowSuggest]() {
+    return Config.self.get<boolean>(ConfigProp.ShowSuggest, true);
   }
 
-  get [Prop.ProjectIndicators]() {
+  get [ConfigProp.ProjectIndicators]() {
     const list = Defaults.ProjectIndicators.split(';');
     // * 此处配置和package.json保持一致
-    return Config.self.get<string[]>(Prop.ProjectIndicators, list);
+    return Config.self.get<string[]>(ConfigProp.ProjectIndicators, list);
   }
 
-  get [Prop.LightThemeColors]() {
+  get [ConfigProp.LightThemeColors]() {
     const list = Defaults.LightThemeColors.split(';');
     // * 此处配置和package.json保持一致
-    return Config.self.get<string[]>(Prop.LightThemeColors, list);
+    return Config.self.get<string[]>(ConfigProp.LightThemeColors, list);
   }
 
-  get [Prop.DarkThemeColors]() {
+  get [ConfigProp.DarkThemeColors]() {
     const list = Defaults.DarkThemeColors.split(';');
     // * 此处配置和package.json保持一致
-    return Config.self.get<string[]>(Prop.DarkThemeColors, list);
+    return Config.self.get<string[]>(ConfigProp.DarkThemeColors, list);
   }
 
-  get [Prop.HashSource]() {
-    return Config.self.get<number>(Prop.HashSource, HashSource.ProjectName);
+  get [ConfigProp.HashSource]() {
+    return Config.self.get<number>(ConfigProp.HashSource, HashSource.ProjectName);
   }
 
-  get [Prop.WorkbenchCssPath]() {
-    return Config.self.get<string>(Prop.WorkbenchCssPath, '');
+  get [ConfigProp.WorkbenchCssPath]() {
+    return Config.self.get<string>(ConfigProp.WorkbenchCssPath, '');
   }
 
-  get [Prop.GradientBrightness]() {
-    return Config.self.get<number>(Prop.GradientBrightness, Defaults.GradientBrightness);
+  get [ConfigProp.GradientBrightness]() {
+    return Config.self.get<number>(ConfigProp.GradientBrightness, Defaults.GradientBrightness);
   }
 
-  get [Prop.GradientDarkness]() {
-    return Config.self.get<number>(Prop.GradientDarkness, Defaults.GradientDarkness);
+  get [ConfigProp.GradientDarkness]() {
+    return Config.self.get<number>(ConfigProp.GradientDarkness, Defaults.GradientDarkness);
   }
 
   private static refresh() {
@@ -166,48 +166,72 @@ class Config {
   }
 
   readonly set = {
-    async [Prop.CurrentVersion](value: string) {
-      await Config.self.update(Prop.CurrentVersion, value, vscode.ConfigurationTarget.Global);
+    async [ConfigProp.CurrentVersion](value: string) {
+      await Config.self.update(ConfigProp.CurrentVersion, value, vscode.ConfigurationTarget.Global);
       Config.refresh();
     },
 
-    async [Prop.ShowSuggest](value: boolean) {
-      await Config.self.update(Prop.ShowSuggest, value, vscode.ConfigurationTarget.Global);
+    async [ConfigProp.ShowSuggest](value: boolean) {
+      await Config.self.update(ConfigProp.ShowSuggest, value, vscode.ConfigurationTarget.Global);
       Config.refresh();
     },
 
-    async [Prop.HashSource](value: HashSource) {
-      await Config.self.update(Prop.HashSource, value, vscode.ConfigurationTarget.Global);
+    async [ConfigProp.HashSource](value: HashSource) {
+      await Config.self.update(ConfigProp.HashSource, value, vscode.ConfigurationTarget.Global);
       Config.refresh();
     },
 
-    async [Prop.WorkbenchCssPath](value: string) {
-      await Config.self.update(Prop.WorkbenchCssPath, value, vscode.ConfigurationTarget.Global);
+    async [ConfigProp.WorkbenchCssPath](value: string) {
+      await Config.self.update(
+        ConfigProp.WorkbenchCssPath,
+        value,
+        vscode.ConfigurationTarget.Global
+      );
       Config.refresh();
     },
 
-    async [Prop.GradientBrightness](value: number) {
-      await Config.self.update(Prop.GradientBrightness, value, vscode.ConfigurationTarget.Global);
+    async [ConfigProp.GradientBrightness](value: number) {
+      await Config.self.update(
+        ConfigProp.GradientBrightness,
+        value,
+        vscode.ConfigurationTarget.Global
+      );
       Config.refresh();
     },
 
-    async [Prop.GradientDarkness](value: number) {
-      await Config.self.update(Prop.GradientDarkness, value, vscode.ConfigurationTarget.Global);
+    async [ConfigProp.GradientDarkness](value: number) {
+      await Config.self.update(
+        ConfigProp.GradientDarkness,
+        value,
+        vscode.ConfigurationTarget.Global
+      );
       Config.refresh();
     },
 
-    async [Prop.ProjectIndicators](value: string[]) {
-      await Config.self.update(Prop.ProjectIndicators, value, vscode.ConfigurationTarget.Global);
+    async [ConfigProp.ProjectIndicators](value: string[]) {
+      await Config.self.update(
+        ConfigProp.ProjectIndicators,
+        value,
+        vscode.ConfigurationTarget.Global
+      );
       Config.refresh();
     },
 
-    async [Prop.LightThemeColors](value: string[]) {
-      await Config.self.update(Prop.LightThemeColors, value, vscode.ConfigurationTarget.Global);
+    async [ConfigProp.LightThemeColors](value: string[]) {
+      await Config.self.update(
+        ConfigProp.LightThemeColors,
+        value,
+        vscode.ConfigurationTarget.Global
+      );
       Config.refresh();
     },
 
-    async [Prop.DarkThemeColors](value: string[]) {
-      await Config.self.update(Prop.DarkThemeColors, value, vscode.ConfigurationTarget.Global);
+    async [ConfigProp.DarkThemeColors](value: string[]) {
+      await Config.self.update(
+        ConfigProp.DarkThemeColors,
+        value,
+        vscode.ConfigurationTarget.Global
+      );
       Config.refresh();
     },
   };

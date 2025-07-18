@@ -6,14 +6,10 @@ export const enum ControlName {
   GradientDarkness = 'gradientDarkness',
   HashSource = 'hashSource',
   Refresh = 'refresh',
+  RandomColor = 'randomColor',
   'RandomColor.colorSet' = 'randomColor.colorSet',
   'RandomColor.pure' = 'randomColor.pure',
   'RandomColor.specify' = 'randomColor.specify',
   ProjectIndicators = 'projectIndicators',
   ThemeColors = 'themeColors',
-}
-
-export const enum ThemeSet {
-  LightThemeColors = 'lightThemeColors',
-  DarkThemeColors = 'darkThemeColors',
 }

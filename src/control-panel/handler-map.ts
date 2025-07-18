@@ -1,14 +1,14 @@
 import { existsSync } from 'node:fs';
 
 import { GradientStyle, HashSource } from '@/common/consts';
-import configs from '@/common/configs';
+import configs, { ConfigProp } from '@/common/configs';
 import i18n from '@/common/i18n';
 import RGBA from '@/common/rgba';
 import { getHashSource, getColor, getColorByK } from '@/core/colors';
 
 import { AfterStyle } from '@/features/gradient/consts';
 import hacker from '@/features/gradient/hacker';
-import { ControlName, ThemeSet } from './consts';
+import { ControlName } from './consts';
 import { HandelResult, PostedValue } from './types';
 import style from '@/core/style';
 
@@ -105,6 +105,9 @@ export const handlerMap = {
     await style.applyColor(color);
     result.msg = Panel.refresh.success(token, color.toString());
   },
+  [ControlName.RandomColor]: async (_result: HandelResult, _value: PostedValue) => {
+    throw new Error('RandomColor只是个标记，应该具体有颜色套组、纯粹、指定');
+  },
   [ControlName['RandomColor.colorSet']]: async (_result: HandelResult, _value: PostedValue) => {
     const color = getColorByK(Math.random());
     await style.applyColor(color);
@@ -133,7 +136,7 @@ export const handlerMap = {
       .filter(Boolean);
     await configs.set.projectIndicators(indicators);
   },
-  [ControlName.ThemeColors]: async (result: HandelResult, value: Record<ThemeSet, string[]>) => {
+  [ControlName.ThemeColors]: async (result: HandelResult, value: Record<string, string[]>) => {
     if (typeof value !== 'object' || value === null) {
       result.succ = false;
       result.msg = Panel.typeError(value, 'an object');
@@ -142,8 +145,8 @@ export const handlerMap = {
     // const vscode = await import('vscode');
     // vscode.window.showInformationMessage('调色板变化' + JSON.stringify(value));
 
-    const light = value[ThemeSet.LightThemeColors];
-    const dark = value[ThemeSet.DarkThemeColors];
+    const light = value[ConfigProp.LightThemeColors];
+    const dark = value[ConfigProp.DarkThemeColors];
 
     // 必须至少有一个是正常的
     let validCount = 0;
