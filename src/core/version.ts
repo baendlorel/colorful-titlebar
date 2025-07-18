@@ -1,7 +1,6 @@
 import vscode from 'vscode';
-import { Consts } from '@/common/consts';
+import { Commands, Consts } from '@/common/consts';
 import i18n from '@/common/i18n';
-import controlPanel from './control-panel';
 import configs from '@/common/configs';
 
 class Version {
@@ -21,7 +20,9 @@ class Version {
         `🎉 ${Consts.DisplayName} ${i18n.Version.updated(actualVersion)}`
       );
       configs.set.currentVersion(actualVersion);
-      await controlPanel.call(context);
+
+      // 用执行命令的方式拉起，减少引入
+      vscode.commands.executeCommand(Commands.ControlPanel);
       return true;
     }
     return false;
