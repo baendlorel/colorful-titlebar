@@ -1222,31 +1222,31 @@
 
       <div class="control-item" style="grid-template-columns: 1fr 1.8fr;">
         <div class="control-label-group">
-          <div class="control-label">${Panel.colorPalette.label}</div>
-          <div class="control-desc">${Panel.colorPalette.description}</div>
+          <div class="control-label">${Panel.themePalette.label}</div>
+          <div class="control-desc">${Panel.themePalette.description}</div>
         </div>
         <div class="control-form" style="display: flex; flex-direction: column; gap: 8px;">
           <div class="palette" name="lightThemeColors">
             <div class="palette-label">
-              ${Panel.colorPalette.lightColors}
-              <span class="palette-hint">${Panel.colorPalette.dragHint}</span>
+              ${Panel.themePalette.lightColors}
+              <span class="palette-hint">${Panel.themePalette.dragHint}</span>
             </div>
             <div class="color-list">
-              <button type="button" class="palette-add-color" title="${Panel.colorPalette.addColor}">+</button>
+              <button type="button" class="palette-add-color" title="${Panel.themePalette.addColor}">+</button>
             </div>
           </div>
           <div class="palette" name="darkThemeColors">
             <div class="palette-label">
-              ${Panel.colorPalette.darkColors}
-              <span class="palette-hint">${Panel.colorPalette.dragHint}</span>
+              ${Panel.themePalette.darkColors}
+              <span class="palette-hint">${Panel.themePalette.dragHint}</span>
             </div>
             <div class="color-list">
-              <button type="button" class="palette-add-color" title="${Panel.colorPalette.addColor}">+</button>
+              <button type="button" class="palette-add-color" title="${Panel.themePalette.addColor}">+</button>
             </div>
           </div>
         </div>
-        <div class="control-error" name="colorPalette"></div>
-        <div class="control-succ" name="colorPalette"></div>
+        <div class="control-error" name="themePalette"></div>
+        <div class="control-succ" name="themePalette"></div>
       </div>
     </form>
   </div>
@@ -1491,14 +1491,14 @@
             const color = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
             const paletteItem = createPaletteItem(name, color);
             colorList.insertBefore(paletteItem, addButton);
-            onPaletteChange(name);
+            onPalettesChange(name);
           }
           // 如果点击的是删除按钮，那么删除这个色块
           else if (is(e, 'palette-remove-color')) {
             const removeButton = e.target;
             const paletteItem = removeButton.closest('.palette-item');
             paletteItem.remove();
-            onPaletteChange(name);
+            onPalettesChange(name);
           }
           // 如果点击的是色块，那么开始编辑它
           else if (is(e, 'palette-item')) {
@@ -1571,8 +1571,13 @@
       return $('.palette-input[belong="' + name + '"]').map((input) => input.value);
     }
 
-    function onPaletteChange(name) {
-      vspost({ name, value: getPaletteColors(name) });
+    // 这里要突出多个palette可能同时变化的情况
+    function onPalettesChange(...names) {
+      const value = {};
+      for (const name of names) {
+        value[name] = getPaletteColors(name);
+      }
+      vspost({ name: 'palettesChange', value });
     }
 
     // 拖拽功能
@@ -1635,14 +1640,13 @@
         const newBelong = palette.getAttribute('name');
         const belong = draggedElement.getAttribute('belong');
         if (belong === newBelong) {
-          onPaletteChange(belong);
+          onPalettesChange(belong);
         } else {
           // 顺序不能错，必须先设定新belong再触发change，否则change里面获取input的时结果还是旧的
           draggedElement.setAttribute('belong', newBelong);
           const colorInput = draggedElement.querySelector('.palette-input');
           colorInput.setAttribute('belong', newBelong);
-          onPaletteChange(belong);
-          onPaletteChange(newBelong);
+          onPalettesChange(belong, newBelong);
         }
       }
 

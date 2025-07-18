@@ -200,6 +200,16 @@ class Config {
       await Config.self.update(Prop.ProjectIndicators, value, vscode.ConfigurationTarget.Global);
       Config.refresh();
     },
+
+    async [Prop.LightThemeColors](value: string[]) {
+      await Config.self.update(Prop.LightThemeColors, value, vscode.ConfigurationTarget.Global);
+      Config.refresh();
+    },
+
+    async [Prop.DarkThemeColors](value: string[]) {
+      await Config.self.update(Prop.DarkThemeColors, value, vscode.ConfigurationTarget.Global);
+      Config.refresh();
+    },
   };
 }
 

@@ -19,7 +19,7 @@ export default (() => {
       title: '设置',
       description: '在这里可以控制标题栏颜色和样式',
       loading: '更新中...',
-      typeError: (value: string | number | boolean, shouldBe?: string) =>
+      typeError: (value: unknown, shouldBe?: string) =>
         `值或值类型无效，得到的是${value}(${typeof value})${shouldBe ? '，应该是' + shouldBe : ''}`,
       success: '保存成功',
       showSuggest: {
@@ -75,6 +75,17 @@ export default (() => {
       projectIndicators: {
         label: '项目指示器',
         description: `含有这些文件的文件夹会计算标题栏颜色`,
+      },
+      themePalette: {
+        label: '颜色套组',
+        description: '编辑亮色和暗色主题的颜色套组，用于计算颜色生成。颜色的顺序会影响计算出的颜色',
+        lightColors: '亮色套组',
+        darkColors: '暗色套组',
+        addColor: '添加颜色',
+        removeColor: '删除',
+        dragHint: '拖拽重新排序',
+        emptyPalette: '至少得有1个颜色',
+        allSaved: '全都保存完成',
       },
     },
 
@@ -154,7 +165,7 @@ export default (() => {
       description: 'Control titlebar color and style here',
       loading: 'Updating...',
       success: 'Saved successfully',
-      typeError: (value: string | number | boolean, shouldBe?: string) =>
+      typeError: (value: unknown, shouldBe?: string) =>
         `Invalid value or value type, got ${value}(${typeof value})${
           shouldBe ? '. Should be ' + shouldBe : ''
         }`,
@@ -213,6 +224,18 @@ export default (() => {
       projectIndicators: {
         label: 'Project Indicators',
         description: `Folders containing these files will have their titlebar color calculated`,
+      },
+      themePalette: {
+        label: 'Color Palette',
+        description:
+          'Edit light and dark theme color sets for random color functionality. Order of the colors will affect the generated results',
+        lightColors: 'Light Colors',
+        darkColors: 'Dark Colors',
+        addColor: 'Add Color',
+        removeColor: 'Remove',
+        dragHint: 'Drag to reorder',
+        emptyPalette: 'Should add at least 1 color',
+        allSaved: 'All color sets are saved',
       },
     },
 

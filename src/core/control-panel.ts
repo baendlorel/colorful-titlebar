@@ -23,9 +23,13 @@ const enum ControlName {
   'RandomColor.colorSet' = 'randomColor.colorSet',
   'RandomColor.pure' = 'randomColor.pure',
   'RandomColor.specify' = 'randomColor.specify',
+  ProjectIndicators = 'projectIndicators',
+  PalettesChange = 'palettesChange',
+}
+
+const enum ThemeSet {
   LightThemeColors = 'lightThemeColors',
   DarkThemeColors = 'darkThemeColors',
-  ProjectIndicators = 'projectIndicators',
 }
 
 interface HandelResult {
@@ -147,8 +151,6 @@ const handlerMap = {
     }
     await applyManualColor(value);
   },
-  [ControlName.LightThemeColors]: async (result: HandelResult, value: PostedValue) => {},
-  [ControlName.DarkThemeColors]: async (result: HandelResult, value: PostedValue) => {},
   [ControlName.ProjectIndicators]: async (result: HandelResult, value: PostedValue) => {
     if (typeof value !== 'string') {
       result.succ = false;
@@ -160,6 +162,42 @@ const handlerMap = {
       .map((item) => item.trim())
       .filter(Boolean);
     await configs.set.projectIndicators(indicators);
+  },
+  [ControlName.PalettesChange]: async (result: HandelResult, value: Record<ThemeSet, string[]>) => {
+    if (typeof value !== 'object' || value === null) {
+      result.succ = false;
+      result.msg = Panel.typeError(value, 'an object');
+      throw null;
+    }
+    const light = value[ThemeSet.LightThemeColors];
+    const dark = value[ThemeSet.DarkThemeColors];
+    // 必须至少有一个是正常的
+    let validCount = 0;
+    if (Array.isArray(light)) {
+      if (light.length === 0) {
+        result.succ = false;
+        result.msg = Panel.themePalette.emptyPalette;
+        throw null;
+      }
+      validCount++;
+      await configs.set.lightThemeColors(light);
+    }
+    if (Array.isArray(dark)) {
+      if (dark.length === 0) {
+        result.succ = false;
+        result.msg = Panel.themePalette.emptyPalette;
+        throw null;
+      }
+      validCount++;
+      await configs.set.darkThemeColors(dark);
+    }
+    if (validCount === 0) {
+      result.succ = false;
+      result.msg = Panel.typeError(value, 'an object with arrays');
+      throw null;
+    } else if (validCount === 2) {
+      result.msg = Panel.themePalette.allSaved;
+    }
   },
 };
 
@@ -251,7 +289,7 @@ export default async function (this: vscode.ExtensionContext) {
       position: relative;
       padding: 30px;
       width: 100%;
-      max-width: 540px;
+      max-width: 560px;
       background-color: var(--ct-panel-bg);
       border-radius: 16px;
       box-shadow: 0 10px 30px var(--ct-shadow-color);
@@ -332,9 +370,15 @@ export default async function (this: vscode.ExtensionContext) {
     }
 
 
+    .control-item-double {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 20px;
+    }
+
     .control-item {
       display: grid;
-      grid-template-columns: 1fr 210px;
+      grid-template-columns: 1fr 1fr;
       grid-template-rows: auto auto auto;
       column-gap: 20px;
       margin-bottom: 10px;
@@ -354,7 +398,7 @@ export default async function (this: vscode.ExtensionContext) {
       color: var(--ct-text-color-weak);
     }
 
-    .control-input-group {
+    .control-form {
       display: flex;
       align-items: center;
       font-family: Arial, Helvetica, sans-serif;
@@ -506,6 +550,18 @@ export default async function (this: vscode.ExtensionContext) {
       cursor: pointer;
     }
 
+    .input-percent {
+      position: relative;
+    }
+
+    .input-percent::after {
+      position: absolute;
+      content: '%';
+      right: 8px;
+      margin-top: 0px;
+      color: var(--ct-text-color-weak);
+    }
+
     .input-percent input[type="number"] {
       position: relative;
       width: 75px;
@@ -516,14 +572,6 @@ export default async function (this: vscode.ExtensionContext) {
     .input-percent input[type="number"]::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
-    }
-
-    .input-percent::after {
-      position: absolute;
-      content: '%';
-      right: 40px;
-      margin-top: -2px;
-      color: var(--ct-text-color-weak);
     }
 
     textarea,
@@ -685,6 +733,132 @@ export default async function (this: vscode.ExtensionContext) {
       height: 100%;
       opacity: 0;
       cursor: pointer;
+    }
+  </style>
+
+  <style category="颜色套组编辑器样式">
+    /* 颜色套组编辑器样式 */
+    .palette {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .palette-label {
+      font-weight: 500;
+      color: var(--ct-text-color);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .palette-hint {
+      font-size: 11px;
+      color: var(--ct-text-color-weak);
+      font-weight: normal;
+    }
+
+    .color-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 48px;
+      padding: 8px;
+      border: 2px dashed var(--ct-border-color);
+      border-radius: 8px;
+      background-color: rgba(0, 0, 0, 0.02);
+      transition: border-color 0.3s ease;
+    }
+
+    [theme="dark"] .color-list {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .color-list.drag-over {
+      border-color: var(--ct-primary);
+      background-color: rgba(34, 109, 231, 0.1);
+    }
+
+    .palette-item {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .palette-item:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .palette-item.dragging {
+      opacity: 0.5;
+      transform: rotate(5deg);
+    }
+
+    .palette-item .palette-remove-color {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 16px;
+      height: 16px;
+      background-color: var(--ct-danger);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 10px;
+      line-height: 1;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .palette-item:hover .palette-remove-color {
+      opacity: 1;
+    }
+
+    .palette-item .palette-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .palette-add-color {
+      width: 32px;
+      height: 32px;
+      border: 2px dashed var(--ct-border-color);
+      background: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ct-text-color-weak);
+      font-size: 18px;
+      transition: all 0.2s ease;
+    }
+
+    .palette-add-color:hover {
+      border-color: var(--ct-primary);
+      color: var(--ct-primary);
+      background-color: rgba(34, 109, 231, 0.1);
     }
   </style>
   <style category="theme-switch">
@@ -1090,15 +1264,16 @@ export default async function (this: vscode.ExtensionContext) {
     <form id="settings" class="control-panel">
       <div class="header">
         <div>
-          <h1><span class="colorful-title">${
-            Consts.DisplayName
-          }</span><span class="version">v${version.get(this)}</span></h1>
+          <h1>
+            <span class="colorful-title">${Consts.DisplayName}</span>
+            <span class="version">v${version.get(this)}</span>
+          </h1>
           <p>by<a href="https://github.com/baendlorel">Kasukabe Tsumugi</a></p>
           <p>${Panel.description}</p>
         </div>
         <div>
           <label for="theme" class="kskb-theme-switch">
-            <input type="checkbox" id="theme" name="theme" class="control-input kskb-dummy">
+            <input type="checkbox" id="theme" name="theme" class="kskb-dummy">
             <div class="kskb-moon">
               <div class="kskb-icon"></div>
             </div>
@@ -1126,7 +1301,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.showSuggest.label}</div>
           <div class="control-desc">${Panel.showSuggest.description}</div>
         </div>
-        <div class="control-input-group">
+        <div class="control-form">
           <label class="toggle-switch">
             <input type="checkbox" class="control-input" name="showSuggest">
             <span class="slider"></span>
@@ -1141,7 +1316,7 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.workbenchCssPath.label}</div>
           <div class="control-desc">${Panel.workbenchCssPath.description}</div>
         </div>
-        <div class="control-input-group">
+        <div class="control-form">
           <textarea class="control-input textarea" name="workbenchCssPath"></textarea>
         </div>
         <div class="control-error" name="workbenchCssPath"></div>
@@ -1153,8 +1328,8 @@ export default async function (this: vscode.ExtensionContext) {
           <label class="control-label">${Panel.gradient.label}</label>
           <div class="control-desc">${Panel.gradient.description}</div>
         </div>
-        <div class="control-input-group">
-          <select name="gradient" class="control-input select">
+        <div class="control-form">
+          <select class="control-input select" name="gradient">
             <option value="" selected>${Panel.gradient.empty}</option>
             <option value="${GradientStyle.BrightCenter}">
               ${Panel.gradient[GradientStyle.BrightCenter]}
@@ -1171,28 +1346,30 @@ export default async function (this: vscode.ExtensionContext) {
         <div class="control-succ" name="gradient"></div>
       </div>
 
-      <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.gradientBrightness.label}</div>
-          <div class="control-desc">${Panel.gradientBrightness.description}</div>
+      <div class="control-item-double">
+        <div class="control-item" style="grid-template-columns: 1fr auto;">
+          <div class="control-label-group">
+            <div class="control-label">${Panel.gradientBrightness.label}</div>
+            <div class="control-desc">${Panel.gradientBrightness.description}</div>
+          </div>
+          <div class="control-form input-percent">
+            <input type="number" min="0" max="100" step="5" class="control-input" name="gradientBrightness" />
+          </div>
+          <div class="control-error" name="gradientBrightness"></div>
+          <div class="control-succ" name="gradientBrightness"></div>
         </div>
-        <div class="control-input-group input-percent">
-          <input type="number" min="0" max="100" step="5" class="control-input" name="gradientBrightness" />
-        </div>
-        <div class="control-error" name="gradientBrightness"></div>
-        <div class="control-succ" name="gradientBrightness"></div>
-      </div>
 
-      <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.gradientDarkness.label}</div>
-          <div class="control-desc">${Panel.gradientDarkness.description}</div>
+        <div class="control-item" style="grid-template-columns: 1fr auto;">
+          <div class="control-label-group">
+            <div class="control-label">${Panel.gradientDarkness.label}</div>
+            <div class="control-desc">${Panel.gradientDarkness.description}</div>
+          </div>
+          <div class="control-form input-percent">
+            <input type="number" min="0" max="100" step="5" class="control-input" name="gradientDarkness" />
+          </div>
+          <div class="control-error" name="gradientDarkness"></div>
+          <div class="control-succ" name="gradientDarkness"></div>
         </div>
-        <div class="control-input-group input-percent">
-          <input type="number" min="0" max="100" step="5" class="control-input" name="gradientDarkness" />
-        </div>
-        <div class="control-error" name="gradientDarkness"></div>
-        <div class="control-succ" name="gradientDarkness"></div>
       </div>
 
       <div class="control-item">
@@ -1200,8 +1377,8 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.hashSource.label}</div>
           <div class="control-desc">${Panel.hashSource.description}</div>
         </div>
-        <div class="control-input-group">
-          <select name="hashSource" class="control-input select">
+        <div class="control-form">
+          <select class="control-input select" name="hashSource">
             <option value="${HashSource.ProjectName}">
               ${Panel.hashSource[HashSource.ProjectName]}
             </option>
@@ -1220,18 +1397,19 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.randomColor.label}</div>
           <div class="control-desc">${Panel.randomColor.description}</div>
         </div>
-        <div class="control-input-group">
+        <div class="control-form">
           <div class="dropdown">
             <button type="button" class="dropdown-button" tabindex="0">
               ${Panel.randomColor.label}
             </button>
             <div class="dropdown-menu">
-              <button type="button" class="dropdown-item" name="randomColor.colorSet">
+              <button type="button" class="control-input dropdown-item" name="randomColor.colorSet">
                 ${Panel.randomColor.colorSet}
               </button>
-              <button type="button" class="dropdown-item" name="randomColor.pure">
+              <button type="button" class="control-input dropdown-item" name="randomColor.pure">
                 ${Panel.randomColor.pure}
               </button>
+              <!--control-input 不需要，因为这个按钮是靠选颜色来变更的-->
               <button type="button" class="dropdown-item color-picker" title="${
                 Panel.randomColor.specify
               }" name="randomColor.specify">
@@ -1250,8 +1428,8 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.refresh.label}</div>
           <div class="control-desc">${Panel.refresh.description}</div>
         </div>
-        <div class="control-input-group">
-          <button type="button" class="control-button" name="refresh">
+        <div class="control-form">
+          <button type="button" class="control-input control-button" name="refresh">
             <span>${Panel.refresh.button}</span>
           </button>
         </div>
@@ -1264,97 +1442,137 @@ export default async function (this: vscode.ExtensionContext) {
           <div class="control-label">${Panel.projectIndicators.label}</div>
           <div class="control-desc">${Panel.projectIndicators.description}</div>
         </div>
-        <div class="control-input-group">
+        <div class="control-form">
           <textarea class="control-input textarea" name="projectIndicators"></textarea>
         </div>
         <div class="control-error" name="projectIndicators"></div>
         <div class="control-succ" name="projectIndicators"></div>
       </div>
+
+      <div class="control-item" style="grid-template-columns: 1fr 1.8fr;">
+        <div class="control-label-group">
+          <div class="control-label">${Panel.themePalette.label}</div>
+          <div class="control-desc">${Panel.themePalette.description}</div>
+        </div>
+        <div class="control-form" style="display: flex; flex-direction: column; gap: 8px;">
+          <div class="palette" name="lightThemeColors">
+            <div class="palette-label">
+              ${Panel.themePalette.lightColors}
+              <span class="palette-hint">${Panel.themePalette.dragHint}</span>
+            </div>
+            <div class="color-list">
+              <button type="button" class="palette-add-color" title="${
+                Panel.themePalette.addColor
+              }">+</button>
+            </div>
+          </div>
+          <div class="palette" name="darkThemeColors">
+            <div class="palette-label">
+              ${Panel.themePalette.darkColors}
+              <span class="palette-hint">${Panel.themePalette.dragHint}</span>
+            </div>
+            <div class="color-list">
+              <button type="button" class="palette-add-color" title="${
+                Panel.themePalette.addColor
+              }">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="control-error" name="themePalette"></div>
+        <div class="control-succ" name="themePalette"></div>
+      </div>
     </form>
   </div>
 
   <script>
-    {
-      const isProd = '${env}' === 'prod';
+    const isProd = '${env}' === 'prod';
 
-      // functions
-      const vspost = (() => {
-        let o = isProd ? acquireVsCodeApi() : {
-          postMessage: (a) => console.log('vscode.postMessage', a)
-        };
-        return function (data) {
-          freeze();
-          o.postMessage({
-            from: 'colorful-titlebar',
-            ...data
-          });
-        }
-      })();
+    function s(...strings) {
+      return ''.concat(...strings);
+    }
 
-      const theme = () => {
-        const body = document.querySelector('.body');
-        const currentTheme = body.getAttribute('theme');
-        body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
+    /**
+     * 默认查找的是输入元素，可以指定查找类型
+     * - 如果用#开头，那么以它是元素id来继续搜索
+     * @type {(name: string, tp: 'input' | 'button' | 'error' | 'succ' ) => HTMLElement}
+     */
+    function find(name, tp = 'input') {
+      if (name.startsWith('#')) {
+        return document.querySelector(name);
       }
+      switch (tp) {
+        case 'succ':
+          return document.querySelector(s('.control-succ[name="', name, '"]'));
+        case 'error':
+          return document.querySelector(s('.control-error[name="', name, '"]'));
+        case 'button':
+          return document.querySelector(s('button[name="', name, '"]', ',.control-button[name="', name, '"]'));
+        case 'input':
+        default:
+          return document.querySelector(s('.control-input[name="', name, '"]'))
+      }
+    }
 
-      /**
-       * 默认查找的是输入元素，可以指定查找类型
-       * @param {string} name - 元素的 name 属性
-       * @param {string} tp - 元素类型：input | button | error | succ
-       */
-      const find = (name, tp = 'input') => {
-        switch (tp) {
-          case 'succ':
-            return document.querySelector(['.control-succ[name="', name, '"]'].join(''));
-          case 'error':
-            return document.querySelector(['.control-error[name="', name, '"]'].join(''));
-          case 'button':
-            return document.querySelector(['button[name="', name, '"]', ',.control-button[name="', name, '"]'].join(''));
-          case 'input':
-          default:
-            return document.querySelector(['.control-input[name="', name, '"]'].join(''))
-        }
+    /**
+     * @type {(selectors: keyof HTMLElementTagNameMap)=>HTMLElement[]}
+     */
+    function $(...args) {
+      return Array.from(document.querySelectorAll(...args));
+    }
+
+    /**
+     * @type {(data: { name: string, value: any } ) => void}
+     */
+    function vspost(data) {
+      let o = isProd ? acquireVsCodeApi() : {
+        postMessage: (a) => console.log('vscode.postMessage', a)
       };
+      freeze();
+      o.postMessage({
+        from: 'colorful-titlebar',
+        ...data
+      });
+    }
 
-      const i18n = (() => {
-        const zh = {
-          NumberLimit: (min, max, isInt = true) => ['请输入', min, '到', max, '之间的', isInt ? '整数' : '数'].join('')
-        }
-        const en = {
-          NumberLimit: (min, max, isInt = true) => ['Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max].join(' ')
-        }
-        switch ('${configs.lang}') {
-          case 'zh':
-            return zh;
-          case 'en':
-            return en;
-          default:
-            return zh;
-        }
-      })()
-
-      /**
-       * @type {HTMLFormElement} 
-       */
-      const settings = document.getElementById('settings');
-      const formInputs = Array.from(settings.elements);
-
-      const freeze = () => {
-        document.querySelectorAll('.control-error,.control-succ').forEach(el => el.textContent = '');
-        if (isProd) {
-          settings.classList.add('freeze');
-          formInputs.forEach((el) => el.disabled = true);
-        }
+    const i18n = (function () {
+      const zh = {
+        NumberLimit: (min, max, isInt = true) => s('请输入', min, '到', max, '之间的', isInt ? '整数' : '数')
       }
-
-      const unfreeze = () => {
-        setTimeout(() => settings.classList.remove('freeze'), 200);
-        formInputs.forEach((el) => el.disabled = false)
+      const en = {
+        NumberLimit: (min, max, isInt = true) => s('Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max)
       }
+      switch ('${configs.lang}') {
+        case 'zh':
+          return zh;
+        case 'en':
+          return en;
+        default:
+          return zh;
+      }
+    })();
 
-      // init
+    /**
+     * @type {HTMLFormElement} 
+     */
+    function freeze() {
+      $('.control-error,.control-succ').forEach(el => el.textContent = '');
       if (isProd) {
-        find('theme').checked = "${configs.theme}" === 'light';
+        find('#settings').classList.add('freeze');
+        $('.control-input').forEach((el) => el.disabled = true);
+      }
+    }
+
+    function unfreeze() {
+      setTimeout(() => find('#settings').classList.remove('freeze'), 200);
+      $('.control-input').forEach((el) => el.disabled = false)
+    }
+
+    /**
+     * # init 
+     */
+    function initSettingsValue() {
+      if (isProd) {
+        document.getElementById('theme').checked = "${configs.theme}" === 'light';
         find('showSuggest').checked = '${configs.showSuggest}' === 'true';
         find('workbenchCssPath').value = '${configs.workbenchCssPath}';
         find('hashSource').value = '${configs.hashSource}';
@@ -1367,7 +1585,7 @@ export default async function (this: vscode.ExtensionContext) {
         const testScript = document.createElement('script');
         testScript.src = './template-replacer.js';
         document.body.appendChild(testScript);
-        find('theme').checked = true;
+        document.getElementById('theme').checked = true;
         find('showSuggest').checked = false;
         find('workbenchCssPath').value = '/d/work/ddddddddddd/fffffffff/44444444/222222222/44444444/aaa.css';
         find('hashSource').value = '';
@@ -1377,53 +1595,15 @@ export default async function (this: vscode.ExtensionContext) {
         find('randomColor.specify').value = '#EE7ACC';
         find('projectIndicators').value = '.git;Cargo.toml;README.md;package.json;pom.xml;build.gradle;Makefile';
       }
+    }
 
-      // 初始化主题切换器
-      find('theme').addEventListener('change', theme);
-
-      // 初始化所有textarea
-      Array.from(document.querySelectorAll('textarea')).forEach((textarea) => {
-        textarea.addEventListener('input', (event) => {
-          textarea.style.height = 'auto';
-          textarea.style.height = textarea.scrollHeight + 'px';
-        });
-        textarea.style.height = 'auto';
-        textarea.style.height = textarea.scrollHeight + 'px';
-      });
-
-
-      // 初始化所有颜色选择器
-      Array.from(document.querySelectorAll('button.color-picker')).forEach((picker) => {
-        const colorInput = picker.querySelector('input[type="color"]');
-        colorInput.addEventListener('input', () => {
-          const [r, g, b] = colorInput.value
-            .replace('#', '')
-            .match(/.{2}/g)
-            .map((hex) => parseInt(hex, 16));
-          const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
-          picker.style.color = brightness > 128 ? '#000' : '#fff';
-          picker.style.backgroundColor = colorInput.value
-        });
-        picker.addEventListener('click', colorInput.click.bind(colorInput));
-
-      });
-
-      // 要推送到插件的事件
-      ['randomColor.colorSet', 'randomColor.pure', 'refresh'].forEach((name) => {
-        const button = find(name, 'button');
-        if (button) {
-          button.onclick = () => vspost({ name, value: find(name)?.value });
-        }
-      });
-
-      settings.addEventListener('change', function (event) {
-        event.preventDefault();
+    function initSettingsChangeEvents() {
+      // 要推送到插件的输入变更事件
+      find('#settings').addEventListener('change', (event) => {
+        /**
+         * @type {HTMLInputElement} 
+         */
         const input = event.target;
-        // 控制面板的主题变更不需要推送给插件
-        if (input.name === 'theme') {
-          return;
-        }
-
         const data = {
           name: input.name,
           value: input.value
@@ -1445,9 +1625,18 @@ export default async function (this: vscode.ExtensionContext) {
           data.value = value;
         } else if (input.type === 'checkbox') {
           data.value = input.checked;
+        } else if (input.classList.contains('palette-input')) {
+          // 已经在初始化调色盘的地方处理过了
+          return;
         }
 
         vspost(data);
+      });
+
+      // 要推送到插件的按钮点击事件
+      $('button.control-input[name]').forEach((button) => {
+        const name = button.getAttribute('name');
+        find(name, 'button').onclick = () => vspost({ name, value: null });
       });
 
       // 插件回馈的结果
@@ -1472,7 +1661,236 @@ export default async function (this: vscode.ExtensionContext) {
           }
         }
       });
-    } 
+    }
+
+    function initSimpleInputs() {
+      // 初始化主题切换器
+      document.getElementById('theme').addEventListener('change', function () {
+        const body = document.querySelector('.body');
+        const currentTheme = body.getAttribute('theme');
+        body.setAttribute('theme', currentTheme === 'dark' ? 'light' : 'dark');
+      });
+
+      // 初始化所有textarea
+      $('textarea').forEach((textarea) => {
+        textarea.addEventListener('input', function (event) {
+          textarea.style.height = 'auto';
+          textarea.style.height = textarea.scrollHeight + 'px';
+        });
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+      });
+
+      // 初始化单独的颜色选择器
+      $('button.color-picker').forEach((picker) => {
+        const colorInput = picker.querySelector('input[type="color"]');
+        colorInput.addEventListener('input', function () {
+          const [r, g, b] = colorInput.value
+            .replace('#', '')
+            .match(/.{2}/g)
+            .map((hex) => parseInt(hex, 16));
+          const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
+          picker.style.color = brightness > 128 ? '#000' : '#fff';
+          picker.style.backgroundColor = colorInput.value;
+          picker.title = colorInput.value;
+        });
+        picker.addEventListener('click', colorInput.click.bind(colorInput));
+        picker.title = colorInput.value;
+      });
+    }
+
+    /**
+     * # 颜色套组编辑器
+     */
+    function initColorPalette() {
+      $('.palette').forEach((palette) => {
+
+        const name = palette.getAttribute('name');
+        // 因为color-list的元素是不断变化的，因此事件只能注册在div上
+        const colorList = palette.querySelector('.color-list');
+
+        function is(e, className) {
+          return e.target.classList.contains(className);
+        }
+
+        palette.addEventListener('change', () => {
+          vspost({ name, value: getPaletteColors(name) });
+        });
+
+        colorList.addEventListener('click', (e) => {
+          // 如果点击了添加按钮，则添加新颜色
+          if (is(e, 'palette-add-color')) {
+            const addButton = e.target;
+            const color = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+            const paletteItem = createPaletteItem(name, color);
+            colorList.insertBefore(paletteItem, addButton);
+            onPalettesChange(name);
+          }
+          // 如果点击的是删除按钮，那么删除这个色块
+          else if (is(e, 'palette-remove-color')) {
+            const removeButton = e.target;
+            const paletteItem = removeButton.closest('.palette-item');
+            paletteItem.remove();
+            onPalettesChange(name);
+          }
+          // 如果点击的是色块，那么开始编辑它
+          else if (is(e, 'palette-item')) {
+            const paletteItem = e.target;
+            paletteItem.querySelector('.palette-input').click();
+          }
+        })
+      });
+
+      const lightColors = isProd ? '${lightThemeColors}'.split(';') : ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+      const darkColors = isProd ? '${darkThemeColors}'.split(';') : ['#E74C3C', '#1ABC9C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'];
+
+      renderColorList('lightThemeColors', lightColors);
+      renderColorList('darkThemeColors', darkColors);
+
+      // 添加事件监听器
+      $('.color-list').forEach((list) => {
+        list.addEventListener('dragstart', handleDragStart);
+        list.addEventListener('dragover', handleDragOver);
+        list.addEventListener('dragenter', handleDragEnter);
+        list.addEventListener('dragleave', handleDragLeave);
+        list.addEventListener('drop', handleDrop);
+      });
+    }
+
+    function renderColorList(name, colors) {
+      const palette = document.querySelector(s('.palette[name="', name, '"]'));
+      const colorList = palette.querySelector('.color-list');
+      const addBtn = palette.querySelector('.palette-add-color');
+
+      // 清空现有颜色项（保留添加按钮）
+      palette.querySelectorAll('.palette-item').forEach(item => item.remove());
+
+      // 添加颜色项
+      colors.forEach((color) => {
+        const colorItem = createPaletteItem(name, color);
+        colorList.insertBefore(colorItem, addBtn);
+      });
+    }
+
+    function createPaletteItem(name, color) {
+      const item = document.createElement('div');
+      item.className = 'palette-item';
+      item.style.backgroundColor = color;
+      item.title = color.toLowerCase();
+      item.draggable = true;
+      item.setAttribute('belong', name);
+
+      const remover = document.createElement('button');
+      remover.type = 'button';
+      remover.classList.add('control-input', 'palette-remove-color');
+      remover.innerHTML = '&times;';
+
+      const input = document.createElement('input');
+      input.type = 'color';
+      input.className = 'palette-input';
+      input.value = color;
+      input.setAttribute('belong', name);
+
+      input.addEventListener('input', function () {
+        item.style.backgroundColor = input.value;
+        item.title = input.value;
+      });
+
+      item.append(remover, input);
+      return item;
+    }
+
+    function getPaletteColors(name) {
+      return $('.palette-input[belong="' + name + '"]').map((input) => input.value);
+    }
+
+    // 这里要突出多个palette可能同时变化的情况
+    function onPalettesChange(...names) {
+      const value = {};
+      for (const name of names) {
+        value[name] = getPaletteColors(name);
+      }
+      vspost({ name: 'palettesChange', value });
+    }
+
+    // 拖拽功能
+    let draggedElement = null;
+
+    function handleDragStart(e) {
+      if (e.target.classList.contains('palette-item')) {
+        draggedElement = e.target;
+        e.target.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      }
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    }
+
+    function handleDragEnter(e) {
+      if (e.target.classList.contains('color-list')) {
+        e.target.classList.add('drag-over');
+      }
+    }
+
+    function handleDragLeave(e) {
+      if (e.target.classList.contains('color-list') && !e.target.contains(e.relatedTarget)) {
+        e.target.classList.remove('drag-over');
+      }
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      const colorList = e.target.closest('.color-list');
+
+      // 只有在拖进color-list里面的时候再处理
+      if (colorList && draggedElement) {
+        colorList.classList.remove('drag-over');
+
+        const targetItem = e.target.closest('.palette-item');
+        const addButton = colorList.querySelector('.palette-add-color');
+
+        if (targetItem && targetItem !== draggedElement) {
+          // 插入到目标位置
+          const rect = targetItem.getBoundingClientRect();
+          const isAfter = e.clientX > rect.left + rect.width / 2;
+
+          if (isAfter) {
+            colorList.insertBefore(draggedElement, targetItem.nextSibling);
+          } else {
+            colorList.insertBefore(draggedElement, targetItem);
+          }
+        } else if (!targetItem) {
+          // 插入到最后（添加按钮前）
+          colorList.insertBefore(draggedElement, addButton);
+        }
+
+        draggedElement.classList.remove('dragging');
+
+        const palette = colorList.closest('.palette')
+        const newBelong = palette.getAttribute('name');
+        const belong = draggedElement.getAttribute('belong');
+        if (belong === newBelong) {
+          onPalettesChange(belong);
+        } else {
+          // 顺序不能错，必须先设定新belong再触发change，否则change里面获取input的时结果还是旧的
+          draggedElement.setAttribute('belong', newBelong);
+          const colorInput = draggedElement.querySelector('.palette-input');
+          colorInput.setAttribute('belong', newBelong);
+          onPalettesChange(belong, newBelong);
+        }
+      }
+
+      draggedElement = null;
+    }
+
+    // 开始初始化
+    initColorPalette();
+    initSettingsValue();
+    initSimpleInputs();
+    initSettingsChangeEvents();
   </script>
 </body>
 
