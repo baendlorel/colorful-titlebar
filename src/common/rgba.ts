@@ -40,7 +40,14 @@ export default class RGBA {
   private b = 0;
   private a = 1;
 
-  constructor(s?: string) {
+  constructor(s?: string | RGBA) {
+    if (s instanceof RGBA) {
+      this.r = s.r;
+      this.g = s.g;
+      this.b = s.b;
+      this.a = s.a;
+      return;
+    }
     const parsed = parseRgba(s);
     this.r = parsed[0];
     this.g = parsed[1];

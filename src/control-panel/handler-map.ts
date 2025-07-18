@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 
-import { GradientStyle, HashSource, TitleBarConsts } from '@/common/consts';
+import { GradientStyle, HashSource } from '@/common/consts';
 import configs from '@/common/configs';
 import i18n from '@/common/i18n';
 import RGBA from '@/common/rgba';
@@ -10,6 +10,7 @@ import { AfterStyle } from '@/features/gradient/consts';
 import hacker from '@/features/gradient/hacker';
 import { ControlName, ThemeSet } from './consts';
 import { HandelResult, PostedValue } from './types';
+import style from '@/core/style';
 
 const Panel = i18n.ControlPanel;
 export const handlerMap = {
@@ -101,16 +102,16 @@ export const handlerMap = {
   [ControlName.Refresh]: async (result: HandelResult, _value: PostedValue) => {
     const token = getHashSource(configs.cwd);
     const color = getColor(configs.cwd);
-    await applyManualColor(color);
+    await style.applyColor(color);
     result.msg = Panel.refresh.success(token, color.toString());
   },
   [ControlName['RandomColor.colorSet']]: async (_result: HandelResult, _value: PostedValue) => {
     const color = getColorByK(Math.random());
-    await applyManualColor(color);
+    await style.applyColor(color);
   },
   [ControlName['RandomColor.pure']]: async (_result: HandelResult, _value: PostedValue) => {
     const color = RGBA.uniformRandom();
-    await applyManualColor(color);
+    await style.applyColor(color);
   },
   [ControlName['RandomColor.specify']]: async (result: HandelResult, value: PostedValue) => {
     if (typeof value !== 'string') {
@@ -118,7 +119,7 @@ export const handlerMap = {
       result.msg = Panel.typeError(value, 'a string');
       throw null;
     }
-    await applyManualColor(value);
+    await style.applyColor(value);
   },
   [ControlName.ProjectIndicators]: async (result: HandelResult, value: PostedValue) => {
     if (typeof value !== 'string') {
@@ -138,6 +139,9 @@ export const handlerMap = {
       result.msg = Panel.typeError(value, 'an object');
       throw null;
     }
+    const vscode = await import('vscode');
+    vscode.window.showInformationMessage('调色板变化' + JSON.stringify(value));
+
     const light = value[ThemeSet.LightThemeColors];
     const dark = value[ThemeSet.DarkThemeColors];
 
@@ -169,19 +173,4 @@ export const handlerMap = {
       result.msg = Panel.themePalette.allSaved;
     }
   },
-};
-
-/**
- * Apply manually selected color to titlebar
- */
-const applyManualColor = async (color: string | RGBA) => {
-  if (typeof color === 'string') {
-    color = new RGBA(color);
-  }
-  const newStyle = {
-    [TitleBarConsts.ActiveBg]: color.toString(),
-    [TitleBarConsts.InactiveBg]: color.toGreyDarkenString(),
-  };
-
-  await configs.setWorkspace[TitleBarConsts.WorkbenchSection](newStyle);
 };

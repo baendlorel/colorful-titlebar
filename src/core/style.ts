@@ -6,15 +6,15 @@ import { Commands, SettingsJson, TitleBarConsts } from '@/common/consts';
 import i18n from '@/common/i18n';
 import configs from '@/common/configs';
 import popSuggest from '@/common/pop-suggest';
+import RGBA from '@/common/rgba';
 
 import { getColor } from './colors';
 
 class TitleBarStyle {
   /**
    * 设置标题栏颜色
-   * @param satisfied 是否是满意的情况下调用，如果不满意那么会弹窗提示是否要手选颜色
    */
-  async refresh(satisfied = false) {
+  async refresh() {
     if (!configs.cwd) {
       return;
     }
@@ -33,32 +33,25 @@ class TitleBarStyle {
 
     // 开始计算颜色并应用
     const color = getColor(configs.cwd);
+    await this.applyColor(color);
+
+    const suggest = i18n.Features.color.suggest;
+    // 询问用户是否要手动选择颜色
+    const result = await popSuggest(suggest.msg, suggest.yes, suggest.no);
+    if (result === suggest.yes) {
+      // 通过命令ID拉起颜色选择器，避免循环引用
+      await vscode.commands.executeCommand(Commands.ControlPanel);
+    }
+  }
+
+  async applyColor(color: string | RGBA) {
+    color = new RGBA(color);
     const newStyle = {
       [TitleBarConsts.ActiveBg]: color.toString(),
       [TitleBarConsts.InactiveBg]: color.toGreyDarkenString(),
     };
-    const oldStyle = configs[TitleBarConsts.WorkbenchSection];
-    if (
-      oldStyle &&
-      oldStyle[TitleBarConsts.ActiveBg] === newStyle[TitleBarConsts.ActiveBg] &&
-      oldStyle[TitleBarConsts.InactiveBg] === newStyle[TitleBarConsts.InactiveBg]
-    ) {
-      return;
-    }
 
     await configs.setWorkspace[TitleBarConsts.WorkbenchSection](newStyle);
-
-    if (!satisfied) {
-      const suggest = i18n.Features.color.suggest;
-
-      // 询问用户是否要手动选择颜色
-      const result = await popSuggest(suggest.msg, suggest.yes, suggest.no);
-
-      if (result === suggest.yes) {
-        // 通过命令ID拉起颜色选择器，避免循环引用
-        await vscode.commands.executeCommand(Commands.ControlPanel);
-      }
-    }
   }
 
   async applyIfNotSet() {
