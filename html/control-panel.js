@@ -124,7 +124,7 @@
       find(names['randomColor.specify'], 'button').style.backgroundColor = '#EE7ACC';
       find(names['randomColor.specify']).value = '#EE7ACC';
       find(names.projectIndicators).value =
-        '.git;Cargo.toml;README.md;package.json;pom.xml;build.gradle;Makefile';
+        '.git\nCargo.toml\nREADME.md\npackage.json\npom.xml\nbuild.gradle\nMakefile';
     }
   }
 
@@ -348,12 +348,12 @@
   }
 
   // 这里要突出多个palette可能同时变化的情况
-  function onPalettesChange(...names) {
+  function onPalettesChange(...paletteNames) {
     const value = {};
-    for (const name of names) {
+    for (const name of paletteNames) {
       value[name] = getPaletteColors(name);
     }
-    vspost({ name: 'themeColors', value });
+    vspost({ name: names.themeColors, value });
   }
 
   // 拖拽功能

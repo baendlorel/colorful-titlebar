@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${Panel.title}</title>
   <script purpose="常量套组">
-    const consts = {
+    var consts = {
       isProd: '${env}' === 'prod',
       lang: '${configs.lang}',
       configs: {
@@ -35,6 +35,7 @@
         // 这两个是配置决定的名字
         lightThemeColors: "${ControlName['ThemeColors.light']}",
         darkThemeColors: "${ControlName['ThemeColors.dark']}",
+        themeColors: '${ControlName.ThemeColors}',
       }
     }
   </script>
@@ -273,7 +274,7 @@
   </div>
 
   <script purpose="加载测试UI文本">
-    {
+    if (!consts.isProd) {
       const testScript = document.createElement('script');
       testScript.src = '../tests/template-replacer.js';
       document.body.appendChild(testScript);

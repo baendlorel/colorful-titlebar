@@ -2,7 +2,7 @@ import vscode from 'vscode';
 
 import { Consts, HashSource, TitleBarConsts } from './consts';
 
-export const enum ConfigProp {
+const enum ConfigProp {
   CurrentVersion = 'currentVersion',
   ShowSuggest = 'showSuggest',
   LightThemeColors = 'lightThemeColors',

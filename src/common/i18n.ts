@@ -74,7 +74,7 @@ export default (() => {
       },
       projectIndicators: {
         label: '项目指示器',
-        description: `含有这些文件的文件夹会计算标题栏颜色`,
+        description: `含有这些文件的文件夹会计算标题栏颜色，使用回车分隔`,
       },
       themeColors: {
         label: '颜色套组',
@@ -223,7 +223,7 @@ export default (() => {
       },
       projectIndicators: {
         label: 'Project Indicators',
-        description: `Folders containing these files will have their titlebar color calculated`,
+        description: `Folders containing these files will have their titlebar color calculated. Separate with new lines`,
       },
       themeColors: {
         label: 'Color Palette',

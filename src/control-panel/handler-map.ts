@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 
 import { GradientStyle, HashSource } from '@/common/consts';
-import configs, { ConfigProp } from '@/common/configs';
+import configs from '@/common/configs';
 import i18n from '@/common/i18n';
 import RGBA from '@/common/rgba';
 import { getHashSource, getColor, getColorByK } from '@/core/colors';
@@ -131,7 +131,7 @@ export const handlerMap = {
       throw null;
     }
     const indicators = value
-      .split(';')
+      .split('\n')
       .map((item) => item.trim())
       .filter(Boolean);
     await configs.set.projectIndicators(indicators);
@@ -145,8 +145,8 @@ export const handlerMap = {
     // const vscode = await import('vscode');
     // vscode.window.showInformationMessage('调色板变化' + JSON.stringify(value));
 
-    const light = value[ConfigProp.LightThemeColors];
-    const dark = value[ConfigProp.DarkThemeColors];
+    const light = value[ControlName['ThemeColors.light']];
+    const dark = value[ControlName['ThemeColors.dark']];
 
     // 必须至少有一个是正常的
     let validCount = 0;

@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 import { Consts, GradientStyle, HashSource } from '@/common/consts';
 import i18n from '@/common/i18n';
-import configs, { ConfigProp } from '@/common/configs';
+import configs from '@/common/configs';
 import RGBA from '@/common/rgba';
 import version from '@/core/version';
 import { handlerMap } from './handler-map';
@@ -29,6 +29,7 @@ export default async function (this: vscode.ExtensionContext) {
     }
   )).onDidDispose(() => (controlPanel = null));
 
+  // 准备导入路径
   const scriptPath = vscode.Uri.file(join(this.extensionPath, 'html', 'control-panel.js'));
   const cssPath = vscode.Uri.file(join(this.extensionPath, 'html', 'style.css'));
   const cssThemeSwitchPath = vscode.Uri.file(join(this.extensionPath, 'html', 'theme-switch.css'));
@@ -44,7 +45,7 @@ export default async function (this: vscode.ExtensionContext) {
   const currentColor = configs.currentColor ?? '#007ACC';
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
   const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
-  const projectIndicators = configs.projectIndicators.join(';');
+  const projectIndicators = configs.projectIndicators.join('\n');
   const lightThemeColors = configs.lightThemeColors.map((c) => new RGBA(c).toRGBString()).join(';');
   const darkThemeColors = configs.darkThemeColors.map((c) => new RGBA(c).toRGBString()).join(';');
 
@@ -56,7 +57,7 @@ export default async function (this: vscode.ExtensionContext) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${Panel.title}</title>
   <script purpose="常量套组">
-    const consts = {
+    var consts = {
       isProd: '${env}' === 'prod',
       lang: '${configs.lang}',
       configs: {
@@ -70,6 +71,22 @@ export default async function (this: vscode.ExtensionContext) {
         projectIndicators: '${projectIndicators}',
         lightThemeColors: '${lightThemeColors}',
         darkThemeColors: '${darkThemeColors}',
+      },
+      names: {
+        // 这些都是指令=控制名的情况
+        showSuggest: '${ControlName.ShowSuggest}',
+        workbenchCssPath: '${ControlName.WorkbenchCssPath}',
+        gradient: '${ControlName.Gradient}',
+        hashSource: '${ControlName.HashSource}',
+        gradientBrightness: '${ControlName.GradientBrightness}',
+        gradientDarkness: '${ControlName.GradientDarkness}',
+        refresh: '${ControlName.Refresh}',
+        'randomColor.specify': "${ControlName['RandomColor.specify']}",
+        projectIndicators: '${ControlName.ProjectIndicators}',
+        // 这两个是配置决定的名字
+        lightThemeColors: "${ControlName['ThemeColors.light']}",
+        darkThemeColors: "${ControlName['ThemeColors.dark']}",
+        themeColors: '${ControlName.ThemeColors}',
       }
     }
   </script>
@@ -272,12 +289,12 @@ export default async function (this: vscode.ExtensionContext) {
           ${Panel.refresh.label}<small>${Panel.refresh.description}</small>
         </div>
         <div class="control-form">
-          <button type="button" class="control-input control-button" name="refresh">
+          <button type="button" class="control-input control-button" name="${ControlName.Refresh}">
             <span>${Panel.refresh.button}</span>
           </button>
         </div>
-        <div class="control-error" name="refresh"></div>
-        <div class="control-succ" name="${ControlName.ProjectIndicators}"></div>
+        <div class="control-error" name="${ControlName.Refresh}"></div>
+        <div class="control-succ" name="${ControlName.Refresh}"></div>
       </div>
 
       <div class="control-item">
@@ -289,8 +306,8 @@ export default async function (this: vscode.ExtensionContext) {
             ControlName.ProjectIndicators
           }"></textarea>
         </div>
-        <div class="control-error" name="${ConfigProp.ProjectIndicators}"></div>
-        <div class="control-succ" name="${ConfigProp.ProjectIndicators}"></div>
+        <div class="control-error" name="${ControlName.ProjectIndicators}"></div>
+        <div class="control-succ" name="${ControlName.ProjectIndicators}"></div>
       </div>
 
       <div class="control-item" style="grid-template-columns: 1fr 1.8fr;">
@@ -298,7 +315,7 @@ export default async function (this: vscode.ExtensionContext) {
           ${Panel.themeColors.label}<small>${Panel.themeColors.description}</small>
         </div>
         <div class="control-form" style="display: flex; flex-direction: column; gap: 8px;">
-          <div class="palette" name="${ConfigProp.LightThemeColors}">
+          <div class="palette" name="${ControlName['ThemeColors.light']}">
             <div class="palette-label">
               ${Panel.themeColors.lightColors}
               <span class="palette-hint">${Panel.themeColors.dragHint}</span>
@@ -309,7 +326,7 @@ export default async function (this: vscode.ExtensionContext) {
               }">+</button>
             </div>
           </div>
-          <div class="palette" name="${ConfigProp.DarkThemeColors}">
+          <div class="palette" name="${ControlName['ThemeColors.dark']}">
             <div class="palette-label">
               ${Panel.themeColors.darkColors}
               <span class="palette-hint">${Panel.themeColors.dragHint}</span>
@@ -328,7 +345,7 @@ export default async function (this: vscode.ExtensionContext) {
   </div>
 
   <script purpose="加载测试UI文本">
-    {
+    if (!consts.isProd) {
       const testScript = document.createElement('script');
       testScript.src = '../tests/template-replacer.js';
       document.body.appendChild(testScript);
