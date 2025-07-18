@@ -4,8 +4,6 @@
  */
 
 (function () {
-  ('use strict');
-
   // 中英文文本数据
   const textData = {
     zh: {
@@ -262,7 +260,7 @@
    * @param {string} text
    * @returns {string}
    */
-  const replace = (text) => {
+  const replace2 = (text) => {
     return text
       .replace(
         '${Panel.gradient[GradientStyle.BrightCenter]}',
@@ -313,6 +311,19 @@
       });
   };
 
+  /**
+   * @param {string} text
+   * @returns {string}
+   */
+  function replace(text) {
+    return text
+      .replace('v${version.get(this)}', 'v12.32.12')
+      .replaceAll('${Consts.DisplayName}', 'Colorful Titlebar')
+      .replaceAll('${Panel.', '')
+      .replaceAll('.label}', '')
+      .replaceAll('.description}', 'Desc');
+  }
+
   // 模板替换函数
   function replaceTemplates() {
     /**
@@ -345,14 +356,6 @@
     visit(document.body);
   }
 
-  // 导出调试数据到全局作用域
-  window.DebugData = mockData;
-  window.TextData = textData;
-
   // 开始替换
   replaceTemplates();
-
-  console.log('🎨 Template Replacer loaded! Available commands:');
-  console.log('  - DebugData: 查看所有测试数据 / View all test data');
-  console.log('  - TextData: 查看语言文本数据 / View language text data');
 })();

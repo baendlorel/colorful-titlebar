@@ -18,8 +18,9 @@
   const lang = consts.lang;
   /** @type {Config} */
   const configs = consts.configs;
+  const names = consts.names;
 
-  function s(...strings) {
+  function concat(...strings) {
     return ''.concat(...strings);
   }
 
@@ -77,11 +78,11 @@
     lang === 'en'
       ? {
           NumberLimit: (min, max, isInt = true) =>
-            s('Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max),
+            concat('Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max),
         }
       : {
           NumberLimit: (min, max, isInt = true) =>
-            s('请输入', min, '到', max, '之间的', isInt ? '整数' : '数'),
+            concat('请输入', min, '到', max, '之间的', isInt ? '整数' : '数'),
         };
 
   function freeze() {
@@ -105,25 +106,24 @@
   function initSettingsValue() {
     if (isProd) {
       document.getElementById('theme').checked = configs.theme;
-      find('showSuggest').checked = configs.showSuggest;
-      find('workbenchCssPath').value = configs.workbenchCssPath;
-      find('hashSource').value = configs.hashSource;
-      find('gradientBrightness').value = configs.gradientBrightness;
-      find('gradientDarkness').value = configs.gradientDarkness;
-      find('randomColor.specify', 'button').style.backgroundColor = configs.currentColor;
-      find('randomColor.specify').value = configs.currentColor;
-      find('projectIndicators').value = configs.projectIndicators;
+      find(names.showSuggest).checked = configs.showSuggest;
+      find(names.workbenchCssPath).value = configs.workbenchCssPath;
+      find(names.hashSource).value = configs.hashSource;
+      find(names.gradientBrightness).value = configs.gradientBrightness;
+      find(names.gradientDarkness).value = configs.gradientDarkness;
+      find(names['randomColor.specify'], 'button').style.backgroundColor = configs.currentColor;
+      find(names['randomColor.specify']).value = configs.currentColor;
+      find(names.projectIndicators).value = configs.projectIndicators;
     } else {
       document.getElementById('theme').checked = true;
-      find('showSuggest').checked = false;
-      find('workbenchCssPath').value =
-        '/d/work/ddddddddddd/fffffffff/44444444/222222222/44444444/aaa.css';
-      find('hashSource').value = '';
-      find('gradientBrightness').value = '99';
-      find('gradientDarkness').value = '12';
-      find('randomColor.specify', 'button').style.backgroundColor = '#EE7ACC';
-      find('randomColor.specify').value = '#EE7ACC';
-      find('projectIndicators').value =
+      find(names.showSuggest).checked = false;
+      find(names.workbenchCssPath).value = '/d/work/ddddddddddd/fffffffff/aaa.css';
+      find(names.hashSource).value = '';
+      find(names.gradientBrightness).value = '99';
+      find(names.gradientDarkness).value = '12';
+      find(names['randomColor.specify'], 'button').style.backgroundColor = '#EE7ACC';
+      find(names['randomColor.specify']).value = '#EE7ACC';
+      find(names.projectIndicators).value =
         '.git;Cargo.toml;README.md;package.json;pom.xml;build.gradle;Makefile';
     }
   }
@@ -285,8 +285,8 @@
       ? configs.darkThemeColors.split(';')
       : ['#E74C3C', '#1ABC9C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'];
 
-    renderColorList('lightThemeColors', lightColors);
-    renderColorList('darkThemeColors', darkColors);
+    renderColorList(names.lightThemeColors, lightColors);
+    renderColorList(names.darkThemeColors, darkColors);
 
     // find('themeColors', 'error').textContent = JSON.stringify({ lightColors, darkColors });
 
@@ -301,7 +301,7 @@
   }
 
   function renderColorList(name, colors) {
-    const palette = document.querySelector(s('.palette[name="', name, '"]'));
+    const palette = q('.palette[name="', name, '"]');
     const colorList = palette.querySelector('.color-list');
     const addBtn = palette.querySelector('.palette-add-color');
 
