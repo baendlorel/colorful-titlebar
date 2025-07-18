@@ -1,7 +1,7 @@
 import vscode from 'vscode';
-import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 
-import { Consts, GradientStyle, HashSource, TitleBarConsts } from '@/common/consts';
+import { Consts, GradientStyle, HashSource } from '@/common/consts';
 import i18n from '@/common/i18n';
 import configs from '@/common/configs';
 import RGBA from '@/common/rgba';
@@ -23,6 +23,9 @@ export default async function (this: vscode.ExtensionContext) {
     vscode.ViewColumn.One,
     { enableScripts: true, retainContextWhenHidden: true }
   )).onDidDispose(() => (controlPanel = null));
+
+  const scriptPath = vscode.Uri.file(join(this.extensionPath, 'main.js'));
+  const scriptUri = controlPanel.webview.asWebviewUri(scriptPath);
 
   // 准备一些数据
   const env = 'prod';
@@ -197,14 +200,12 @@ export default async function (this: vscode.ExtensionContext) {
       border-bottom: 1px solid var(--ct-border-color);
     }
 
-    .control-label-group {
-      display: grid;
-      grid-template-rows: auto auto;
+    .control-label {
       color: var(--ct-text-color);
     }
 
-    .control-desc {
-      font-size: 0.8em;
+    .control-label small {
+      display: block;
       color: var(--ct-text-color-weak);
     }
 
@@ -1107,9 +1108,8 @@ export default async function (this: vscode.ExtensionContext) {
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.showSuggest.label}</div>
-          <div class="control-desc">${Panel.showSuggest.description}</div>
+        <div class="control-label">
+          ${Panel.showSuggest.label}<small>${Panel.showSuggest.description}</small>
         </div>
         <div class="control-form">
           <label class="toggle-switch">
@@ -1122,9 +1122,8 @@ export default async function (this: vscode.ExtensionContext) {
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.workbenchCssPath.label}</div>
-          <div class="control-desc">${Panel.workbenchCssPath.description}</div>
+        <div class="control-label">
+          ${Panel.workbenchCssPath.label}<small>${Panel.workbenchCssPath.description}</small>
         </div>
         <div class="control-form">
           <textarea class="control-input textarea" name="workbenchCssPath"></textarea>
@@ -1134,9 +1133,8 @@ export default async function (this: vscode.ExtensionContext) {
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <label class="control-label">${Panel.gradient.label}</label>
-          <div class="control-desc">${Panel.gradient.description}</div>
+        <div class="control-label">
+          ${Panel.gradient.label}<small>${Panel.gradient.description}</small>
         </div>
         <div class="control-form">
           <select class="control-input select" name="gradient">
@@ -1158,9 +1156,8 @@ export default async function (this: vscode.ExtensionContext) {
 
       <div class="control-item-double">
         <div class="control-item" style="grid-template-columns: 1fr auto;">
-          <div class="control-label-group">
-            <div class="control-label">${Panel.gradientBrightness.label}</div>
-            <div class="control-desc">${Panel.gradientBrightness.description}</div>
+          <div class="control-label">
+            ${Panel.gradientBrightness.label}<small>${Panel.gradientBrightness.description}</small>
           </div>
           <div class="control-form input-percent">
             <input type="number" min="0" max="100" step="5" class="control-input" name="gradientBrightness" />
@@ -1170,9 +1167,8 @@ export default async function (this: vscode.ExtensionContext) {
         </div>
 
         <div class="control-item" style="grid-template-columns: 1fr auto;">
-          <div class="control-label-group">
-            <div class="control-label">${Panel.gradientDarkness.label}</div>
-            <div class="control-desc">${Panel.gradientDarkness.description}</div>
+          <div class="control-label">
+            ${Panel.gradientDarkness.label}<small>${Panel.gradientDarkness.description}</small>
           </div>
           <div class="control-form input-percent">
             <input type="number" min="0" max="100" step="5" class="control-input" name="gradientDarkness" />
@@ -1183,9 +1179,8 @@ export default async function (this: vscode.ExtensionContext) {
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.hashSource.label}</div>
-          <div class="control-desc">${Panel.hashSource.description}</div>
+        <div class="control-label">
+          ${Panel.hashSource.label}<small>${Panel.hashSource.description}</small>
         </div>
         <div class="control-form">
           <select class="control-input select" name="hashSource">
@@ -1203,9 +1198,8 @@ export default async function (this: vscode.ExtensionContext) {
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.randomColor.label}</div>
-          <div class="control-desc">${Panel.randomColor.description}</div>
+        <div class="control-label">
+          ${Panel.randomColor.label}<small>${Panel.randomColor.description}</small>
         </div>
         <div class="control-form">
           <div class="dropdown">
@@ -1234,9 +1228,8 @@ export default async function (this: vscode.ExtensionContext) {
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.refresh.label}</div>
-          <div class="control-desc">${Panel.refresh.description}</div>
+        <div class="control-label">
+          ${Panel.refresh.label}<small>${Panel.refresh.description}</small>
         </div>
         <div class="control-form">
           <button type="button" class="control-input control-button" name="refresh">
@@ -1248,9 +1241,8 @@ export default async function (this: vscode.ExtensionContext) {
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.projectIndicators.label}</div>
-          <div class="control-desc">${Panel.projectIndicators.description}</div>
+        <div class="control-label">
+          ${Panel.projectIndicators.label}<small>${Panel.projectIndicators.description}</small>
         </div>
         <div class="control-form">
           <textarea class="control-input textarea" name="projectIndicators"></textarea>
@@ -1260,9 +1252,8 @@ export default async function (this: vscode.ExtensionContext) {
       </div>
 
       <div class="control-item" style="grid-template-columns: 1fr 1.8fr;">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.themeColors.label}</div>
-          <div class="control-desc">${Panel.themeColors.description}</div>
+        <div class="control-label">
+          ${Panel.themeColors.label}<small>${Panel.themeColors.description}</small>
         </div>
         <div class="control-form" style="display: flex; flex-direction: column; gap: 8px;">
           <div class="palette" name="lightThemeColors">
@@ -1294,8 +1285,20 @@ export default async function (this: vscode.ExtensionContext) {
     </form>
   </div>
 
-  <script>
+  <script top>
     const isProd = '${env}' === 'prod';
+  </script>
+
+  <script>
+    function loadJS() {
+      const script = document.createElement('script');
+      script.src = isProd ? '${scriptUri}' : './main.js';
+      document.body.appendChild(script);
+    }
+    loadJS();
+  </script>
+
+  <script>
 
     function s(...strings) {
       return ''.concat(...strings);
@@ -1393,7 +1396,7 @@ export default async function (this: vscode.ExtensionContext) {
         find('projectIndicators').value = '${projectIndicators}';
       } else {
         const testScript = document.createElement('script');
-        testScript.src = './template-replacer.js';
+        testScript.src = '../../tests/template-replacer.js';
         document.body.appendChild(testScript);
         document.getElementById('theme').checked = true;
         find('showSuggest').checked = false;
@@ -1574,7 +1577,6 @@ export default async function (this: vscode.ExtensionContext) {
       // 清空现有颜色项（保留添加按钮）
       palette.querySelectorAll('.palette-item').forEach(item => item.remove());
 
-      find('themeColors', 'succ').textContent = JSON.stringify(colors);
       // 添加颜色项
       colors.forEach((color) => {
         const colorItem = createPaletteItem(name, color);
