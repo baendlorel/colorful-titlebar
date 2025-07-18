@@ -14,6 +14,7 @@ const Panel = i18n.ControlPanel;
 
 let controlPanel: vscode.WebviewPanel | null = null;
 
+// fixme F5测试下来莫名其妙报consts找不到，明明有啊
 export default async function (this: vscode.ExtensionContext) {
   if (controlPanel !== null) {
     return; // 防止创建多个设置页面
@@ -57,7 +58,7 @@ export default async function (this: vscode.ExtensionContext) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${Panel.title}</title>
   <script purpose="常量套组">
-    var consts = {
+    window.consts = {
       isProd: '${env}' === 'prod',
       lang: '${configs.lang}',
       configs: {
