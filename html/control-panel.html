@@ -27,19 +27,19 @@
   <script purpose="加载css">
     function loadCss() {
       const css = document.createElement('link');
-      css.href = isProd ? '${cssUri}' : './style.css';
+      css.href = consts.isProd ? '${cssUri}' : './style.css';
       css.rel = 'stylesheet';
       css.type = 'text/css';
       document.head.appendChild(css);
 
       const cssThemeSwitch = document.createElement('link');
-      cssThemeSwitch.href = isProd ? '${cssThemeSwitchUri}' : './theme-switch.css';
+      cssThemeSwitch.href = consts.isProd ? '${cssThemeSwitchUri}' : './theme-switch.css';
       cssThemeSwitch.rel = 'stylesheet';
       cssThemeSwitch.type = 'text/css';
       document.head.appendChild(cssThemeSwitch);
 
       const cssPalette = document.createElement('link');
-      cssPalette.href = isProd ? '${cssPaletteUri}' : './palette.css';
+      cssPalette.href = consts.isProd ? '${cssPaletteUri}' : './palette.css';
       cssPalette.rel = 'stylesheet';
       cssPalette.type = 'text/css';
       document.head.appendChild(cssPalette);
@@ -267,7 +267,7 @@
   <script purpose="加载js">
     function loadJS() {
       const script = document.createElement('script');
-      script.src = isProd ? '${scriptUri}' : './control-panel.js';
+      script.src = consts.isProd ? '${scriptUri}' : './control-panel.js';
       document.body.appendChild(script);
     }
     loadJS();
