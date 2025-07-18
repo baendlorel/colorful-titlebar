@@ -76,7 +76,7 @@ export default (() => {
         label: '项目指示器',
         description: `含有这些文件的文件夹会计算标题栏颜色`,
       },
-      themePalette: {
+      themeColors: {
         label: '颜色套组',
         description: '编辑亮色和暗色主题的颜色套组，用于计算颜色生成。颜色的顺序会影响计算出的颜色',
         lightColors: '亮色套组',
@@ -225,7 +225,7 @@ export default (() => {
         label: 'Project Indicators',
         description: `Folders containing these files will have their titlebar color calculated`,
       },
-      themePalette: {
+      themeColors: {
         label: 'Color Palette',
         description:
           'Edit light and dark theme color sets for random color functionality. Order of the colors will affect the generated results',

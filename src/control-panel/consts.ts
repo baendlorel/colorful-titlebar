@@ -10,7 +10,7 @@ export const enum ControlName {
   'RandomColor.pure' = 'randomColor.pure',
   'RandomColor.specify' = 'randomColor.specify',
   ProjectIndicators = 'projectIndicators',
-  PalettesChange = 'palettesChange',
+  ThemeColors = 'themeColors',
 }
 
 export const enum ThemeSet {

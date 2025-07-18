@@ -133,7 +133,7 @@ export const handlerMap = {
       .filter(Boolean);
     await configs.set.projectIndicators(indicators);
   },
-  [ControlName.PalettesChange]: async (result: HandelResult, value: Record<ThemeSet, string[]>) => {
+  [ControlName.ThemeColors]: async (result: HandelResult, value: Record<ThemeSet, string[]>) => {
     if (typeof value !== 'object' || value === null) {
       result.succ = false;
       result.msg = Panel.typeError(value, 'an object');
@@ -150,7 +150,7 @@ export const handlerMap = {
     if (Array.isArray(light)) {
       if (light.length === 0) {
         result.succ = false;
-        result.msg = Panel.themePalette.emptyPalette;
+        result.msg = Panel.themeColors.emptyPalette;
         throw null;
       }
       validCount++;
@@ -159,7 +159,7 @@ export const handlerMap = {
     if (Array.isArray(dark)) {
       if (dark.length === 0) {
         result.succ = false;
-        result.msg = Panel.themePalette.emptyPalette;
+        result.msg = Panel.themeColors.emptyPalette;
         throw null;
       }
       validCount++;
@@ -170,7 +170,7 @@ export const handlerMap = {
       result.msg = Panel.typeError(value, 'an object with arrays');
       throw null;
     } else if (validCount === 2) {
-      result.msg = Panel.themePalette.allSaved;
+      result.msg = Panel.themeColors.allSaved;
     }
   },
 };

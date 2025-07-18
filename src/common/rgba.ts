@@ -86,6 +86,8 @@ export default class RGBA {
 
   /**
    * 将本颜色输出为hex字符串
+   * - `#RRGGBBAA`
+   * - 有alpha
    */
   toString() {
     const r = toHex(this.r);
@@ -93,6 +95,18 @@ export default class RGBA {
     const b = toHex(this.b);
     const a = toHex(this.a * 255);
     return `#${r}${g}${b}${a}`;
+  }
+
+  /**
+   * 将本颜色输出为hex字符串
+   * - `#RRGGBB`
+   * - 不含alpha
+   */
+  toRGBString() {
+    const r = toHex(this.r);
+    const g = toHex(this.g);
+    const b = toHex(this.b);
+    return `#${r}${g}${b}`;
   }
 
   /**

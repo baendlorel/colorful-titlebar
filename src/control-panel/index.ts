@@ -30,8 +30,8 @@ export default async function (this: vscode.ExtensionContext) {
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
   const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
   const projectIndicators = configs.projectIndicators.join(';');
-  const lightThemeColors = configs.lightThemeColors.map((c) => new RGBA(c).toString()).join(';');
-  const darkThemeColors = configs.darkThemeColors.map((c) => new RGBA(c).toString()).join(';');
+  const lightThemeColors = configs.lightThemeColors.map((c) => new RGBA(c).toRGBString()).join(';');
+  const darkThemeColors = configs.darkThemeColors.map((c) => new RGBA(c).toRGBString()).join(';');
 
   controlPanel.webview.html = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -1261,35 +1261,35 @@ export default async function (this: vscode.ExtensionContext) {
 
       <div class="control-item" style="grid-template-columns: 1fr 1.8fr;">
         <div class="control-label-group">
-          <div class="control-label">${Panel.themePalette.label}</div>
-          <div class="control-desc">${Panel.themePalette.description}</div>
+          <div class="control-label">${Panel.themeColors.label}</div>
+          <div class="control-desc">${Panel.themeColors.description}</div>
         </div>
         <div class="control-form" style="display: flex; flex-direction: column; gap: 8px;">
           <div class="palette" name="lightThemeColors">
             <div class="palette-label">
-              ${Panel.themePalette.lightColors}
-              <span class="palette-hint">${Panel.themePalette.dragHint}</span>
+              ${Panel.themeColors.lightColors}
+              <span class="palette-hint">${Panel.themeColors.dragHint}</span>
             </div>
             <div class="color-list">
               <button type="button" class="palette-add-color" title="${
-                Panel.themePalette.addColor
+                Panel.themeColors.addColor
               }">+</button>
             </div>
           </div>
           <div class="palette" name="darkThemeColors">
             <div class="palette-label">
-              ${Panel.themePalette.darkColors}
-              <span class="palette-hint">${Panel.themePalette.dragHint}</span>
+              ${Panel.themeColors.darkColors}
+              <span class="palette-hint">${Panel.themeColors.dragHint}</span>
             </div>
             <div class="color-list">
               <button type="button" class="palette-add-color" title="${
-                Panel.themePalette.addColor
+                Panel.themeColors.addColor
               }">+</button>
             </div>
           </div>
         </div>
-        <div class="control-error" name="themePalette"></div>
-        <div class="control-succ" name="themePalette"></div>
+        <div class="control-error" name="themeColors"></div>
+        <div class="control-succ" name="themeColors"></div>
       </div>
     </form>
   </div>
@@ -1523,10 +1523,7 @@ export default async function (this: vscode.ExtensionContext) {
           return e.target.classList.contains(className);
         }
 
-        palette.addEventListener('change', () => {
-          vspost({ name, value: getPaletteColors(name) });
-        });
-
+        palette.addEventListener('change', () => onPalettesChange(name));
         colorList.addEventListener('click', (e) => {
           // 如果点击了添加按钮，则添加新颜色
           if (is(e, 'palette-add-color')) {
@@ -1557,6 +1554,8 @@ export default async function (this: vscode.ExtensionContext) {
       renderColorList('lightThemeColors', lightColors);
       renderColorList('darkThemeColors', darkColors);
 
+      // find('themeColors', 'error').textContent = JSON.stringify({ lightColors, darkColors });
+
       // 添加事件监听器
       $('.color-list').forEach((list) => {
         list.addEventListener('dragstart', handleDragStart);
@@ -1575,6 +1574,7 @@ export default async function (this: vscode.ExtensionContext) {
       // 清空现有颜色项（保留添加按钮）
       palette.querySelectorAll('.palette-item').forEach(item => item.remove());
 
+      find('themeColors', 'succ').textContent = JSON.stringify(colors);
       // 添加颜色项
       colors.forEach((color) => {
         const colorItem = createPaletteItem(name, color);
@@ -1620,7 +1620,7 @@ export default async function (this: vscode.ExtensionContext) {
       for (const name of names) {
         value[name] = getPaletteColors(name);
       }
-      vspost({ name: 'palettesChange', value });
+      vspost({ name: 'themeColors', value });
     }
 
     // 拖拽功能
@@ -1719,7 +1719,7 @@ export default async function (this: vscode.ExtensionContext) {
       msg: Panel.success,
     };
 
-    vscode.window.showInformationMessage(JSON.stringify(message));
+    // vscode.window.showInformationMessage(JSON.stringify(message));
 
     try {
       const handler = handlerMap[result.name];
