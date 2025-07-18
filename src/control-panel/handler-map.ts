@@ -176,4 +176,10 @@ export const handlerMap = {
       result.msg = Panel.themeColors.allSaved;
     }
   },
+  [ControlName['ThemeColors.light']]: async (_result: HandelResult, _value: PostedValue) => {
+    throw new Error('ThemeColors.light只是个标记');
+  },
+  [ControlName['ThemeColors.dark']]: async (_result: HandelResult, _value: PostedValue) => {
+    throw new Error('ThemeColors.dark只是个标记');
+  },
 };

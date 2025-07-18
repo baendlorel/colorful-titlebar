@@ -187,8 +187,8 @@
         find(resp.name, 'succ').textContent = resp.msg;
 
         // 如果调整了渐变配置，那么置空渐变选项以备重新选择
-        if (resp.name === 'gradientBrightness' || resp.name === 'gradientDarkness') {
-          find('gradient').value = '';
+        if (resp.name === names.gradientBrightness || resp.name === names.gradientDarkness) {
+          find(names.gradient).value = '';
         }
       }
     });
