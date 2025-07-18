@@ -1,3 +1,23 @@
+/**
+ * @typedef {Object} Config
+ * @property {boolean} theme
+ * @property {boolean} hashSource
+ * @property {string} showSuggest
+ * @property {string} workbenchCssPath
+ * @property {string} gradientBrightness
+ * @property {string} gradientDarkness
+ * @property {string} currentColor
+ * @property {string} projectIndicators
+ * @property {string} lightThemeColors
+ * @property {string} darkThemeColors
+ */
+/** @type {boolean} */
+var isProd;
+/** @type {Config} */
+var configs;
+/** @type {string} */
+var lang;
+
 function s(...strings) {
   return ''.concat(...strings);
 }
@@ -15,16 +35,12 @@ function $(...strings) {
 }
 
 /**
- * 默认查找的是输入元素，可以指定查找类型
- * - 如果用#开头，那么以它是元素id来继续搜索
- * @param {string | `#${string}`} name
+ * 用name属性查找元素，可以指定查找类型
+ * @param {string} name
  * @param {'input' | 'button' | 'error' | 'succ'} tp
  * @returns {HTMLElement} Found element
  */
 function find(name, tp = 'input') {
-  if (name.startsWith('#')) {
-    return q(name);
-  }
   return (find.handler[tp] ?? find.handler.input)(name);
 }
 find.handler = {
@@ -35,7 +51,7 @@ find.handler = {
 };
 
 /**
- * @type {(data: { name: string, value: any } ) => void}
+ * @param {{ name: string, value: any }} data
  */
 function vspost(data) {
   const vscode = isProd
@@ -57,7 +73,7 @@ function vspost(data) {
 }
 
 const i18n =
-  '${configs.lang}' === 'en'
+  lang === 'en'
     ? {
         NumberLimit: (min, max, isInt = true) =>
           s('Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max),
@@ -67,15 +83,12 @@ const i18n =
           s('请输入', min, '到', max, '之间的', isInt ? '整数' : '数'),
       };
 
-/**
- * @type {HTMLFormElement}
- */
 function freeze() {
   freeze = isProd
     ? function () {
         $('.control-error,.control-succ').forEach((el) => (el.textContent = ''));
         $('.control-input').forEach((el) => (el.disabled = true));
-        find('#settings').classList.add('freeze');
+        q('#settings').classList.add('freeze');
       }
     : function () {
         $('.control-error,.control-succ').forEach((el) => (el.textContent = ''));
@@ -84,8 +97,10 @@ function freeze() {
 }
 
 function unfreeze() {
-  setTimeout(() => find('#settings').classList.remove('freeze'), 200);
-  $('.control-input').forEach((el) => (el.disabled = false));
+  setTimeout(() => {
+    q('#settings').classList.remove('freeze');
+    $('.control-input').forEach((el) => (el.disabled = false));
+  }, 200);
 }
 
 /**
@@ -93,18 +108,18 @@ function unfreeze() {
  */
 function initSettingsValue() {
   if (isProd) {
-    document.getElementById('theme').checked = '${configs.theme}' === 'light';
-    find('showSuggest').checked = '${configs.showSuggest}' === 'true';
-    find('workbenchCssPath').value = '${configs.workbenchCssPath}';
-    find('hashSource').value = '${configs.hashSource}';
-    find('gradientBrightness').value = '${gradientBrightness}';
-    find('gradientDarkness').value = '${gradientDarkness}';
-    find('randomColor.specify', 'button').style.backgroundColor = '${currentColor}';
-    find('randomColor.specify').value = '${currentColor}';
-    find('projectIndicators').value = '${projectIndicators}';
+    document.getElementById('theme').checked = configs.theme;
+    find('showSuggest').checked = configs.showSuggest;
+    find('workbenchCssPath').value = configs.workbenchCssPath;
+    find('hashSource').value = configs.hashSource;
+    find('gradientBrightness').value = configs.gradientBrightness;
+    find('gradientDarkness').value = configs.gradientDarkness;
+    find('randomColor.specify', 'button').style.backgroundColor = configs.currentColor;
+    find('randomColor.specify').value = configs.currentColor;
+    find('projectIndicators').value = configs.projectIndicators;
   } else {
     const testScript = document.createElement('script');
-    testScript.src = '../../tests/template-replacer.js';
+    testScript.src = '../../../tests/template-replacer.js';
     document.body.appendChild(testScript);
     document.getElementById('theme').checked = true;
     find('showSuggest').checked = false;
@@ -122,7 +137,7 @@ function initSettingsValue() {
 
 function initSettingsChangeEvents() {
   // 要推送到插件的输入变更事件
-  find('#settings').addEventListener('change', (event) => {
+  q('#settings').addEventListener('change', (event) => {
     /**
      * @type {HTMLInputElement}
      */
@@ -265,10 +280,10 @@ function initColorPalette() {
   });
 
   const lightColors = isProd
-    ? '${lightThemeColors}'.split(';')
+    ? configs.lightThemeColors.split(';')
     : ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
   const darkColors = isProd
-    ? '${darkThemeColors}'.split(';')
+    ? configs.darkThemeColors.split(';')
     : ['#E74C3C', '#1ABC9C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'];
 
   renderColorList('lightThemeColors', lightColors);
@@ -420,3 +435,5 @@ initColorPalette();
 initSettingsValue();
 initSimpleInputs();
 initSettingsChangeEvents();
+q('.body').style.display = '';
+setTimeout(() => (q('.body').style.opacity = '1'), 100);

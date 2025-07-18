@@ -21,7 +21,11 @@ export default async function (this: vscode.ExtensionContext) {
     'controllPanel',
     Panel.title,
     vscode.ViewColumn.One,
-    { enableScripts: true, retainContextWhenHidden: true }
+    {
+      enableScripts: true,
+      localResourceRoots: [vscode.Uri.joinPath(this.extensionUri, 'media')],
+      retainContextWhenHidden: true,
+    }
   )).onDidDispose(() => (controlPanel = null));
 
   const scriptPath = vscode.Uri.file(join(this.extensionPath, 'main.js'));
@@ -1736,6 +1740,8 @@ export default async function (this: vscode.ExtensionContext) {
     } finally {
       if (controlPanel) {
         await controlPanel.webview.postMessage(result);
+      } else {
+        vscode.window.showErrorMessage('控制面板被dispose了？');
       }
     }
   });
