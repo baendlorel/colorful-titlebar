@@ -54,43 +54,45 @@ export default async function (this: vscode.ExtensionContext) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${Panel.title}</title>
-  <script consts="常量套组">
-    const isProd = '${env}' === 'prod';
-    const lang = '${configs.lang}';
-    const configs = {
-      theme: '${configs.theme}' === 'light',
-      showSuggest: '${configs.showSuggest}' === 'true',
-      workbenchCssPath: '${configs.workbenchCssPath}',
-      hashSource: '${configs.hashSource}',
-      gradientBrightness: '${gradientBrightness}',
-      gradientDarkness: '${gradientDarkness}',
-      currentColor: '${currentColor}',
-      projectIndicators: '${projectIndicators}',
-      lightThemeColors: '${lightThemeColors}',
-      darkThemeColors: '${darkThemeColors}',
+  <script purpose="常量套组">
+    const consts = {
+      isProd: '${env}' === 'prod',
+      lang: '${configs.lang}',
+      configs: {
+        theme: '${configs.theme}' === 'light',
+        showSuggest: '${configs.showSuggest}' === 'true',
+        workbenchCssPath: '${configs.workbenchCssPath}',
+        hashSource: '${configs.hashSource}',
+        gradientBrightness: '${gradientBrightness}',
+        gradientDarkness: '${gradientDarkness}',
+        currentColor: '${currentColor}',
+        projectIndicators: '${projectIndicators}',
+        lightThemeColors: '${lightThemeColors}',
+        darkThemeColors: '${darkThemeColors}',
+      }
     }
   </script>
-  <script>
-    function loadCss() {
+
+  <script purpose="加载css">
+    {
       const css = document.createElement('link');
-      css.href = isProd ? '${cssUri}' : './style.css';
+      css.href = consts.isProd ? '${cssUri}' : './style.css';
       css.rel = 'stylesheet';
       css.type = 'text/css';
       document.head.appendChild(css);
 
       const cssThemeSwitch = document.createElement('link');
-      cssThemeSwitch.href = isProd ? '${cssThemeSwitchUri}' : './theme-switch.css';
+      cssThemeSwitch.href = consts.isProd ? '${cssThemeSwitchUri}' : './theme-switch.css';
       cssThemeSwitch.rel = 'stylesheet';
       cssThemeSwitch.type = 'text/css';
       document.head.appendChild(cssThemeSwitch);
 
       const cssPalette = document.createElement('link');
-      cssPalette.href = isProd ? '${cssPaletteUri}' : './palette.css';
+      cssPalette.href = consts.isProd ? '${cssPaletteUri}' : './palette.css';
       cssPalette.rel = 'stylesheet';
       cssPalette.type = 'text/css';
       document.head.appendChild(cssPalette);
     }
-    loadCss();
   </script>
 
 </head>
@@ -310,13 +312,19 @@ export default async function (this: vscode.ExtensionContext) {
     </form>
   </div>
 
-  <script>
-    function loadJS() {
+  <script purpose="加载测试UI文本">
+    {
+      const testScript = document.createElement('script');
+      testScript.src = '../tests/template-replacer.js';
+      document.body.appendChild(testScript);
+    }
+  </script>
+  <script purpose="加载js">
+    {
       const script = document.createElement('script');
-      script.src = isProd ? '${scriptUri}' : './control-panel.js';
+      script.src = consts.isProd ? '${scriptUri}' : './control-panel.js';
       document.body.appendChild(script);
     }
-    loadJS();
   </script>
 </body>
 

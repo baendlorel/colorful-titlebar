@@ -139,8 +139,8 @@ export const handlerMap = {
       result.msg = Panel.typeError(value, 'an object');
       throw null;
     }
-    const vscode = await import('vscode');
-    vscode.window.showInformationMessage('调色板变化' + JSON.stringify(value));
+    // const vscode = await import('vscode');
+    // vscode.window.showInformationMessage('调色板变化' + JSON.stringify(value));
 
     const light = value[ThemeSet.LightThemeColors];
     const dark = value[ThemeSet.DarkThemeColors];
