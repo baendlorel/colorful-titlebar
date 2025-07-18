@@ -12,11 +12,11 @@
  * @property {string} darkThemeColors
  */
 /** @type {boolean} */
-var isProd;
-/** @type {Config} */
-var configs;
+const isProd = consts.isProd;
 /** @type {string} */
-var lang;
+const lang = consts.lang;
+/** @type {Config} */
+const configs = consts.configs;
 
 function s(...strings) {
   return ''.concat(...strings);

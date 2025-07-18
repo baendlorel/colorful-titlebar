@@ -6,19 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${Panel.title}</title>
   <script purpose="常量套组">
-    const isProd = '${env}' === 'prod';
-    const lang = '${configs.lang}';
-    const configs = {
-      theme: '${configs.theme}' === 'light',
-      showSuggest: '${configs.showSuggest}' === 'true',
-      workbenchCssPath: '${configs.workbenchCssPath}',
-      hashSource: '${configs.hashSource}',
-      gradientBrightness: '${gradientBrightness}',
-      gradientDarkness: '${gradientDarkness}',
-      currentColor: '${currentColor}',
-      projectIndicators: '${projectIndicators}',
-      lightThemeColors: '${lightThemeColors}',
-      darkThemeColors: '${darkThemeColors}',
+    const consts = {
+      isProd: '${env}' === 'prod',
+      lang: '${configs.lang}',
+      configs: {
+        theme: '${configs.theme}' === 'light',
+        showSuggest: '${configs.showSuggest}' === 'true',
+        workbenchCssPath: '${configs.workbenchCssPath}',
+        hashSource: '${configs.hashSource}',
+        gradientBrightness: '${gradientBrightness}',
+        gradientDarkness: '${gradientDarkness}',
+        currentColor: '${currentColor}',
+        projectIndicators: '${projectIndicators}',
+        lightThemeColors: '${lightThemeColors}',
+        darkThemeColors: '${darkThemeColors}',
+      }
     }
   </script>
 
