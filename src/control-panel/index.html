@@ -162,14 +162,12 @@
       border-bottom: 1px solid var(--ct-border-color);
     }
 
-    .control-label-group {
-      display: grid;
-      grid-template-rows: auto auto;
+    .control-label {
       color: var(--ct-text-color);
     }
 
-    .control-desc {
-      font-size: 0.8em;
+    .control-label small {
+      display: block;
       color: var(--ct-text-color-weak);
     }
 
@@ -1072,9 +1070,8 @@
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.showSuggest.label}</div>
-          <div class="control-desc">${Panel.showSuggest.description}</div>
+        <div class="control-label">
+          ${Panel.showSuggest.label}<small>${Panel.showSuggest.description}</small>
         </div>
         <div class="control-form">
           <label class="toggle-switch">
@@ -1087,9 +1084,8 @@
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.workbenchCssPath.label}</div>
-          <div class="control-desc">${Panel.workbenchCssPath.description}</div>
+        <div class="control-label">
+          ${Panel.workbenchCssPath.label}<small>${Panel.workbenchCssPath.description}</small>
         </div>
         <div class="control-form">
           <textarea class="control-input textarea" name="workbenchCssPath"></textarea>
@@ -1099,9 +1095,8 @@
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <label class="control-label">${Panel.gradient.label}</label>
-          <div class="control-desc">${Panel.gradient.description}</div>
+        <div class="control-label">
+          ${Panel.gradient.label}<small>${Panel.gradient.description}</small>
         </div>
         <div class="control-form">
           <select class="control-input select" name="gradient">
@@ -1121,9 +1116,8 @@
 
       <div class="control-item-double">
         <div class="control-item" style="grid-template-columns: 1fr auto;">
-          <div class="control-label-group">
-            <div class="control-label">${Panel.gradientBrightness.label}</div>
-            <div class="control-desc">${Panel.gradientBrightness.description}</div>
+          <div class="control-label">
+            ${Panel.gradientBrightness.label}<small>${Panel.gradientBrightness.description}</small>
           </div>
           <div class="control-form input-percent">
             <input type="number" min="0" max="100" step="5" class="control-input" name="gradientBrightness" />
@@ -1133,9 +1127,8 @@
         </div>
 
         <div class="control-item" style="grid-template-columns: 1fr auto;">
-          <div class="control-label-group">
-            <div class="control-label">${Panel.gradientDarkness.label}</div>
-            <div class="control-desc">${Panel.gradientDarkness.description}</div>
+          <div class="control-label">
+            ${Panel.gradientDarkness.label}<small>${Panel.gradientDarkness.description}</small>
           </div>
           <div class="control-form input-percent">
             <input type="number" min="0" max="100" step="5" class="control-input" name="gradientDarkness" />
@@ -1146,9 +1139,8 @@
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.hashSource.label}</div>
-          <div class="control-desc">${Panel.hashSource.description}</div>
+        <div class="control-label">
+          ${Panel.hashSource.label}<small>${Panel.hashSource.description}</small>
         </div>
         <div class="control-form">
           <select class="control-input select" name="hashSource">
@@ -1166,9 +1158,8 @@
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.randomColor.label}</div>
-          <div class="control-desc">${Panel.randomColor.description}</div>
+        <div class="control-label">
+          ${Panel.randomColor.label}<small>${Panel.randomColor.description}</small>
         </div>
         <div class="control-form">
           <div class="dropdown">
@@ -1195,9 +1186,8 @@
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.refresh.label}</div>
-          <div class="control-desc">${Panel.refresh.description}</div>
+        <div class="control-label">
+          ${Panel.refresh.label}<small>${Panel.refresh.description}</small>
         </div>
         <div class="control-form">
           <button type="button" class="control-input control-button" name="refresh">
@@ -1209,9 +1199,8 @@
       </div>
 
       <div class="control-item">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.projectIndicators.label}</div>
-          <div class="control-desc">${Panel.projectIndicators.description}</div>
+        <div class="control-label">
+          ${Panel.projectIndicators.label}<small>${Panel.projectIndicators.description}</small>
         </div>
         <div class="control-form">
           <textarea class="control-input textarea" name="projectIndicators"></textarea>
@@ -1221,9 +1210,8 @@
       </div>
 
       <div class="control-item" style="grid-template-columns: 1fr 1.8fr;">
-        <div class="control-label-group">
-          <div class="control-label">${Panel.themeColors.label}</div>
-          <div class="control-desc">${Panel.themeColors.description}</div>
+        <div class="control-label">
+          ${Panel.themeColors.label}<small>${Panel.themeColors.description}</small>
         </div>
         <div class="control-form" style="display: flex; flex-direction: column; gap: 8px;">
           <div class="palette" name="lightThemeColors">
@@ -1350,7 +1338,7 @@
         find('projectIndicators').value = '${projectIndicators}';
       } else {
         const testScript = document.createElement('script');
-        testScript.src = './template-replacer.js';
+        testScript.src = '../../tests/template-replacer.js';
         document.body.appendChild(testScript);
         document.getElementById('theme').checked = true;
         find('showSuggest').checked = false;
