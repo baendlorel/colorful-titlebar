@@ -25,7 +25,7 @@
   </script>
 
   <script purpose="加载css">
-    function loadCss() {
+    {
       const css = document.createElement('link');
       css.href = consts.isProd ? '${cssUri}' : './style.css';
       css.rel = 'stylesheet';
@@ -44,7 +44,6 @@
       cssPalette.type = 'text/css';
       document.head.appendChild(cssPalette);
     }
-    loadCss();
   </script>
 
 </head>
@@ -264,13 +263,19 @@
     </form>
   </div>
 
+  <script purpose="加载测试UI文本">
+    {
+      const testScript = document.createElement('script');
+      testScript.src = '../tests/template-replacer.js';
+      document.body.appendChild(testScript);
+    }
+  </script>
   <script purpose="加载js">
-    function loadJS() {
+    {
       const script = document.createElement('script');
       script.src = consts.isProd ? '${scriptUri}' : './control-panel.js';
       document.body.appendChild(script);
     }
-    loadJS();
   </script>
 </body>
 

@@ -11,7 +11,7 @@
  * @property {string} lightThemeColors
  * @property {string} darkThemeColors
  */
-(() => {
+(function () {
   /** @type {boolean} */
   const isProd = consts.isProd;
   /** @type {string} */
@@ -119,9 +119,6 @@
       find('randomColor.specify').value = configs.currentColor;
       find('projectIndicators').value = configs.projectIndicators;
     } else {
-      const testScript = document.createElement('script');
-      testScript.src = '../../../tests/template-replacer.js';
-      document.body.appendChild(testScript);
       document.getElementById('theme').checked = true;
       find('showSuggest').checked = false;
       find('workbenchCssPath').value =
@@ -210,7 +207,7 @@
     });
   }
 
-  function initSimpleInputs() {
+  function initAutoHeightTextarea() {
     // 初始化所有textarea
     $('textarea').forEach((textarea) => {
       textarea.addEventListener('input', function (event) {
@@ -220,7 +217,9 @@
       textarea.style.height = 'auto';
       textarea.style.height = textarea.scrollHeight + 'px';
     });
+  }
 
+  function initColorPickers() {
     // 初始化单独的颜色选择器
     $('button.color-picker').forEach((picker) => {
       const colorInput = picker.querySelector('input[type="color"]');
@@ -433,20 +432,14 @@
   }
 
   // 开始初始化
-  const body = q('.body');
   initThemeSwitch();
   initColorPalette();
+  initColorPickers();
   initSettingsValue();
   initSettingsChangeEvents();
-  body.style.display = '';
-  body.addEventListener(
-    'transitionstart',
-    () => {
-      // 这样可以让textarea自动计算高度生效，在display:none的情况下无法正确计算高度，渲染出来的高度是初始高度
-      initSimpleInputs();
-    },
-    { once: true }
-  );
+  q('.body').style.display = '';
+  // 这样可以让textarea自动计算高度生效，在display:none的情况下无法正确计算高度，渲染出来的高度是初始高度
+  q('.body').addEventListener('transitionstart', initAutoHeightTextarea, { once: true });
 
-  setTimeout(() => (body.style.opacity = '1'), 100);
+  setTimeout(() => (q('.body').style.opacity = '1'), 100);
 })();
