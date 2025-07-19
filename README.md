@@ -13,7 +13,7 @@ A VS Code extension that adds colorful background colors to the title bar based 
 - 🌍 **Multi-language Support**: Full Chinese and English interface
 - ✨ **Gradient Overlay Effects**: Add beautiful gradient overlays to enhance the titlebar appearance (requires CSS hacking)
 
-## 🔥 Breaking Changes in v1.2.0
+## 🔥 Breaking Changes
 
 **All previous commands have been removed and replaced with a unified Control Panel!** The new control panel provides a more intuitive and user-friendly interface for managing all extension settings. [Learn more about the Control Panel](#control-panel).
 
@@ -37,7 +37,6 @@ The extension now features a comprehensive Control Panel that replaces all previ
 ### Opening the Control Panel
 
 - **Command**: `Ctrl+Shift+P` → "Colorful Titlebar: Open Control Panel"
-- **Menu**: Right-click on the title bar → "Colorful Titlebar Settings"
 
 ### Control Panel Features
 
@@ -70,6 +69,22 @@ The Control Panel provides real-time configuration of all extension settings:
 
 - **Refresh Colors**: Force regenerate colors for the current project
 - **Apply Settings**: All changes are applied immediately with visual feedback
+
+#### 🎨 Project Indicators Configuration
+
+- **Project Indicators**: Configure the list of files or folders used to identify projects
+  - Support multi-line editing with one indicator per line
+  - Custom scrollbar: Beautiful scrollbar component with smooth mouse wheel and drag operations
+  - Dynamic scrollbar height: Scrollbar size reflects content ratio
+
+#### 🌈 Theme Palette Management
+
+- **Light/Dark Theme Palette**: Configure color schemes for light themes
+  - Support drag-and-drop to reorder colors
+  - Click color blocks to edit
+  - Support multiple color formats: `#RRGGBB`, `#RRGGBBAA`, `rgb()`, `rgba()`
+  - Dynamically add and remove colors
+  - Support cross-palette drag-and-drop color movement
 
 ### Real-time Feedback
 
@@ -218,6 +233,39 @@ MIT License - see [LICENSE](LICENSE) file for details.
 Issues and Pull Requests are welcome!
 
 ## 📝 Changelog
+
+### 1.3.0
+
+- **🎯 UI/UX Major Improvements**
+
+  - **Color Palette Management**: Added comprehensive palette management functionality
+    - Configure color palettes for light and dark themes directly in the control panel
+    - Provided default light and dark color palettes
+  - **Custom Textarea with Scrollbar**: Hand-crafted custom scrollbar since VS Code doesn't support custom scrollbar styling!
+    - Beautiful custom scrollbar components for editing project indicators configuration
+    - Dynamic scrollbar height reflects content ratio - larger for less content, smaller for more content
+    - Enhanced mouse wheel and drag interactions for better user control
+  - **Visual Feedback**: Improved loading states with animated SVG spinners
+  - **Theme Consistency**: Enhanced theme switching with better visual continuity
+  - **Responsive Design**: Better layout adaptation for different screen sizes
+
+- **🛠️ Code Quality Enhancements**
+
+  - **TypeScript Integration**: Added comprehensive JSDoc type annotations throughout the codebase
+  - **HTMLElement Extensions**: Properly typed custom HTMLElement prototype extensions (mount method)
+  - **Modular Architecture**: Reorganized code structure with better separation of concerns
+  - **Error Handling**: Improved error handling with better user feedback
+
+- **🚀 Performance Optimizations**
+
+  - **Memory Management**: Optimized DOM manipulation and event handling
+  - **Efficient Rendering**: Reduced unnecessary re-renders in control panel
+  - **Better Resource Usage**: Improved cleanup of event listeners and DOM references
+
+- **🧪 Developer Experience**
+  - **Better Debugging**: Enhanced logging and error reporting
+  - **Code Documentation**: Comprehensive function and method documentation
+  - **Maintainable Code**: Cleaner code structure with better naming conventions
 
 ### 1.2.2
 
