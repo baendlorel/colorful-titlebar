@@ -265,7 +265,7 @@
   }
 
   function initTextarea() {
-    const WHEEL_RATIO = 0.06; // 这个值是测试得到的，无标准
+    const WHEEL_RATIO = 0.1; // 这个值是测试得到的，无标准
 
     // 初始化所有带有滚动条的textarea
     const drag = {
@@ -297,6 +297,7 @@
       const scroller = h('div', { class: 'textarea-scoller' }).mount(wrapper);
 
       textarea.addEventListener('wheel', (event) => {
+        event.preventDefault();
         const rawY = scroller.offsetTop + event.deltaY * WHEEL_RATIO;
         moveScroller(textarea, scroller, rawY, drag.verticalPad);
       });
@@ -347,10 +348,28 @@
       if (scroller) {
         const maxHeight = parseInt(wrapper.getAttribute('max-height'), 10) || 80;
         autoHeight = function () {
+          textarea.style.height = 'auto';
           if (maxHeight > textarea.scrollHeight) {
             scroller.style.display = 'none';
+            textarea.style.height = textarea.scrollHeight + 'px';
           } else {
             scroller.style.display = '';
+            textarea.style.height = maxHeight + 'px';
+
+            // 文本高度超过最大高度时，需要重新计算滚动条位置
+            // 保持当前的滚动比例，但基于新的 scrollHeight
+
+            // heightForScroll代表可以用在滚动的高度，因为textarea自己有高度
+            const heightForScroll = textarea.scrollHeight - textarea.offsetHeight;
+            const k = textarea.scrollTop / heightForScroll;
+            const newScrollTop = heightForScroll * k;
+
+            // 根据新的 scrollTop 计算滚动条应该在的位置
+            const maxTop = textarea.offsetHeight - scroller.offsetHeight - drag.verticalPad;
+            const rawY = drag.verticalPad + (newScrollTop / heightForScroll) * maxTop;
+
+            // 应用新的滚动条位置
+            moveScroller(textarea, scroller, rawY, drag.verticalPad);
           }
         };
       } else {

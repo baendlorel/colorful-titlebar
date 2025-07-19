@@ -317,7 +317,7 @@ input:checked + .slider:before {
   right: 3px;
   border-radius: 10px;
   width: 6px;
-  height: 20px;
+  height: 38.2%;
   background-color: var(--ct-primary-light);
 }
 
