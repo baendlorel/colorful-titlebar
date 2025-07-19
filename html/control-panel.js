@@ -21,6 +21,11 @@
   const configs = window.__kskb_consts.configs;
   const names = window.__kskb_consts.names;
 
+  HTMLElement.prototype.mount = function (el) {
+    el.appendChild(this);
+    return this;
+  };
+
   function concat(...strings) {
     return ''.concat(...strings);
   }
@@ -260,29 +265,48 @@
   }
 
   function initTextarea() {
-    // 初始化所有带有滚动条的textarea
-    const drag = { scroller: false, textareaMaxHeight: 0, y: 0, scrollerY: 0, verticalPad: 0 };
-    $('.textarea-wrapper').forEach((wrapper) => {
-      const maxHeight = parseInt(wrapper.getAttribute('max-height'), 10) || 80;
-      /**
-       * @type {HTMLDivElement}
-       */
-      const scroller = h('div', { class: 'textarea-scoller' });
+    const WHEEL_RATIO = 0.06; // 这个值是测试得到的，无标准
 
-      wrapper.appendChild(scroller);
+    // 初始化所有带有滚动条的textarea
+    const drag = {
+      scroller: null,
+      textarea: null,
+      y: 0,
+      scrollerY: 0,
+      verticalPad: 0,
+    };
+
+    /**
+     * 移动滚动条的关键函数
+     * @param {HTMLTextAreaElement} textarea 文本框
+     * @param {HTMLDivElement} scroller 滚动条
+     * @param {number} rawY 现在的y坐标，必须算好了给它，它会自己clamp到合适的范围
+     * @param {number} pad 滚动条的垂直内边距，通常是3
+     */
+    const moveScroller = function (textarea, scroller, rawY, pad) {
+      const minTop = pad;
+      const maxTop = textarea.offsetHeight - scroller.offsetHeight - minTop;
+      const y = Math.max(minTop, Math.min(rawY, maxTop));
+      scroller.style.top = y + 'px';
+      const k = y / maxTop;
+      textarea.scrollTop = (textarea.scrollHeight - textarea.offsetHeight) * k;
+    };
+
+    $('.textarea-wrapper').forEach((wrapper) => {
       const textarea = wrapper.querySelector('.textarea');
-      if (maxHeight > textarea.scrollHeight) {
-        scroller.style.display = 'none';
-      } else {
-        scroller.style.display = '';
-      }
+      const scroller = h('div', { class: 'textarea-scoller' }).mount(wrapper);
+
+      textarea.addEventListener('wheel', (event) => {
+        const rawY = scroller.offsetTop + event.deltaY * WHEEL_RATIO;
+        moveScroller(textarea, scroller, rawY, drag.verticalPad);
+      });
 
       scroller.addEventListener('mousedown', (event) => {
         event.preventDefault();
         drag.scroller = scroller;
+        drag.textarea = textarea;
         drag.y = event.clientY;
         drag.scrollerY = scroller.offsetTop;
-        drag.textareaMaxHeight = textarea.offsetHeight;
       });
     });
 
@@ -298,19 +322,20 @@
     });
 
     document.addEventListener('mouseup', () => {
-      drag.scroller = false;
+      drag.scroller = null;
+      drag.textarea = null;
       drag.y = 0;
       drag.scrollerY = 0;
     });
 
     document.addEventListener('mousemove', (event) => {
       if (drag.scroller) {
-        const rawY = drag.scrollerY + (event.clientY - drag.y);
-        const y = Math.max(
-          drag.verticalPad,
-          Math.min(rawY, drag.textareaMaxHeight - drag.scroller.offsetHeight - drag.verticalPad)
+        moveScroller(
+          drag.textarea,
+          drag.scroller,
+          drag.scrollerY + (event.clientY - drag.y),
+          drag.verticalPad
         );
-        drag.scroller.style.top = y + 'px';
       }
     });
 
