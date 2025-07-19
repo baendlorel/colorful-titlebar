@@ -8,7 +8,7 @@ const parseRgba = (s: string | undefined) => {
     const g = parseInt(hex.slice(2, 4), 16);
     const b = parseInt(hex.slice(4, 6), 16);
     const a = hexMatch[2] ? parseInt(hexMatch[2], 16) / 255 : 1;
-    return [r, g, b, a];
+    return { r, g, b, a, valid: true };
   }
 
   const rgbaMatch = s.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
@@ -17,10 +17,10 @@ const parseRgba = (s: string | undefined) => {
     const g = parseInt(rgbaMatch[2], 10);
     const b = parseInt(rgbaMatch[3], 10);
     const a = rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1;
-    return [r, g, b, a];
+    return { r, g, b, a, valid: true };
   }
 
-  return [0, 0, 0, 1];
+  return { r: 0, g: 0, b: 0, a: 0, valid: false };
 };
 
 const toHex = (n: number) => Math.floor(n).toString(16).padStart(2, '0');
@@ -40,19 +40,23 @@ export default class RGBA {
   private b = 0;
   private a = 1;
 
+  valid: boolean;
+
   constructor(s?: string | RGBA) {
     if (s instanceof RGBA) {
       this.r = s.r;
       this.g = s.g;
       this.b = s.b;
       this.a = s.a;
+      this.valid = s.valid;
       return;
     }
     const parsed = parseRgba(s);
-    this.r = parsed[0];
-    this.g = parsed[1];
-    this.b = parsed[2];
-    this.a = parsed[3];
+    this.r = parsed.r;
+    this.g = parsed.g;
+    this.b = parsed.b;
+    this.a = parsed.a;
+    this.valid = parsed.valid;
   }
 
   get brightness() {

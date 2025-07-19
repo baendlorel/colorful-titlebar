@@ -187,7 +187,7 @@
     }
   }
 
-  function initSettingsChangeEvents() {
+  function initGeneralInputChange() {
     // 要推送到插件的输入变更事件
     q('#settings').addEventListener('change', (event) => {
       /**
@@ -213,7 +213,7 @@
 
         if (Number.isNaN(value) || value < min || value > max) {
           find(input.name, 'error').innerText = i18n.NumberLimit(min, max, true);
-          input.value = input.defaultValue; // 恢复默认值
+          input.value = min;
           return;
         }
         data.value = value;
@@ -633,7 +633,7 @@
   initPalette();
   initColorPickers();
   initSettingsValue();
-  initSettingsChangeEvents();
+  initGeneralInputChange();
   q('.body').style.display = '';
   // 这样可以让textarea自动计算高度生效，在display:none的情况下无法正确计算高度，渲染出来的高度是初始高度
   q('.body').addEventListener('transitionstart', initTextarea, { once: true });

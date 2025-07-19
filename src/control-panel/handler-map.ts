@@ -20,7 +20,7 @@ export const handlerMap = {
       result.msg = Panel.typeError(value, 'a boolean');
       throw null;
     }
-    await configs.set.showSuggest(value);
+    await configs.setShowSuggest(value);
   },
   [ControlName.WorkbenchCssPath]: async (result: HandelResult, value: PostedValue) => {
     if (typeof value !== 'string') {
@@ -34,7 +34,7 @@ export const handlerMap = {
       result.msg = Panel.workbenchCssPath.notExist;
       throw null;
     }
-    await configs.set.workbenchCssPath(cssPath);
+    await configs.setWorkbenchCssPath(cssPath);
   },
   [ControlName.Gradient]: async (result: HandelResult, value: PostedValue) => {
     let gradientStyle: AfterStyle;
@@ -69,23 +69,23 @@ export const handlerMap = {
     result.msg = Panel.gradient.success;
   },
   [ControlName.GradientBrightness]: async (result: HandelResult, value: PostedValue) => {
-    const d = parseInt(String(value), 10) / 100;
-    if (Number.isNaN(d) || d < 0 || d > 1) {
+    const d = parseInt(String(value), 10);
+    if (Number.isNaN(d) || d < 0 || d > 100 || !Number.isSafeInteger(d)) {
       result.succ = false;
       result.msg = Panel.typeError(value);
       throw null;
     }
-    await configs.set.gradientBrightness(d);
+    await configs.setGradientBrightness(d);
     result.msg = Panel.gradient.success;
   },
   [ControlName.GradientDarkness]: async (result: HandelResult, value: PostedValue) => {
-    const d = parseInt(String(value), 10) / 100;
-    if (Number.isNaN(d) || d < 0 || d > 1) {
+    const d = parseInt(String(value), 10);
+    if (Number.isNaN(d) || d < 0 || d > 100 || !Number.isSafeInteger(d)) {
       result.succ = false;
       result.msg = Panel.typeError(value);
       throw null;
     }
-    await configs.set.gradientDarkness(d);
+    await configs.setGradientDarkness(d);
     result.msg = Panel.gradient.success;
   },
   [ControlName.HashSource]: async (result: HandelResult, value: PostedValue) => {
@@ -96,7 +96,7 @@ export const handlerMap = {
       result.msg = Panel.typeError(value, `one of ${arr.join(', ')}`);
       throw null;
     }
-    await configs.set.hashSource(d);
+    await configs.setHashSource(d);
     result.msg = Panel.hashSource.success;
   },
   [ControlName.Refresh]: async (result: HandelResult, _value: PostedValue) => {
@@ -134,9 +134,9 @@ export const handlerMap = {
       .split(Prod.Separator)
       .map((item) => item.trim())
       .filter(Boolean);
-    await configs.set.projectIndicators(indicators);
+    await configs.setProjectIndicators(indicators);
   },
-  [ControlName.ThemeColors]: async (result: HandelResult, value: Record<string, string[]>) => {
+  [ControlName.ThemeColors]: async (result: HandelResult, value: Record<string, RGBA[]>) => {
     if (typeof value !== 'object' || value === null) {
       result.succ = false;
       result.msg = Panel.typeError(value, 'an object');
@@ -145,10 +145,11 @@ export const handlerMap = {
     // const vscode = await import('vscode');
     // vscode.window.showInformationMessage('调色板变化' + JSON.stringify(value));
 
-    const light = value[ControlName['ThemeColors.light']];
-    const dark = value[ControlName['ThemeColors.dark']];
+    let light = value[ControlName['ThemeColors.light']];
+    let dark = value[ControlName['ThemeColors.dark']];
 
     // 必须至少有一个是正常的
+    // todo 这里要细致校验两者正确性
     let validCount = 0;
     if (Array.isArray(light)) {
       if (light.length === 0) {
@@ -157,7 +158,7 @@ export const handlerMap = {
         throw null;
       }
       validCount++;
-      await configs.set.lightThemeColors(light);
+      await configs.setLightThemeColors(light);
     }
     if (Array.isArray(dark)) {
       if (dark.length === 0) {
@@ -166,8 +167,9 @@ export const handlerMap = {
         throw null;
       }
       validCount++;
-      await configs.set.darkThemeColors(dark);
+      await configs.setDarkThemeColors(dark);
     }
+
     if (validCount === 0) {
       result.succ = false;
       result.msg = Panel.typeError(value, 'an object with arrays');

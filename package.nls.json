@@ -2,6 +2,7 @@
   "extension.category": "Colorful Titlebar",
   "configuration.title": "Colorful Titlebar",
   "command.controlPanel.title": "Open Control Panel",
+  "configuration.akasha.description": "This is encrypted user settings. Open the Colorful Titlebar Control Panel from the command palette to modify settings. Note that only global settings will be loaded.",
   "configuration.gradientBrightness.description": "Indicates how bright the gradient effect is at bright positions, given as a decimal between 0 and 1",
   "configuration.gradientDarkness.description": "Indicates how dark the gradient effect is at dark positions, given as a decimal between 0 and 1",
   "configuration.showSuggest.description": "Whether to show suggest messages",

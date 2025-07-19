@@ -4,6 +4,7 @@ import { Consts, GradientStyle, HashSource, TitleBarConsts } from './consts';
 export default (() => {
   const zh = {
     Unknown: '未知',
+    InvalidAkasha: '用户配置读取失败，也许是配置数据损坏，将启用默认配置覆盖',
 
     BlockAllSuggestion: { button: '屏蔽所有建议' },
     NotWorkspace: '没有打开工作区文件夹，不改变标题栏颜色',
@@ -149,6 +150,9 @@ export default (() => {
 
   const en = {
     Unknown: 'unknown',
+    InvalidAkasha:
+      'User configuration read failed, maybe the config data is corrupted, will use default config to override',
+
     BlockAllSuggestion: { button: 'Block Suggestions' },
     NotWorkspace: 'No workspace folder opened, titlebar color remains unchanged',
     NotProject: 'Current folder is not a project directory, titlebar color remains unchanged',

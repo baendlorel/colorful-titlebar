@@ -47,6 +47,10 @@
     "configuration": {
       "title": "%configuration.title%",
       "properties": {
+        "colorful-titlebar.akasha": {
+          "type": "string",
+          "default": ""
+        },
         "colorful-titlebar.currentVersion": {
           "type": "string",
           "default": "outdated"
