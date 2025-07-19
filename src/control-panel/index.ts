@@ -82,7 +82,13 @@ export default async function (this: vscode.ExtensionContext) {
         gradientBrightness: '${ControlName.GradientBrightness}',
         gradientDarkness: '${ControlName.GradientDarkness}',
         refresh: '${ControlName.Refresh}',
+        randomColor: '${ControlName.RandomColor}',
+        'randomColor.colorSet': "${ControlName['RandomColor.colorSet']}",
+        'randomColor.pure': "${ControlName['RandomColor.pure']}",
         'randomColor.specify': "${ControlName['RandomColor.specify']}",
+        isRandomColor: (s) => s === "${ControlName['RandomColor.colorSet']}" || s === "${
+    ControlName['RandomColor.pure']
+  }" || s === "${ControlName['RandomColor.specify']}",
         projectIndicators: '${ControlName.ProjectIndicators}',
         // 这两个是配置决定的名字
         lightThemeColors: "${ControlName['ThemeColors.light']}",

@@ -270,7 +270,9 @@
         // 如果是几个特定的改颜色的指令，那么更新按钮的背景色
         if (names.refresh === resp.name || names.isRandomColor(resp.name)) {
           if (resp.other?.color) {
-            find(names['randomColor.specify'], 'button').style.backgroundColor = resp.other.color;
+            const button = find(names['randomColor.specify'], 'button');
+            const colorInput = button.querySelector('input[type="color"]');
+            colorInput.updateColor && colorInput.updateColor(resp.other.color);
           }
         }
       }
@@ -432,15 +434,18 @@
   function initColorPickers() {
     $('button.color-picker').forEach((picker) => {
       const colorInput = picker.querySelector('input[type="color"]');
-      colorInput.addEventListener('input', function () {
-        const [r, g, b] = colorInput.value
+      colorInput.updateColor = function (color) {
+        const [r, g, b] = color
           .replace('#', '')
           .match(/.{2}/g)
           .map((hex) => parseInt(hex, 16));
         const brightness = Math.floor((r * 299 + g * 587 + b * 114) / 1000);
         picker.style.color = brightness > 128 ? '#000' : '#fff';
-        picker.style.backgroundColor = colorInput.value;
-        picker.title = colorInput.value;
+        picker.style.backgroundColor = color;
+        picker.title = color;
+      };
+      colorInput.addEventListener('input', function () {
+        colorInput.updateColor(colorInput.value);
       });
       picker.addEventListener('click', colorInput.click.bind(colorInput));
       picker.title = colorInput.value;
