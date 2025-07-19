@@ -171,11 +171,6 @@
       find(names['randomColor.specify'], 'button').style.backgroundColor = configs.currentColor;
       find(names['randomColor.specify']).value = configs.currentColor;
       // 换成换行符是为了编辑textarea更方便
-      find(names.projectIndicators, 'succ').innerHTML = configs.projectIndicators.replaceAll(
-        SEP,
-        '\n'
-      );
-      find(names.projectIndicators, 'error').innerHTML = configs.projectIndicators;
       find(names.projectIndicators).value = configs.projectIndicators.replaceAll(SEP, '\n');
     } else {
       document.getElementById('theme').checked = true;
@@ -203,6 +198,10 @@
         name: input.name,
         value: input.value,
       };
+
+      if (data.name === 'theme') {
+        return; // 主题切换事件不需要被post
+      }
 
       // 如果数字类不符合要求，则返回并提示
       if (input.type === 'number') {
@@ -434,7 +433,7 @@
   }
 
   // #region 颜色套组编辑器
-  function initColorPalette() {
+  function initPalette() {
     /**
      * 创建一个调色板色块
      * @param {string} name 调色板颜色，将会作为belong属性设置在input元素上
@@ -631,7 +630,7 @@
 
   // 开始初始化
   initThemeSwitch();
-  initColorPalette();
+  initPalette();
   initColorPickers();
   initSettingsValue();
   initSettingsChangeEvents();
