@@ -8,7 +8,7 @@ import { getHashSource, getColor, getColorByK } from '@/core/colors';
 
 import { AfterStyle } from '@/features/gradient/consts';
 import hacker from '@/features/gradient/hacker';
-import { ControlName } from './consts';
+import { ControlName, Prod } from './consts';
 import { HandelResult, PostedValue } from './types';
 import style from '@/core/style';
 
@@ -131,7 +131,7 @@ export const handlerMap = {
       throw null;
     }
     const indicators = value
-      .split('\n')
+      .split(Prod.Separator)
       .map((item) => item.trim())
       .filter(Boolean);
     await configs.set.projectIndicators(indicators);

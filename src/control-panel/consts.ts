@@ -15,3 +15,8 @@ export const enum ControlName {
   'ThemeColors.light',
   'ThemeColors.dark',
 }
+
+export const enum Prod {
+  Env = 'prod',
+  Separator = ';',
+}

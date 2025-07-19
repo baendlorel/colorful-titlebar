@@ -6,9 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${Panel.title}</title>
   <script purpose="常量套组">
-    window.consts = {
-      isProd: '${env}' === 'prod',
+    window.__kskb_consts = {
+      isProd: '${Prod.Env}' === 'prod',
       lang: '${configs.lang}',
+      separator: '${Prod.Env}' === 'prod' ? '${Prod.Separator}' : ';',
       configs: {
         theme: '${configs.theme}' === 'light',
         showSuggest: '${configs.showSuggest}' === 'true',
@@ -43,19 +44,19 @@
   <script purpose="加载css">
     {
       const css = document.createElement('link');
-      css.href = consts.isProd ? '${cssUri}' : './style.css';
+      css.href = window.__kskb_consts.isProd ? '${cssUri}' : './style.css';
       css.rel = 'stylesheet';
       css.type = 'text/css';
       document.head.appendChild(css);
 
       const cssThemeSwitch = document.createElement('link');
-      cssThemeSwitch.href = consts.isProd ? '${cssThemeSwitchUri}' : './theme-switch.css';
+      cssThemeSwitch.href = window.__kskb_consts.isProd ? '${cssThemeSwitchUri}' : './theme-switch.css';
       cssThemeSwitch.rel = 'stylesheet';
       cssThemeSwitch.type = 'text/css';
       document.head.appendChild(cssThemeSwitch);
 
       const cssPalette = document.createElement('link');
-      cssPalette.href = consts.isProd ? '${cssPaletteUri}' : './palette.css';
+      cssPalette.href = window.__kskb_consts.isProd ? '${cssPaletteUri}' : './palette.css';
       cssPalette.rel = 'stylesheet';
       cssPalette.type = 'text/css';
       document.head.appendChild(cssPalette);
@@ -274,7 +275,7 @@
   </div>
 
   <script purpose="加载测试UI文本">
-    if (!consts.isProd) {
+    if (!window.__kskb_consts.isProd) {
       const testScript = document.createElement('script');
       testScript.src = '../tests/template-replacer.js';
       document.body.appendChild(testScript);
@@ -283,7 +284,7 @@
   <script purpose="加载js">
     {
       const script = document.createElement('script');
-      script.src = consts.isProd ? '${scriptUri}' : './control-panel.js';
+      script.src = window.__kskb_consts.isProd ? '${scriptUri}' : './control-panel.js';
       document.body.appendChild(script);
     }
   </script>

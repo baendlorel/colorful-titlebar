@@ -6,15 +6,15 @@ import i18n from '@/common/i18n';
 import configs from '@/common/configs';
 import RGBA from '@/common/rgba';
 import version from '@/core/version';
+
 import { handlerMap } from './handler-map';
 import { HandelResult } from './types';
-import { ControlName } from './consts';
+import { ControlName, Prod } from './consts';
 
 const Panel = i18n.ControlPanel;
 
 let controlPanel: vscode.WebviewPanel | null = null;
 
-// fixme F5测试下来莫名其妙报consts找不到，明明有啊
 export default async function (this: vscode.ExtensionContext) {
   if (controlPanel !== null) {
     return; // 防止创建多个设置页面
@@ -42,13 +42,16 @@ export default async function (this: vscode.ExtensionContext) {
   const cssPaletteUri = controlPanel.webview.asWebviewUri(cssPalettePath);
 
   // 准备一些数据
-  const env = 'prod';
   const currentColor = configs.currentColor ?? '#007ACC';
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
   const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
-  const projectIndicators = configs.projectIndicators.join('\n');
-  const lightThemeColors = configs.lightThemeColors.map((c) => new RGBA(c).toRGBString()).join(';');
-  const darkThemeColors = configs.darkThemeColors.map((c) => new RGBA(c).toRGBString()).join(';');
+  const projectIndicators = configs.projectIndicators.join(Prod.Separator);
+  const lightThemeColors = configs.lightThemeColors
+    .map((c) => new RGBA(c).toRGBString())
+    .join(Prod.Separator);
+  const darkThemeColors = configs.darkThemeColors
+    .map((c) => new RGBA(c).toRGBString())
+    .join(Prod.Separator);
 
   controlPanel.webview.html = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -58,9 +61,10 @@ export default async function (this: vscode.ExtensionContext) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${Panel.title}</title>
   <script purpose="常量套组">
-    window.consts = {
-      isProd: '${env}' === 'prod',
+    window.__kskb_consts = {
+      isProd: '${Prod.Env}' === 'prod',
       lang: '${configs.lang}',
+      separator: '${Prod.Env}' === 'prod' ? '${Prod.Separator}' : ';',
       configs: {
         theme: '${configs.theme}' === 'light',
         showSuggest: '${configs.showSuggest}' === 'true',
@@ -95,19 +99,19 @@ export default async function (this: vscode.ExtensionContext) {
   <script purpose="加载css">
     {
       const css = document.createElement('link');
-      css.href = consts.isProd ? '${cssUri}' : './style.css';
+      css.href = window.__kskb_consts.isProd ? '${cssUri}' : './style.css';
       css.rel = 'stylesheet';
       css.type = 'text/css';
       document.head.appendChild(css);
 
       const cssThemeSwitch = document.createElement('link');
-      cssThemeSwitch.href = consts.isProd ? '${cssThemeSwitchUri}' : './theme-switch.css';
+      cssThemeSwitch.href = window.__kskb_consts.isProd ? '${cssThemeSwitchUri}' : './theme-switch.css';
       cssThemeSwitch.rel = 'stylesheet';
       cssThemeSwitch.type = 'text/css';
       document.head.appendChild(cssThemeSwitch);
 
       const cssPalette = document.createElement('link');
-      cssPalette.href = consts.isProd ? '${cssPaletteUri}' : './palette.css';
+      cssPalette.href = window.__kskb_consts.isProd ? '${cssPaletteUri}' : './palette.css';
       cssPalette.rel = 'stylesheet';
       cssPalette.type = 'text/css';
       document.head.appendChild(cssPalette);
@@ -346,7 +350,7 @@ export default async function (this: vscode.ExtensionContext) {
   </div>
 
   <script purpose="加载测试UI文本">
-    if (!consts.isProd) {
+    if (!window.__kskb_consts.isProd) {
       const testScript = document.createElement('script');
       testScript.src = '../tests/template-replacer.js';
       document.body.appendChild(testScript);
@@ -355,7 +359,7 @@ export default async function (this: vscode.ExtensionContext) {
   <script purpose="加载js">
     {
       const script = document.createElement('script');
-      script.src = consts.isProd ? '${scriptUri}' : './control-panel.js';
+      script.src = window.__kskb_consts.isProd ? '${scriptUri}' : './control-panel.js';
       document.body.appendChild(script);
     }
   </script>

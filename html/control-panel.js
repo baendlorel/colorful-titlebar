@@ -13,12 +13,13 @@
  */
 (function () {
   /** @type {boolean} */
-  const isProd = consts.isProd;
+  const isProd = window.__kskb_consts.isProd;
   /** @type {string} */
-  const lang = consts.lang;
-  /** @type {Config} */
-  const configs = consts.configs;
-  const names = consts.names;
+  const lang = window.__kskb_consts.lang;
+  /** @type {string} */
+  const SEP = window.__kskb_consts.separator;
+  const configs = window.__kskb_consts.configs;
+  const names = window.__kskb_consts.names;
 
   function concat(...strings) {
     return ''.concat(...strings);
@@ -113,7 +114,13 @@
       find(names.gradientDarkness).value = configs.gradientDarkness;
       find(names['randomColor.specify'], 'button').style.backgroundColor = configs.currentColor;
       find(names['randomColor.specify']).value = configs.currentColor;
-      find(names.projectIndicators).value = configs.projectIndicators;
+      // 换成换行符是为了编辑textarea更方便
+      find(names.projectIndicators, 'succ').innerHTML = configs.projectIndicators.replaceAll(
+        SEP,
+        '\n'
+      );
+      find(names.projectIndicators, 'error').innerHTML = configs.projectIndicators;
+      find(names.projectIndicators).value = configs.projectIndicators.replaceAll(SEP, '\n');
     } else {
       document.getElementById('theme').checked = true;
       find(names.showSuggest).checked = false;
@@ -123,6 +130,7 @@
       find(names.gradientDarkness).value = '12';
       find(names['randomColor.specify'], 'button').style.backgroundColor = '#EE7ACC';
       find(names['randomColor.specify']).value = '#EE7ACC';
+      // 换成换行符是为了编辑textarea更方便
       find(names.projectIndicators).value =
         '.git\nCargo.toml\nREADME.md\npackage.json\npom.xml\nbuild.gradle\nMakefile';
     }
@@ -159,6 +167,11 @@
       } else if (input.classList.contains('palette-input')) {
         // 已经在初始化调色盘的地方处理过了
         return;
+      }
+
+      if (input.name === names.projectIndicators) {
+        // 特殊处理项目指示器，将换行符转换为分号
+        data.value = input.value.replace(/\n/g, SEP).replace(/\s/g, '');
       }
 
       vspost(data);
@@ -279,10 +292,10 @@
     });
 
     const lightColors = isProd
-      ? configs.lightThemeColors.split(';')
+      ? configs.lightThemeColors.split(SEP)
       : ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
     const darkColors = isProd
-      ? configs.darkThemeColors.split(';')
+      ? configs.darkThemeColors.split(SEP)
       : ['#E74C3C', '#1ABC9C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#34495E'];
 
     renderColorList(names.lightThemeColors, lightColors);
