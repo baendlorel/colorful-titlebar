@@ -129,4 +129,5 @@ class TitleBarStyle {
   }
 }
 
-export default new TitleBarStyle();
+const style = new TitleBarStyle();
+export default style;

@@ -1,18 +1,20 @@
 import { existsSync } from 'node:fs';
 
+import { getHashSource, getColor, getColorByK } from '@/core/colors';
+import style from '@/core/style';
 import { GradientStyle, HashSource } from '@/common/consts';
 import configs from '@/common/configs';
 import i18n from '@/common/i18n';
 import RGBA from '@/common/rgba';
-import { getHashSource, getColor, getColorByK } from '@/core/colors';
+import safe from '@/common/safe';
 
 import { AfterStyle } from '@/features/gradient/consts';
 import hacker from '@/features/gradient/hacker';
 import { ControlName, Prod } from './consts';
 import { HandelResult, PostedValue } from './types';
-import style from '@/core/style';
 
 const Panel = i18n.ControlPanel;
+
 export const handlerMap = {
   [ControlName.ShowSuggest]: async (result: HandelResult, value: PostedValue) => {
     if (typeof value !== 'boolean') {
@@ -69,23 +71,25 @@ export const handlerMap = {
     result.msg = Panel.gradient.success;
   },
   [ControlName.GradientBrightness]: async (result: HandelResult, value: PostedValue) => {
-    const d = parseInt(String(value), 10);
-    if (Number.isNaN(d) || d < 0 || d > 100 || !Number.isSafeInteger(d)) {
+    const raw = parseInt(String(value), 10);
+    const percent = safe.percent(raw);
+    if (percent === null) {
       result.succ = false;
       result.msg = Panel.typeError(value);
       throw null;
     }
-    await configs.setGradientBrightness(d);
+    await configs.setGradientBrightness(percent);
     result.msg = Panel.gradient.success;
   },
   [ControlName.GradientDarkness]: async (result: HandelResult, value: PostedValue) => {
-    const d = parseInt(String(value), 10);
-    if (Number.isNaN(d) || d < 0 || d > 100 || !Number.isSafeInteger(d)) {
+    const raw = parseInt(String(value), 10);
+    const percent = safe.percent(raw);
+    if (percent === null) {
       result.succ = false;
       result.msg = Panel.typeError(value);
       throw null;
     }
-    await configs.setGradientDarkness(d);
+    await configs.setGradientDarkness(percent);
     result.msg = Panel.gradient.success;
   },
   [ControlName.HashSource]: async (result: HandelResult, value: PostedValue) => {
@@ -142,40 +146,35 @@ export const handlerMap = {
       result.msg = Panel.typeError(value, 'an object');
       throw null;
     }
-    // const vscode = await import('vscode');
-    // vscode.window.showInformationMessage('调色板变化' + JSON.stringify(value));
-
-    let light = value[ControlName['ThemeColors.light']];
-    let dark = value[ControlName['ThemeColors.dark']];
 
     // 必须至少有一个是正常的
-    // todo 这里要细致校验两者正确性
-    let validCount = 0;
-    if (Array.isArray(light)) {
+    const errors: string[] = [];
+    const light = safe.colors(value[ControlName['ThemeColors.light']]);
+    if (light) {
       if (light.length === 0) {
-        result.succ = false;
-        result.msg = Panel.themeColors.emptyPalette;
-        throw null;
+        errors.push(Panel.themeColors.emptyPalette(Panel.themeColors.lightColors));
+      } else {
+        await configs.setLightThemeColors(light);
       }
-      validCount++;
-      await configs.setLightThemeColors(light);
-    }
-    if (Array.isArray(dark)) {
-      if (dark.length === 0) {
-        result.succ = false;
-        result.msg = Panel.themeColors.emptyPalette;
-        throw null;
-      }
-      validCount++;
-      await configs.setDarkThemeColors(dark);
+    } else {
+      errors.push(Panel.themeColors.invalidPaletteColor(Panel.themeColors.lightColors));
     }
 
-    if (validCount === 0) {
+    const dark = safe.colors(value[ControlName['ThemeColors.dark']]);
+    if (dark) {
+      if (dark.length === 0) {
+        errors.push(Panel.themeColors.emptyPalette(Panel.themeColors.darkColors));
+      } else {
+        await configs.setDarkThemeColors(dark);
+      }
+    } else {
+      errors.push(Panel.themeColors.invalidPaletteColor(Panel.themeColors.darkColors));
+    }
+
+    if (errors.length > 0) {
       result.succ = false;
-      result.msg = Panel.typeError(value, 'an object with arrays');
+      result.msg = errors.join('\n');
       throw null;
-    } else if (validCount === 2) {
-      result.msg = Panel.themeColors.allSaved;
     }
   },
   [ControlName['ThemeColors.light']]: async (_result: HandelResult, _value: PostedValue) => {

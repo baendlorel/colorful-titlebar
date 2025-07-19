@@ -1,7 +1,7 @@
 import vscode from 'vscode';
 import { Consts, GradientStyle, HashSource, TitleBarConsts } from './consts';
 
-export default (() => {
+const i18n = (() => {
   const zh = {
     Unknown: '未知',
     InvalidAkasha: '用户配置读取失败，也许是配置数据损坏，将启用默认配置覆盖',
@@ -85,7 +85,8 @@ export default (() => {
         addColor: '添加颜色',
         removeColor: '删除',
         dragHint: '拖拽重新排序',
-        emptyPalette: '至少得有1个颜色',
+        emptyPalette: (name: string) => `${name}至少得有1个颜色`,
+        invalidPaletteColor: (name: string) => `${name}存在无效颜色`,
         allSaved: '全都保存完成',
       },
     },
@@ -238,7 +239,8 @@ export default (() => {
         addColor: 'Add Color',
         removeColor: 'Remove',
         dragHint: 'Drag to reorder',
-        emptyPalette: 'Should add at least 1 color',
+        emptyPalette: (name: string) => `${name} should add at least 1 color`,
+        invalidPaletteColor: (name: string) => `${name} has invalid color(s)`,
         allSaved: 'All color sets are saved',
       },
     },
@@ -307,3 +309,5 @@ export default (() => {
   const isChinese = vscode.env.language.toLowerCase().startsWith('zh');
   return isChinese ? zh : en;
 })();
+
+export default i18n;

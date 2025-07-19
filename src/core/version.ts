@@ -29,4 +29,5 @@ class Version {
   }
 }
 
-export default new Version();
+const version = new Version();
+export default version;

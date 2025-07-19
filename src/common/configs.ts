@@ -1,9 +1,10 @@
 import vscode from 'vscode';
+import aes from '@/core/aes';
 
 import { Consts, HashSource, TitleBarConsts } from './consts';
 import RGBA from './rgba';
-import aes from '@/core/aes';
 import i18n from './i18n';
+import safe from './safe';
 
 const enum Defaults {
   LightThemeColors = 'rgb(167, 139, 250);rgb(147, 197, 253);rgb(128, 203, 196);rgb(172, 243, 157);rgb(250, 204, 21);rgb(253, 151, 31);rgb(251, 113, 133)',
@@ -29,27 +30,6 @@ interface TitleBarStyleCustomization {
   [TitleBarConsts.ActiveBg]: string;
   [TitleBarConsts.InactiveBg]: string;
 }
-
-const validColors = (rawColors: RGBA[] | undefined): RGBA[] | null => {
-  if (Array.isArray(rawColors)) {
-    const colors = rawColors.map((color) => new RGBA(String(color)));
-    if (colors.some((c) => !c.valid)) {
-      return null;
-    } else {
-      return colors;
-    }
-  } else {
-    return null;
-  }
-};
-
-const validPercent = (value: number | undefined): number | null => {
-  if (typeof value === 'number' && value >= 0 && value <= 100 && Number.isSafeInteger(value)) {
-    return value;
-  } else {
-    return null;
-  }
-};
 
 class Configs {
   /**
@@ -103,8 +83,8 @@ class Configs {
 
     raw.showSuggest = typeof raw.showSuggest === 'boolean' ? raw.showSuggest : defaults.showSuggest;
 
-    raw.lightThemeColors = validColors(raw.lightThemeColors) ?? defaults.lightThemeColors;
-    raw.darkThemeColors = validColors(raw.darkThemeColors) ?? defaults.darkThemeColors;
+    raw.lightThemeColors = safe.colors(raw.lightThemeColors) ?? defaults.lightThemeColors;
+    raw.darkThemeColors = safe.colors(raw.darkThemeColors) ?? defaults.darkThemeColors;
 
     raw.projectIndicators = Array.isArray(raw.projectIndicators)
       ? raw.projectIndicators.map((indicator) => String(indicator).trim())
@@ -121,9 +101,9 @@ class Configs {
     raw.workbenchCssPath =
       typeof raw.workbenchCssPath === 'string' ? raw.workbenchCssPath : defaults.workbenchCssPath;
 
-    raw.gradientBrightness = validPercent(raw.gradientBrightness) ?? defaults.gradientBrightness;
+    raw.gradientBrightness = safe.percent(raw.gradientBrightness) ?? defaults.gradientBrightness;
 
-    raw.gradientDarkness = validPercent(raw.gradientDarkness) ?? defaults.gradientDarkness;
+    raw.gradientDarkness = safe.percent(raw.gradientDarkness) ?? defaults.gradientDarkness;
 
     // & 至此，已经严谨地确保了所有配置都是正确的数据和类型
     return raw as Config;

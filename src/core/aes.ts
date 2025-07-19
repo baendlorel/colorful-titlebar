@@ -1,6 +1,5 @@
 import { createCipheriv, createDecipheriv, randomBytes, createHash } from 'node:crypto';
 
-// todo 把所有的配置数据加密，避免用户改坏了
 /**
  * AES 加密解密工具类
  */
@@ -60,5 +59,5 @@ class AESCrypto {
     return decrypted;
   }
 }
-
-export default new AESCrypto('saitamasaikou! by Kasukabe Tsumugi');
+const aes = new AESCrypto('saitamasaikou! by Kasukabe Tsumugi');
+export default aes;
