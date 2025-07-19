@@ -43,15 +43,11 @@ export default async function (this: vscode.ExtensionContext) {
 
   // 准备一些数据
   const currentColor = configs.titleBarColor ?? '#007ACC';
-  const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
-  const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
   const projectIndicators = configs.projectIndicators.join(Prod.Separator);
   const lightThemeColors = configs.lightThemeColors
-    .map((c) => new RGBA(c).toRGBString())
+    .map((c) => c.toRGBString())
     .join(Prod.Separator);
-  const darkThemeColors = configs.darkThemeColors
-    .map((c) => new RGBA(c).toRGBString())
-    .join(Prod.Separator);
+  const darkThemeColors = configs.darkThemeColors.map((c) => c.toRGBString()).join(Prod.Separator);
 
   controlPanel.webview.html = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -70,8 +66,8 @@ export default async function (this: vscode.ExtensionContext) {
         showSuggest: '${configs.showSuggest}' === 'true',
         workbenchCssPath: '${configs.workbenchCssPath}',
         hashSource: '${configs.hashSource}',
-        gradientBrightness: '${gradientBrightness}',
-        gradientDarkness: '${gradientDarkness}',
+        gradientBrightness: '${configs.gradientBrightness}',
+        gradientDarkness: '${configs.gradientDarkness}',
         currentColor: '${currentColor}',
         projectIndicators: '${projectIndicators}',
         lightThemeColors: '${lightThemeColors}',

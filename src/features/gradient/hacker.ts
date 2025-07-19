@@ -61,9 +61,11 @@ class Hacker {
         break;
     }
 
+    const darkness = (configs.gradientDarkness / 100).toString();
+    const brightness = (configs.gradientBrightness / 100).toString();
     const style = rawStyle
-      .replaceAll('{darkness}', configs.gradientDarkness.toString())
-      .replaceAll('{brightness}', configs.gradientBrightness.toString())
+      .replaceAll('{darkness}', darkness)
+      .replaceAll('{brightness}', brightness)
       .replace(/\n[\s]+/g, '');
 
     // vscode.window.showInformationMessage(style);

@@ -140,7 +140,10 @@ export const handlerMap = {
       .filter(Boolean);
     await configs.setProjectIndicators(indicators);
   },
-  [ControlName.ThemeColors]: async (result: HandelResult, value: Record<string, RGBA[]>) => {
+  [ControlName.ThemeColors]: async (
+    result: HandelResult,
+    value: Record<string, RGBA[] | undefined>
+  ) => {
     if (typeof value !== 'object' || value === null) {
       result.succ = false;
       result.msg = Panel.typeError(value, 'an object');
@@ -149,26 +152,37 @@ export const handlerMap = {
 
     // 必须至少有一个是正常的
     const errors: string[] = [];
-    const light = safe.colors(value[ControlName['ThemeColors.light']]);
-    if (light) {
-      if (light.length === 0) {
-        errors.push(Panel.themeColors.emptyPalette(Panel.themeColors.lightColors));
+
+    const rawLight = value[ControlName['ThemeColors.light']];
+    if (rawLight) {
+      const light = safe.colors(rawLight);
+      if (light) {
+        if (light.length === 0) {
+          errors.push(Panel.themeColors.emptyPalette(Panel.themeColors.lightColors));
+        } else {
+          await configs.setLightThemeColors(light);
+        }
       } else {
-        await configs.setLightThemeColors(light);
+        errors.push(Panel.themeColors.invalidPaletteColor(Panel.themeColors.lightColors));
       }
-    } else {
-      errors.push(Panel.themeColors.invalidPaletteColor(Panel.themeColors.lightColors));
     }
 
-    const dark = safe.colors(value[ControlName['ThemeColors.dark']]);
-    if (dark) {
-      if (dark.length === 0) {
-        errors.push(Panel.themeColors.emptyPalette(Panel.themeColors.darkColors));
+    const rawDark = value[ControlName['ThemeColors.dark']];
+    if (rawDark) {
+      const dark = safe.colors(rawDark);
+      if (dark) {
+        if (dark.length === 0) {
+          errors.push(Panel.themeColors.emptyPalette(Panel.themeColors.darkColors));
+        } else {
+          await configs.setDarkThemeColors(dark);
+        }
       } else {
-        await configs.setDarkThemeColors(dark);
+        errors.push(Panel.themeColors.invalidPaletteColor(Panel.themeColors.darkColors));
       }
-    } else {
-      errors.push(Panel.themeColors.invalidPaletteColor(Panel.themeColors.darkColors));
+    }
+
+    if (!rawDark && !rawLight) {
+      errors.push('意外地一个颜色都没有？');
     }
 
     if (errors.length > 0) {
