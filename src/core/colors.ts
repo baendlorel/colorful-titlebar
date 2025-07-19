@@ -33,7 +33,7 @@ export const getHashSource = (fullPath: string) => {
 };
 
 export const getColorByK = (k: number) => {
-  const colorSet = configs.colorSet;
+  const colorSet = configs.theme === 'dark' ? configs.darkThemeColors : configs.lightThemeColors;
   const n = colorSet.length;
   const a = Math.floor(k * n);
   const b = (a + 1) % n; // 如果不取余数，会在a=length-1时，b=length而提取到undefined，最终解析出黑色

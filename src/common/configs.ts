@@ -164,26 +164,19 @@ class Configs {
     }
   }
 
-  private async save() {
-    const self = vscode.workspace.getConfiguration(Consts.Name);
-    const encrypted = aes.encrypt(this.serialize());
-    await self.update(Consts.Akasha, encrypted, vscode.ConfigurationTarget.Global);
-  }
-
-  private async overrideWithDefaults() {
-    this.self = this.getDefault();
-    await this.save();
-  }
-
-  get colorSet() {
-    switch (vscode.window.activeColorTheme.kind) {
-      case vscode.ColorThemeKind.Dark:
-      case vscode.ColorThemeKind.HighContrast:
-        return this.self.darkThemeColors;
-      case vscode.ColorThemeKind.Light:
-      case vscode.ColorThemeKind.HighContrastLight:
-        return this.self.lightThemeColors;
+  private async save(): Promise<void> {
+    try {
+      const self = vscode.workspace.getConfiguration(Consts.Name);
+      const akasha = aes.encrypt(this.serialize());
+      await self.update(Consts.Akasha, akasha, vscode.ConfigurationTarget.Global);
+    } catch (error) {
+      throw error;
     }
+  }
+
+  private overrideWithDefaults(): Promise<void> {
+    this.self = this.getDefault();
+    return this.save();
   }
 
   get currentColor() {
@@ -268,50 +261,49 @@ class Configs {
     return this.self.gradientDarkness;
   }
 
-  async setCurrentVersion(value: string) {
-    // 更新加密配置中的版本信息
+  setCurrentVersion(value: string): Promise<void> {
     this.self.currentVersion = value;
-    await this.save();
+    return this.save();
   }
 
-  async setShowSuggest(value: boolean) {
+  setShowSuggest(value: boolean): Promise<void> {
     this.self.showSuggest = value;
-    await this.save();
+    return this.save();
   }
 
-  async setHashSource(value: HashSource) {
+  setHashSource(value: HashSource): Promise<void> {
     this.self.hashSource = value;
-    await this.save();
+    return this.save();
   }
 
-  async setWorkbenchCssPath(value: string) {
+  setWorkbenchCssPath(value: string): Promise<void> {
     this.self.workbenchCssPath = value;
-    await this.save();
+    return this.save();
   }
 
-  async setGradientBrightness(value: number) {
+  setGradientBrightness(value: number): Promise<void> {
     this.self.gradientBrightness = value;
-    await this.save();
+    return this.save();
   }
 
-  async setGradientDarkness(value: number) {
+  setGradientDarkness(value: number): Promise<void> {
     this.self.gradientDarkness = value;
-    await this.save();
+    return this.save();
   }
 
-  async setProjectIndicators(value: string[]) {
+  setProjectIndicators(value: string[]): Promise<void> {
     this.self.projectIndicators = value;
-    await this.save();
+    return this.save();
   }
 
-  async setLightThemeColors(value: RGBA[]) {
+  setLightThemeColors(value: RGBA[]): Promise<void> {
     this.self.lightThemeColors = value;
-    await this.save();
+    return this.save();
   }
 
-  async setDarkThemeColors(value: RGBA[]) {
+  setDarkThemeColors(value: RGBA[]): Promise<void> {
     this.self.darkThemeColors = value;
-    await this.save();
+    return this.save();
   }
 }
 
