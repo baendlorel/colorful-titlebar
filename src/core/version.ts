@@ -19,7 +19,7 @@ class Version {
       vscode.window.showInformationMessage(
         `🎉 ${Consts.DisplayName} ${i18n.Version.updated(actualVersion)}`
       );
-      configs.set.currentVersion(actualVersion);
+      configs.setCurrentVersion(actualVersion);
 
       // 用执行命令的方式拉起，减少引入
       vscode.commands.executeCommand(Commands.ControlPanel);

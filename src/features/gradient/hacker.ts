@@ -32,7 +32,7 @@ class Hacker {
     }
 
     cssPath = input.trim();
-    await configs.set.workbenchCssPath(cssPath);
+    await configs.setWorkbenchCssPath(cssPath);
     return cssPath;
   }
 

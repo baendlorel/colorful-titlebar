@@ -199,6 +199,9 @@ class Configs {
     return this.global.get<TitleBarStyleCustomization>(TitleBarConsts.WorkbenchSection);
   }
 
+  /**
+   * 获取所有层级的标题栏颜色配置
+   */
   get inspectWorkbenchColorCustomizations() {
     return vscode.workspace
       .getConfiguration()
@@ -226,9 +229,16 @@ class Configs {
     return this.global.get<string>(TitleBarConsts.Section);
   }
 
-  setWindowTitleBarStyle(value: string) {
+  /**
+   * 直接全局设定为`custom`
+   */
+  justifyWindowTitleBarStyle() {
     const globalConfig = vscode.workspace.getConfiguration();
-    return globalConfig.update(TitleBarConsts.Section, value, vscode.ConfigurationTarget.Global);
+    return globalConfig.update(
+      TitleBarConsts.Section,
+      TitleBarConsts.Expected,
+      vscode.ConfigurationTarget.Global
+    );
   }
   // #endregion
 

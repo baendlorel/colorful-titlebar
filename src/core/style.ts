@@ -44,21 +44,20 @@ class TitleBarStyle {
     }
   }
 
-  async applyColor(color: string | RGBA) {
+  applyColor(color: string | RGBA): Thenable<void> {
     color = new RGBA(color);
     const newStyle = {
       [TitleBarConsts.ActiveBg]: color.toString(),
       [TitleBarConsts.InactiveBg]: color.toGreyDarkenString(),
     };
-
-    await configs.setWorkspace[TitleBarConsts.WorkbenchSection](newStyle);
+    return configs.setWorkbenchColorCustomizations(newStyle);
   }
 
-  async applyIfNotSet() {
+  applyIfNotSet(): Promise<void> {
     if (this.alreadySet()) {
-      return;
+      return Promise.resolve();
     }
-    await this.refresh();
+    return this.refresh();
   }
 
   /**
@@ -70,7 +69,7 @@ class TitleBarStyle {
       [TitleBarConsts.ActiveBg]: undefined,
       [TitleBarConsts.InactiveBg]: undefined,
     };
-    await configs.setWorkspace[TitleBarConsts.WorkbenchSection](emptyStyle);
+    await configs.setWorkbenchColorCustomizations(emptyStyle);
 
     // 如果.vscode下只有settings一个文件，而且内容和上面的compact一样，那么删除.vscode
     const settingsPath = join(configs.cwd, SettingsJson.Dir); // , 'settings.json'
@@ -85,13 +84,10 @@ class TitleBarStyle {
    * 看看是不是已经设置了颜色，已经设置了就不要重复了
    */
   private alreadySet(): boolean {
-    const workspaceConfig = configs.inspectGlobal[TitleBarConsts.WorkbenchSection];
-    const workspaceValue = workspaceConfig?.workspaceValue;
-
+    const workspaceValue = configs.inspectWorkbenchColorCustomizations?.workspaceValue;
     if (!workspaceValue) {
       return false;
     }
-
     return (
       workspaceValue[TitleBarConsts.ActiveBg] !== undefined &&
       workspaceValue[TitleBarConsts.InactiveBg] !== undefined
@@ -114,8 +110,7 @@ class TitleBarStyle {
    */
   private async tryCustom(): Promise<boolean> {
     // 检测当前标题栏样式设置
-    const value = configs[TitleBarConsts.Section];
-    if (value === TitleBarConsts.Expected) {
+    if (configs.windowTitleBarStyle === TitleBarConsts.Expected) {
       return true;
     }
 
@@ -128,7 +123,7 @@ class TitleBarStyle {
       throw false;
     }
 
-    await configs.setGlobal[TitleBarConsts.Section](TitleBarConsts.Expected);
+    await configs.justifyWindowTitleBarStyle();
     vscode.window.showInformationMessage(i18n.SetTitleBarStyleToCustomSuccess);
     return true;
   }

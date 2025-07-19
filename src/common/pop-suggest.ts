@@ -12,7 +12,7 @@ export default configs.showSuggest
         i18n.BlockAllSuggestion.button
       );
       if (result === i18n.BlockAllSuggestion) {
-        await configs.set.showSuggest(false);
+        await configs.setShowSuggest(false);
       }
       return result;
     }
