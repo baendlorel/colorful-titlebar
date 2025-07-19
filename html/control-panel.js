@@ -309,6 +309,22 @@
         drag.y = event.clientY;
         drag.scrollerY = scroller.offsetTop;
       });
+
+      // 根据 scrollHeight 和容器高度动态计算滚动条高度
+      // 将 updateScrollerHeight 绑定到 textarea 上，供外部调用
+      textarea.updateScrollerHeight = () => {
+        if (textarea.scrollHeight > textarea.offsetHeight) {
+          // 滚动条高度 = 容器高度 * (容器高度 / 内容高度)
+          // 这样当内容越多时，滚动条越小；内容接近容器高度时，滚动条接近容器高度
+          const ratio = textarea.offsetHeight / textarea.scrollHeight;
+          const minScrollerHeight = 20; // 最小滚动条高度，确保用户能够拖拽
+          const maxScrollerHeight = textarea.offsetHeight - drag.verticalPad * 2;
+          const calculatedHeight = maxScrollerHeight * ratio;
+          const scrollerHeight = Math.max(minScrollerHeight, calculatedHeight);
+
+          scroller.style.height = scrollerHeight + 'px';
+        }
+      };
     });
 
     // 探测verticalPad的数值，无法在未绘制的时候敲定
@@ -344,6 +360,9 @@
     $('.textarea').forEach((textarea) => {
       const wrapper = textarea.parentElement;
       const scroller = wrapper.querySelector('.textarea-scoller');
+      /**
+       * @type {function(): void}
+       */
       let autoHeight;
       if (scroller) {
         const maxHeight = parseInt(wrapper.getAttribute('max-height'), 10) || 80;
@@ -355,6 +374,9 @@
           } else {
             scroller.style.display = '';
             textarea.style.height = maxHeight + 'px';
+
+            // 更新滚动条高度
+            textarea.updateScrollerHeight && textarea.updateScrollerHeight();
 
             // 文本高度超过最大高度时，需要重新计算滚动条位置
             // 保持当前的滚动比例，但基于新的 scrollHeight
