@@ -37,6 +37,50 @@
     return Array.from(document.querySelectorAll(strings.join('')));
   }
 
+  function h(...args) {
+    let el = null;
+    if (args[0]) {
+      el = document.createElement(args[0]);
+    }
+    if (typeof args[1] === 'string') {
+      el.className = args[1];
+    } else if (typeof args[1] === 'object' && args[1] !== null) {
+      for (const [key, value] of Object.entries(args[1])) {
+        switch (key) {
+          case 'class':
+          case 'className':
+            el.className = value;
+            break;
+          case 'draggable':
+            el.draggable = value;
+            break;
+          case 'value':
+            el.value = value;
+            break;
+          case 'checked':
+            el.checked = value;
+            break;
+          case 'style':
+            if (typeof value === 'object' && value !== null) {
+              for (const [styleKey, styleValue] of Object.entries(value)) {
+                el.style[styleKey] = styleValue;
+              }
+            } else if (typeof value === 'string') {
+              el.setAttribute(key, value);
+            }
+            break;
+          default:
+            el.setAttribute(key, value);
+            break;
+        }
+      }
+    }
+    if (typeof args[2] === 'string') {
+      el.innerHTML = args[2];
+    }
+    return el;
+  }
+
   /**
    * 用name属性查找元素，可以指定查找类型
    * @param {string} name
@@ -215,15 +259,83 @@
     });
   }
 
-  function initAutoHeightTextarea() {
-    // 初始化所有textarea
-    $('textarea').forEach((textarea) => {
-      textarea.addEventListener('input', function (event) {
-        textarea.style.height = 'auto';
-        textarea.style.height = textarea.scrollHeight + 'px';
+  function initTextarea() {
+    // 初始化所有带有滚动条的textarea
+    const drag = { scroller: false, textareaMaxHeight: 0, y: 0, scrollerY: 0, verticalPad: 0 };
+    $('.textarea-wrapper').forEach((wrapper) => {
+      const maxHeight = parseInt(wrapper.getAttribute('max-height'), 10) || 80;
+      /**
+       * @type {HTMLDivElement}
+       */
+      const scroller = h('div', { class: 'textarea-scoller' });
+
+      wrapper.appendChild(scroller);
+      const textarea = wrapper.querySelector('.textarea');
+      if (maxHeight > textarea.scrollHeight) {
+        scroller.style.display = 'none';
+      } else {
+        scroller.style.display = '';
+      }
+
+      scroller.addEventListener('mousedown', (event) => {
+        event.preventDefault();
+        drag.scroller = scroller;
+        drag.y = event.clientY;
+        drag.scrollerY = scroller.offsetTop;
+        drag.textareaMaxHeight = textarea.offsetHeight;
       });
-      textarea.style.height = 'auto';
-      textarea.style.height = textarea.scrollHeight + 'px';
+    });
+
+    // 探测verticalPad的数值，无法在未绘制的时候敲定
+    requestAnimationFrame(() => {
+      if (drag.verticalPad === 0) {
+        const scoller = q('.textarea-scoller');
+        if (scoller) {
+          const style = getComputedStyle(scoller);
+          drag.verticalPad = parseInt(style.top.replace(/[^\d]/g, ''), 10);
+        }
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      drag.scroller = false;
+      drag.y = 0;
+      drag.scrollerY = 0;
+    });
+
+    document.addEventListener('mousemove', (event) => {
+      if (drag.scroller) {
+        const rawY = drag.scrollerY + (event.clientY - drag.y);
+        const y = Math.max(
+          drag.verticalPad,
+          Math.min(rawY, drag.textareaMaxHeight - drag.scroller.offsetHeight - drag.verticalPad)
+        );
+        drag.scroller.style.top = y + 'px';
+      }
+    });
+
+    // 初始化所有设定了textarea类的textarea
+    $('.textarea').forEach((textarea) => {
+      const wrapper = textarea.parentElement;
+      const scroller = wrapper.querySelector('.textarea-scoller');
+      let autoHeight;
+      if (scroller) {
+        const maxHeight = parseInt(wrapper.getAttribute('max-height'), 10) || 80;
+        autoHeight = function () {
+          if (maxHeight > textarea.scrollHeight) {
+            scroller.style.display = 'none';
+          } else {
+            scroller.style.display = '';
+          }
+        };
+      } else {
+        autoHeight = function () {
+          textarea.style.height = 'auto';
+          textarea.style.height = textarea.scrollHeight + 'px';
+        };
+      }
+      textarea.addEventListener('input', autoHeight);
+      autoHeight();
     });
   }
 
@@ -329,23 +441,21 @@
   }
 
   function createPaletteItem(name, color) {
-    const item = document.createElement('div');
-    item.className = 'palette-item';
-    item.style.backgroundColor = color;
-    item.title = color.toLowerCase();
-    item.draggable = true;
-    item.setAttribute('belong', name);
+    const item = h('div', {
+      class: 'palette-item',
+      style: { backgroundColor: color },
+      title: color.toLowerCase(),
+      draggable: true,
+      belong: name,
+    });
 
-    const remover = document.createElement('button');
-    remover.type = 'button';
-    remover.classList.add('control-input', 'palette-remove-color');
-    remover.innerHTML = '&times;';
+    const remover = h(
+      'button',
+      { type: 'button', class: 'control-input palette-remove-color' },
+      '&times;'
+    );
 
-    const input = document.createElement('input');
-    input.type = 'color';
-    input.className = 'palette-input';
-    input.value = color;
-    input.setAttribute('belong', name);
+    const input = h('input', { type: 'color', class: 'palette-input', value: color, belong: name });
 
     input.addEventListener('input', function () {
       item.style.backgroundColor = input.value;
@@ -450,7 +560,7 @@
   initSettingsChangeEvents();
   q('.body').style.display = '';
   // 这样可以让textarea自动计算高度生效，在display:none的情况下无法正确计算高度，渲染出来的高度是初始高度
-  q('.body').addEventListener('transitionstart', initAutoHeightTextarea, { once: true });
+  q('.body').addEventListener('transitionstart', initTextarea, { once: true });
 
   setTimeout(() => (q('.body').style.opacity = '1'), 100);
   window.freeze = freeze;

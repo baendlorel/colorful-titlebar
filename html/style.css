@@ -307,6 +307,20 @@ input:checked + .slider:before {
   overflow: hidden;
 }
 
+.textarea-wrapper {
+  position: relative;
+}
+
+.textarea-scoller {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  border-radius: 10px;
+  width: 6px;
+  height: 20px;
+  background-color: var(--ct-primary-light);
+}
+
 .select {
   flex: 1;
   appearance: none;
