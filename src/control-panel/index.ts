@@ -42,7 +42,7 @@ export default async function (this: vscode.ExtensionContext) {
   const cssPaletteUri = controlPanel.webview.asWebviewUri(cssPalettePath);
 
   // 准备一些数据
-  const currentColor = configs.currentColor ?? '#007ACC';
+  const currentColor = configs.titleBarColor ?? '#007ACC';
   const gradientBrightness = Math.floor(configs.gradientBrightness * 100);
   const gradientDarkness = Math.floor(configs.gradientDarkness * 100);
   const projectIndicators = configs.projectIndicators.join(Prod.Separator);

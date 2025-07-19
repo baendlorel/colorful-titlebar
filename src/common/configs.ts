@@ -55,7 +55,7 @@ class Configs {
   /**
    * 本插件的配置数据
    */
-  private self!: Config;
+  private my!: Config;
 
   /**
    * 全局配置数据
@@ -131,15 +131,15 @@ class Configs {
 
   private serialize(): string {
     const plain = {
-      currentVersion: this.self.currentVersion,
-      showSuggest: this.self.showSuggest,
-      lightThemeColors: this.self.lightThemeColors.map((color) => color.toRGBString()),
-      darkThemeColors: this.self.darkThemeColors.map((color) => color.toRGBString()),
-      projectIndicators: this.self.projectIndicators,
-      hashSource: this.self.hashSource as number,
-      workbenchCssPath: this.self.workbenchCssPath,
-      gradientBrightness: this.self.gradientBrightness,
-      gradientDarkness: this.self.gradientDarkness,
+      currentVersion: this.my.currentVersion,
+      showSuggest: this.my.showSuggest,
+      lightThemeColors: this.my.lightThemeColors.map((color) => color.toRGBString()),
+      darkThemeColors: this.my.darkThemeColors.map((color) => color.toRGBString()),
+      projectIndicators: this.my.projectIndicators,
+      hashSource: this.my.hashSource as number,
+      workbenchCssPath: this.my.workbenchCssPath,
+      gradientBrightness: this.my.gradientBrightness,
+      gradientDarkness: this.my.gradientDarkness,
     };
     return JSON.stringify(plain);
   }
@@ -156,7 +156,7 @@ class Configs {
     }
 
     try {
-      this.self = this.deserialize(akasha);
+      this.my = this.deserialize(akasha);
       return false;
     } catch (error) {
       vscode.window.showErrorMessage(i18n.InvalidAkasha);
@@ -164,6 +164,11 @@ class Configs {
     }
   }
 
+  /**
+   * 保存后并不需要重新加载，因为
+   * - 每次保存用的self是新取的
+   * - config配置一定是最新的
+   */
   private async save(): Promise<void> {
     try {
       const self = vscode.workspace.getConfiguration(Consts.Name);
@@ -175,136 +180,142 @@ class Configs {
   }
 
   private overrideWithDefaults(): Promise<void> {
-    this.self = this.getDefault();
+    this.my = this.getDefault();
     return this.save();
   }
 
-  get currentColor() {
-    return this[TitleBarConsts.WorkbenchSection]?.[TitleBarConsts.ActiveBg];
+  // #region 系统配置
+  /**
+   * 当前标题栏的颜色，可能没有配置
+   */
+  get titleBarColor() {
+    return this.workbenchColorCustomizations?.[TitleBarConsts.ActiveBg];
   }
 
   /**
    * 当前的标题栏颜色配置，可能是`undefined`
    */
-  get [TitleBarConsts.WorkbenchSection]() {
+  get workbenchColorCustomizations() {
     return this.global.get<TitleBarStyleCustomization>(TitleBarConsts.WorkbenchSection);
+  }
+
+  get inspectWorkbenchColorCustomizations() {
+    return vscode.workspace
+      .getConfiguration()
+      .inspect<TitleBarStyleCustomization>(TitleBarConsts.WorkbenchSection);
+  }
+
+  /**
+   * 设置工作区标题栏颜色
+   * @param value 新颜色，其属性可以是`undefined`来删除
+   * @returns
+   */
+  setWorkbenchColorCustomizations(value: Partial<TitleBarStyleCustomization>): Thenable<void> {
+    const globalConfig = vscode.workspace.getConfiguration();
+    return globalConfig.update(
+      TitleBarConsts.WorkbenchSection,
+      value,
+      vscode.ConfigurationTarget.Workspace
+    );
   }
 
   /**
    * 全局设定，必须是`custom`才行
    */
-  get [TitleBarConsts.Section]() {
+  get windowTitleBarStyle() {
     return this.global.get<string>(TitleBarConsts.Section);
   }
 
-  readonly inspectGlobal = {
-    get [TitleBarConsts.WorkbenchSection]() {
-      return vscode.workspace
-        .getConfiguration()
-        .inspect<TitleBarStyleCustomization>(TitleBarConsts.WorkbenchSection);
-    },
-  };
+  setWindowTitleBarStyle(value: string) {
+    const globalConfig = vscode.workspace.getConfiguration();
+    return globalConfig.update(TitleBarConsts.Section, value, vscode.ConfigurationTarget.Global);
+  }
+  // #endregion
 
-  readonly setWorkspace = {
-    async [TitleBarConsts.WorkbenchSection](value: Partial<TitleBarStyleCustomization>) {
-      const globalConfig = vscode.workspace.getConfiguration();
-      await globalConfig.update(
-        TitleBarConsts.WorkbenchSection,
-        value,
-        vscode.ConfigurationTarget.Workspace
-      );
-    },
-  };
-
-  readonly setGlobal = {
-    async [TitleBarConsts.Section](value: string) {
-      const globalConfig = vscode.workspace.getConfiguration();
-      await globalConfig.update(TitleBarConsts.Section, value, vscode.ConfigurationTarget.Global);
-    },
-  };
-
-  // # 本插件的设定
+  // #region 本插件的独有配置
 
   get currentVersion() {
-    return this.self.currentVersion;
+    return this.my.currentVersion;
   }
 
   get showSuggest() {
-    return this.self.showSuggest;
+    return this.my.showSuggest;
   }
 
   get projectIndicators() {
-    return this.self.projectIndicators;
+    return this.my.projectIndicators;
   }
 
   get lightThemeColors() {
-    return this.self.lightThemeColors;
+    return this.my.lightThemeColors;
   }
 
   get darkThemeColors() {
-    return this.self.darkThemeColors;
+    return this.my.darkThemeColors;
   }
 
   get hashSource() {
-    return this.self.hashSource;
+    return this.my.hashSource;
   }
 
   get workbenchCssPath() {
-    return this.self.workbenchCssPath;
+    return this.my.workbenchCssPath;
   }
 
   get gradientBrightness() {
-    return this.self.gradientBrightness;
+    return this.my.gradientBrightness;
   }
 
   get gradientDarkness() {
-    return this.self.gradientDarkness;
+    return this.my.gradientDarkness;
   }
 
   setCurrentVersion(value: string): Promise<void> {
-    this.self.currentVersion = value;
+    this.my.currentVersion = value;
     return this.save();
   }
 
   setShowSuggest(value: boolean): Promise<void> {
-    this.self.showSuggest = value;
+    this.my.showSuggest = value;
     return this.save();
   }
 
   setHashSource(value: HashSource): Promise<void> {
-    this.self.hashSource = value;
+    this.my.hashSource = value;
     return this.save();
   }
 
   setWorkbenchCssPath(value: string): Promise<void> {
-    this.self.workbenchCssPath = value;
+    this.my.workbenchCssPath = value;
     return this.save();
   }
 
   setGradientBrightness(value: number): Promise<void> {
-    this.self.gradientBrightness = value;
+    this.my.gradientBrightness = value;
     return this.save();
   }
 
   setGradientDarkness(value: number): Promise<void> {
-    this.self.gradientDarkness = value;
+    this.my.gradientDarkness = value;
     return this.save();
   }
 
   setProjectIndicators(value: string[]): Promise<void> {
-    this.self.projectIndicators = value;
+    this.my.projectIndicators = value;
     return this.save();
   }
 
   setLightThemeColors(value: RGBA[]): Promise<void> {
-    this.self.lightThemeColors = value;
+    this.my.lightThemeColors = value;
     return this.save();
   }
 
   setDarkThemeColors(value: RGBA[]): Promise<void> {
-    this.self.darkThemeColors = value;
+    this.my.darkThemeColors = value;
     return this.save();
   }
+
+  // #endregion
 }
 
 export default new Configs();
