@@ -306,7 +306,7 @@ export default async function (this: vscode.ExtensionContext) {
         <div class="control-label">
           ${Panel.projectIndicators.label}<small>${Panel.projectIndicators.description}</small>
         </div>
-        <div class="control-form">
+        <div class="control-form textarea-wrapper" max-height="120">
           <textarea class="control-input textarea" name="${
             ControlName.ProjectIndicators
           }"></textarea>

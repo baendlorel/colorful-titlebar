@@ -1,16 +1,3 @@
-/**
- * @typedef {Object} Config
- * @property {boolean} theme
- * @property {boolean} hashSource
- * @property {string} showSuggest
- * @property {string} workbenchCssPath
- * @property {string} gradientBrightness
- * @property {string} gradientDarkness
- * @property {string} currentColor
- * @property {string} projectIndicators
- * @property {string} lightThemeColors
- * @property {string} darkThemeColors
- */
 (function () {
   /** @type {boolean} */
   const isProd = window.__kskb_consts.isProd;
@@ -21,14 +8,21 @@
   const configs = window.__kskb_consts.configs;
   const names = window.__kskb_consts.names;
 
+  /**
+   * @typedef {Object} HTMLElement
+   * @property {function(HTMLElement): HTMLElement} mount - 将当前元素挂载到目标元素上
+   * @property {function(string, function(Event): void): HTMLElement} on - 为当前元素添加事件
+   */
+
   HTMLElement.prototype.mount = function (el) {
     el.appendChild(this);
     return this;
   };
 
-  function concat(...strings) {
-    return ''.concat(...strings);
-  }
+  HTMLElement.prototype.on = function (eventName, handler) {
+    this.addEventListener(eventName, handler);
+    return this;
+  };
 
   function q(...strings) {
     return document.querySelector(strings.join(''));
@@ -42,9 +36,13 @@
     return Array.from(document.querySelectorAll(strings.join('')));
   }
 
+  /**
+   * @param  {...any} args
+   * @returns {HTMLElement}
+   */
   function h(...args) {
     let el = null;
-    if (args[0]) {
+    if (typeof args[0] === 'string') {
       el = document.createElement(args[0]);
     }
     if (typeof args[1] === 'string') {
@@ -82,6 +80,9 @@
     }
     if (typeof args[2] === 'string') {
       el.innerHTML = args[2];
+    }
+    if (el === null) {
+      throw new Error('Element creation failed, tag name is required');
     }
     return el;
   }
@@ -127,12 +128,16 @@
   const i18n =
     lang === 'en'
       ? {
-          NumberLimit: (min, max, isInt = true) =>
-            concat('Please input', isInt ? 'an integer' : 'a number', 'between', min, 'and', max),
+          NumberLimit: function (min, max, isInt = true) {
+            const numType = isInt ? 'an integer' : 'a number';
+            return ''.concat('Please input', numType, 'between', min, 'and', max);
+          },
         }
       : {
-          NumberLimit: (min, max, isInt = true) =>
-            concat('请输入', min, '到', max, '之间的', isInt ? '整数' : '数'),
+          NumberLimit: function (min, max, isInt = true) {
+            const numType = isInt ? '整数' : '数';
+            return ''.concat('请输入', min, '到', max, '之间的', numType);
+          },
         };
 
   function freeze() {
@@ -150,8 +155,10 @@
     }, 200);
   }
 
+  // #region 初始化函数系列
+
   /**
-   * # init
+   * 初始化设置表单的值
    */
   function initSettingsValue() {
     if (isProd) {
@@ -405,8 +412,10 @@
     });
   }
 
+  /**
+   * 单独的颜色选择器
+   */
   function initColorPickers() {
-    // 初始化单独的颜色选择器
     $('button.color-picker').forEach((picker) => {
       const colorInput = picker.querySelector('input[type="color"]');
       colorInput.addEventListener('input', function () {
@@ -424,23 +433,82 @@
     });
   }
 
-  /**
-   * # 颜色套组编辑器
-   */
+  // #region 颜色套组编辑器
   function initColorPalette() {
+    /**
+     * 创建一个调色板色块
+     * @param {string} name 调色板颜色，将会作为belong属性设置在input元素上
+     * @param {string} color 颜色值
+     * @returns
+     */
+    const createPaletteItem = function (name, color) {
+      const item = h('div', {
+        class: 'palette-item',
+        style: { backgroundColor: color },
+        title: color.toLowerCase(),
+        draggable: true,
+        belong: name,
+      });
+
+      const remover = h(
+        'button',
+        { type: 'button', class: 'control-input palette-remove-color' },
+        '&times;'
+      );
+
+      const intput = h('input', {
+        type: 'color',
+        class: 'palette-input',
+        value: color,
+        belong: name,
+      }).on('input', function () {
+        item.style.backgroundColor = this.value;
+        item.title = this.value;
+      });
+
+      item.append(remover, intput);
+      return item;
+    };
+
+    /**
+     * 支持从一个调色盘拖动颜色到另一个调色盘
+     * @param  {...any} paletteNames 调色盘名字
+     */
+    const onPalettesChange = function (...paletteNames) {
+      const value = {};
+      for (const name of paletteNames) {
+        value[name] = $('.palette-input[belong="' + name + '"]').map((input) => input.value);
+      }
+      vspost({ name: names.themeColors, value });
+    };
+
+    const renderColorList = function (name, colors) {
+      const palette = q('.palette[name="', name, '"]');
+      const colorList = palette.querySelector('.color-list');
+      const addBtn = palette.querySelector('.palette-add-color');
+
+      // 清空现有颜色项（保留添加按钮）
+      palette.querySelectorAll('.palette-item').forEach((item) => item.remove());
+
+      // 添加颜色项
+      colors.forEach((color) => {
+        const colorItem = createPaletteItem(name, color);
+        colorList.insertBefore(colorItem, addBtn);
+      });
+    };
+
     $('.palette').forEach((palette) => {
       const name = palette.getAttribute('name');
       // 因为color-list的元素是不断变化的，因此事件只能注册在div上
       const colorList = palette.querySelector('.color-list');
 
-      function is(e, className) {
-        return e.target.classList.contains(className);
-      }
-
+      // * 这里捕获的其实是palette-input的change事件
       palette.addEventListener('change', () => onPalettesChange(name));
+
+      // * 新增/删除色块也要手动调用onPalettesChange事件
       colorList.addEventListener('click', (e) => {
         // 如果点击了添加按钮，则添加新颜色
-        if (is(e, 'palette-add-color')) {
+        if (e.target.classList.contains('palette-add-color')) {
           const addButton = e.target;
           const color =
             '#' +
@@ -452,14 +520,14 @@
           onPalettesChange(name);
         }
         // 如果点击的是删除按钮，那么删除这个色块
-        else if (is(e, 'palette-remove-color')) {
+        else if (e.target.classList.contains('palette-remove-color')) {
           const removeButton = e.target;
           const paletteItem = removeButton.closest('.palette-item');
           paletteItem.remove();
           onPalettesChange(name);
         }
         // 如果点击的是色块，那么开始编辑它
-        else if (is(e, 'palette-item')) {
+        else if (e.target.classList.contains('palette-item')) {
           const paletteInput = e.target.querySelector('.palette-input');
           if (paletteInput.disabled) {
             return; // 如果输入框被禁用，则不处理
@@ -479,144 +547,87 @@
     renderColorList(names.lightThemeColors, lightColors);
     renderColorList(names.darkThemeColors, darkColors);
 
-    // find('themeColors', 'error').textContent = JSON.stringify({ lightColors, darkColors });
-
+    /**
+     * @type {HTMLDivElement | null}
+     */
+    let draggedPaletteItem = null;
     // 添加事件监听器
     $('.color-list').forEach((list) => {
-      list.addEventListener('dragstart', handleDragStart);
-      list.addEventListener('dragover', handleDragOver);
-      list.addEventListener('dragenter', handleDragEnter);
-      list.addEventListener('dragleave', handleDragLeave);
-      list.addEventListener('drop', handleDrop);
-    });
-  }
-
-  function renderColorList(name, colors) {
-    const palette = q('.palette[name="', name, '"]');
-    const colorList = palette.querySelector('.color-list');
-    const addBtn = palette.querySelector('.palette-add-color');
-
-    // 清空现有颜色项（保留添加按钮）
-    palette.querySelectorAll('.palette-item').forEach((item) => item.remove());
-
-    // 添加颜色项
-    colors.forEach((color) => {
-      const colorItem = createPaletteItem(name, color);
-      colorList.insertBefore(colorItem, addBtn);
-    });
-  }
-
-  function createPaletteItem(name, color) {
-    const item = h('div', {
-      class: 'palette-item',
-      style: { backgroundColor: color },
-      title: color.toLowerCase(),
-      draggable: true,
-      belong: name,
-    });
-
-    const remover = h(
-      'button',
-      { type: 'button', class: 'control-input palette-remove-color' },
-      '&times;'
-    );
-
-    const input = h('input', { type: 'color', class: 'palette-input', value: color, belong: name });
-
-    input.addEventListener('input', function () {
-      item.style.backgroundColor = input.value;
-      item.title = input.value;
-    });
-
-    item.append(remover, input);
-    return item;
-  }
-
-  function getPaletteColors(name) {
-    return $('.palette-input[belong="' + name + '"]').map((input) => input.value);
-  }
-
-  // 这里要突出多个palette可能同时变化的情况
-  function onPalettesChange(...paletteNames) {
-    const value = {};
-    for (const name of paletteNames) {
-      value[name] = getPaletteColors(name);
-    }
-    vspost({ name: names.themeColors, value });
-  }
-
-  // 拖拽功能
-  let draggedElement = null;
-
-  function handleDragStart(e) {
-    if (e.target.classList.contains('palette-item')) {
-      draggedElement = e.target;
-      e.target.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    }
-  }
-
-  function handleDragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-  }
-
-  function handleDragEnter(e) {
-    if (e.target.classList.contains('color-list')) {
-      e.target.classList.add('drag-over');
-    }
-  }
-
-  function handleDragLeave(e) {
-    if (e.target.classList.contains('color-list') && !e.target.contains(e.relatedTarget)) {
-      e.target.classList.remove('drag-over');
-    }
-  }
-
-  function handleDrop(e) {
-    e.preventDefault();
-    const colorList = e.target.closest('.color-list');
-
-    // 只有在拖进color-list里面的时候再处理
-    if (colorList && draggedElement) {
-      colorList.classList.remove('drag-over');
-
-      const targetItem = e.target.closest('.palette-item');
-      const addButton = colorList.querySelector('.palette-add-color');
-
-      if (targetItem && targetItem !== draggedElement) {
-        // 插入到目标位置
-        const rect = targetItem.getBoundingClientRect();
-        const isAfter = e.clientX > rect.left + rect.width / 2;
-
-        if (isAfter) {
-          colorList.insertBefore(draggedElement, targetItem.nextSibling);
-        } else {
-          colorList.insertBefore(draggedElement, targetItem);
+      list.addEventListener('dragstart', function (e) {
+        if (e.target.classList.contains('palette-item')) {
+          draggedPaletteItem = e.target;
+          e.target.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
         }
-      } else if (!targetItem) {
-        // 插入到最后（添加按钮前）
-        colorList.insertBefore(draggedElement, addButton);
-      }
+      });
 
-      draggedElement.classList.remove('dragging');
+      list.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+      });
 
-      const palette = colorList.closest('.palette');
-      const newBelong = palette.getAttribute('name');
-      const belong = draggedElement.getAttribute('belong');
-      if (belong === newBelong) {
-        onPalettesChange(belong);
-      } else {
-        // 顺序不能错，必须先设定新belong再触发change，否则change里面获取input的时结果还是旧的
-        draggedElement.setAttribute('belong', newBelong);
-        const colorInput = draggedElement.querySelector('.palette-input');
-        colorInput.setAttribute('belong', newBelong);
-        onPalettesChange(belong, newBelong);
-      }
-    }
+      list.addEventListener('dragenter', function (e) {
+        if (e.target.classList.contains('color-list')) {
+          e.target.classList.add('drag-over');
+        }
+      });
 
-    draggedElement = null;
+      list.addEventListener('dragleave', function (e) {
+        if (e.target.classList.contains('color-list') && !e.target.contains(e.relatedTarget)) {
+          e.target.classList.remove('drag-over');
+        }
+      });
+
+      list.addEventListener('drop', function (e) {
+        e.preventDefault();
+        const colorList = e.target.closest('.color-list');
+
+        // 只有在拖进color-list里面的时候再处理
+        if (!colorList || !draggedPaletteItem) {
+          return;
+        }
+
+        colorList.classList.remove('drag-over');
+        const targetItem = e.target.closest('.palette-item');
+        const addButton = colorList.querySelector('.palette-add-color');
+
+        if (targetItem && targetItem !== draggedPaletteItem) {
+          // 插入到目标位置
+          const rect = targetItem.getBoundingClientRect();
+          const isAfter = e.clientX > rect.left + rect.width / 2;
+
+          if (isAfter) {
+            colorList.insertBefore(draggedPaletteItem, targetItem.nextSibling);
+          } else {
+            colorList.insertBefore(draggedPaletteItem, targetItem);
+          }
+        } else if (!targetItem) {
+          // 插入到最后（添加按钮前）
+          colorList.insertBefore(draggedPaletteItem, addButton);
+        }
+
+        draggedPaletteItem.classList.remove('dragging');
+
+        const palette = colorList.closest('.palette');
+        const newBelong = palette.getAttribute('name');
+        const belong = draggedPaletteItem.getAttribute('belong');
+        if (belong === newBelong) {
+          onPalettesChange(belong);
+        } else {
+          // 顺序不能错，必须先设定新belong再触发change，否则change里面获取input的时结果还是旧的
+          draggedPaletteItem.setAttribute('belong', newBelong);
+          const colorInput = draggedPaletteItem.querySelector('.palette-input');
+          colorInput.setAttribute('belong', newBelong);
+          onPalettesChange(belong, newBelong);
+        }
+
+        draggedPaletteItem = null;
+      });
+    });
   }
+  // #endregion
+
+  // #endregion
 
   // 开始初始化
   initThemeSwitch();
