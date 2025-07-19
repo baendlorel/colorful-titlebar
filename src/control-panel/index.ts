@@ -374,6 +374,7 @@ export default async function (this: vscode.ExtensionContext) {
       name: message.name,
       succ: true,
       msg: Panel.success,
+      other: {},
     };
 
     // vscode.window.showInformationMessage(JSON.stringify(message));

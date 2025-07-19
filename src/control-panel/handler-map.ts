@@ -79,7 +79,7 @@ export const handlerMap = {
       throw null;
     }
     await configs.setGradientBrightness(percent);
-    result.msg = Panel.gradient.success;
+    result.msg = Panel.gradientBrightness.success;
   },
   [ControlName.GradientDarkness]: async (result: HandelResult, value: PostedValue) => {
     const raw = parseInt(String(value), 10);
@@ -90,7 +90,7 @@ export const handlerMap = {
       throw null;
     }
     await configs.setGradientDarkness(percent);
-    result.msg = Panel.gradient.success;
+    result.msg = Panel.gradientDarkness.success;
   },
   [ControlName.HashSource]: async (result: HandelResult, value: PostedValue) => {
     const d = parseInt(String(value), 10) as HashSource;
@@ -107,18 +107,21 @@ export const handlerMap = {
     const token = getHashSource(configs.cwd);
     const color = getColor(configs.cwd);
     await style.applyColor(color);
-    result.msg = Panel.refresh.success(token, color.toString());
+    result.msg = Panel.refresh.success(token, color.toRGBString());
+    result.other.color = color.toRGBString();
   },
   [ControlName.RandomColor]: async (_result: HandelResult, _value: PostedValue) => {
     throw new Error('RandomColor只是个标记，应该具体有颜色套组、纯粹、指定');
   },
-  [ControlName['RandomColor.colorSet']]: async (_result: HandelResult, _value: PostedValue) => {
+  [ControlName['RandomColor.colorSet']]: async (result: HandelResult, _value: PostedValue) => {
     const color = getColorByK(Math.random());
     await style.applyColor(color);
+    result.other.color = color.toRGBString();
   },
-  [ControlName['RandomColor.pure']]: async (_result: HandelResult, _value: PostedValue) => {
+  [ControlName['RandomColor.pure']]: async (result: HandelResult, _value: PostedValue) => {
     const color = RGBA.uniformRandom();
     await style.applyColor(color);
+    result.other.color = color;
   },
   [ControlName['RandomColor.specify']]: async (result: HandelResult, value: PostedValue) => {
     if (typeof value !== 'string') {

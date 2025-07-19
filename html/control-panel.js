@@ -247,16 +247,31 @@
       unfreeze();
 
       if (!resp.succ) {
-        find(resp.name, 'error').textContent = resp.msg;
+        if (names.isRandomColor(resp.name)) {
+          find(names.randomColor, 'error').textContent = resp.msg;
+        } else {
+          find(resp.name, 'error').textContent = resp.msg;
+        }
         return;
       }
 
       if (resp.msg) {
-        find(resp.name, 'succ').textContent = resp.msg;
+        if (names.isRandomColor(resp.name)) {
+          find(names.randomColor, 'succ').textContent = resp.msg;
+        } else {
+          find(resp.name, 'succ').textContent = resp.msg;
+        }
 
         // 如果调整了渐变配置，那么置空渐变选项以备重新选择
         if (resp.name === names.gradientBrightness || resp.name === names.gradientDarkness) {
           find(names.gradient).value = '';
+        }
+
+        // 如果是几个特定的改颜色的指令，那么更新按钮的背景色
+        if (names.refresh === resp.name || names.isRandomColor(resp.name)) {
+          if (resp.other?.color) {
+            find(names['randomColor.specify'], 'button').style.backgroundColor = resp.other.color;
+          }
         }
       }
     });

@@ -6,6 +6,7 @@ export interface HandelResult {
   name: ControlName;
   succ: boolean;
   msg: string;
+  other: Record<string, any>;
 }
 
 export type PostedValue = string | number | boolean;

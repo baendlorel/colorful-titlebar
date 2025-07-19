@@ -26,7 +26,7 @@ interface Config {
   gradientDarkness: number;
 }
 
-interface TitleBarStyleCustomization {
+interface ColorCustomization {
   [TitleBarConsts.ActiveBg]: string;
   [TitleBarConsts.InactiveBg]: string;
 }
@@ -40,7 +40,9 @@ class Configs {
   /**
    * 全局配置数据
    */
-  private global = vscode.workspace.getConfiguration();
+  private get global() {
+    return vscode.workspace.getConfiguration();
+  }
 
   readonly cwd: string = vscode.workspace.workspaceFolders?.[0].uri.fsPath ?? '';
 
@@ -110,6 +112,7 @@ class Configs {
   }
 
   private serialize(): string {
+    // todo 配置文字大约有2000字，不加密的话只有1100字,能缩减吗
     const plain = {
       currentVersion: this.my.currentVersion,
       showSuggest: this.my.showSuggest,
@@ -125,7 +128,6 @@ class Configs {
   }
 
   /**
-   *
    * @returns 是否需要以默认配置覆盖
    */
   private load(): boolean {
@@ -169,14 +171,8 @@ class Configs {
    * 当前标题栏的颜色，可能没有配置
    */
   get titleBarColor() {
-    return this.workbenchColorCustomizations?.[TitleBarConsts.ActiveBg];
-  }
-
-  /**
-   * 当前的标题栏颜色配置，可能是`undefined`
-   */
-  get workbenchColorCustomizations() {
-    return this.global.get<TitleBarStyleCustomization>(TitleBarConsts.WorkbenchSection);
+    const o = this.global.get<ColorCustomization>(TitleBarConsts.WorkbenchSection);
+    return o?.[TitleBarConsts.ActiveBg];
   }
 
   /**
@@ -185,7 +181,7 @@ class Configs {
   get inspectWorkbenchColorCustomizations() {
     return vscode.workspace
       .getConfiguration()
-      .inspect<TitleBarStyleCustomization>(TitleBarConsts.WorkbenchSection);
+      .inspect<ColorCustomization>(TitleBarConsts.WorkbenchSection);
   }
 
   /**
@@ -193,9 +189,8 @@ class Configs {
    * @param value 新颜色，其属性可以是`undefined`来删除
    * @returns
    */
-  setWorkbenchColorCustomizations(value: Partial<TitleBarStyleCustomization>): Thenable<void> {
-    const globalConfig = vscode.workspace.getConfiguration();
-    return globalConfig.update(
+  setWorkbenchColorCustomizations(value: Partial<ColorCustomization>): Thenable<void> {
+    return this.global.update(
       TitleBarConsts.WorkbenchSection,
       value,
       vscode.ConfigurationTarget.Workspace
@@ -213,8 +208,7 @@ class Configs {
    * 直接全局设定为`custom`
    */
   justifyWindowTitleBarStyle() {
-    const globalConfig = vscode.workspace.getConfiguration();
-    return globalConfig.update(
+    return this.global.update(
       TitleBarConsts.Section,
       TitleBarConsts.Expected,
       vscode.ConfigurationTarget.Global
