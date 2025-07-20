@@ -296,7 +296,10 @@
       textarea: null,
       y: 0,
       scrollerY: 0,
-      verticalPad: 0,
+      /**
+       * & 此数值和.textarea-scroller里的top属性一致
+       */
+      verticalPad: 3,
     };
 
     /**
@@ -317,7 +320,7 @@
 
     $('.textarea-wrapper').forEach((wrapper) => {
       const textarea = wrapper.querySelector('.textarea');
-      const scroller = h('div', { class: 'textarea-scoller' }).mount(wrapper);
+      const scroller = h('div', { class: 'textarea-scroller' }).mount(wrapper);
 
       textarea.addEventListener('wheel', (event) => {
         event.preventDefault();
@@ -350,17 +353,6 @@
       };
     });
 
-    // 探测verticalPad的数值，无法在未绘制的时候敲定
-    requestAnimationFrame(() => {
-      if (drag.verticalPad === 0) {
-        const scoller = q('.textarea-scoller');
-        if (scoller) {
-          const style = getComputedStyle(scoller);
-          drag.verticalPad = parseInt(style.top.replace(/[^\d]/g, ''), 10);
-        }
-      }
-    });
-
     document.addEventListener('mouseup', () => {
       drag.scroller = null;
       drag.textarea = null;
@@ -382,7 +374,7 @@
     // 初始化所有设定了textarea类的textarea
     $('.textarea').forEach((textarea) => {
       const wrapper = textarea.parentElement;
-      const scroller = wrapper.querySelector('.textarea-scoller');
+      const scroller = wrapper.querySelector('.textarea-scroller');
       /**
        * @type {function(): void}
        */
@@ -475,7 +467,7 @@
         '&times;'
       );
 
-      const intput = h('input', {
+      const input = h('input', {
         type: 'color',
         class: 'palette-input',
         value: color,
@@ -485,7 +477,7 @@
         item.title = this.value;
       });
 
-      item.append(remover, intput);
+      item.append(remover, input);
       return item;
     };
 

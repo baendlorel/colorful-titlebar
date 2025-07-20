@@ -311,7 +311,7 @@ input:checked + .slider:before {
   position: relative;
 }
 
-.textarea-scoller {
+.textarea-scroller {
   position: absolute;
   top: 3px;
   right: 3px;

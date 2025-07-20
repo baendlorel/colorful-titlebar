@@ -4,7 +4,6 @@ import { join } from 'node:path';
 import { Consts, GradientStyle, HashSource } from '@/common/consts';
 import i18n from '@/common/i18n';
 import configs from '@/common/configs';
-import RGBA from '@/common/rgba';
 import version from '@/core/version';
 
 import { handlerMap } from './handler-map';
@@ -20,7 +19,7 @@ export default async function (this: vscode.ExtensionContext) {
     return; // 防止创建多个设置页面
   }
   (controlPanel = vscode.window.createWebviewPanel(
-    'controllPanel',
+    'controlPanel',
     Panel.title,
     vscode.ViewColumn.One,
     {
