@@ -1,5 +1,5 @@
 import vscode from 'vscode';
-import aes from '@/core/aes';
+import chacha20 from '@/core/chacha20';
 
 import { Consts, HashSource, TitleBarConsts } from './consts';
 import RGBA from './rgba';
@@ -8,9 +8,9 @@ import sanitizer from './sanitizer';
 import { deflateRawSync, inflateRawSync } from 'node:zlib';
 
 const enum Defaults {
-  LightThemeColors = 'rgb(167, 139, 250);rgb(147, 197, 253);rgb(128, 203, 196);rgb(172, 243, 157);rgb(250, 204, 21);rgb(253, 151, 31);rgb(251, 113, 133)',
-  DarkThemeColors = 'rgb(68, 0, 116);rgb(0, 47, 85);rgb(0, 66, 66);rgb(0, 75, 28);rgb(124, 65, 1);rgb(133, 33, 33)',
-  ProjectIndicators = '.git;package.json;pom.xml;Cargo.toml;go.mod;README.md;LICENSE;tsconfig.json;yarn.lock;pnpm-lock.yaml;package-lock.json;webpack.config.js;vite.config.js;vite.config.ts;next.config.js;pyproject.toml;setup.py;CMakeLists.txt;Makefile;build.gradle;composer.json;Gemfile;.nvmrc;.node-version;Deno.json;deno.jsonc',
+  LightThemeColors = `rgb(167, 139, 250)${Consts.ConfigSeparator}rgb(147, 197, 253)${Consts.ConfigSeparator}rgb(128, 203, 196)${Consts.ConfigSeparator}rgb(172, 243, 157)${Consts.ConfigSeparator}rgb(250, 204, 21)${Consts.ConfigSeparator}rgb(253, 151, 31)${Consts.ConfigSeparator}rgb(251, 113, 133)`,
+  DarkThemeColors = `rgb(68, 0, 116)${Consts.ConfigSeparator}rgb(0, 47, 85)${Consts.ConfigSeparator}rgb(0, 66, 66)${Consts.ConfigSeparator}rgb(0, 75, 28)${Consts.ConfigSeparator}rgb(124, 65, 1)${Consts.ConfigSeparator}rgb(133, 33, 33)`,
+  ProjectIndicators = `.git${Consts.ConfigSeparator}package.json${Consts.ConfigSeparator}pom.xml${Consts.ConfigSeparator}Cargo.toml${Consts.ConfigSeparator}go.mod${Consts.ConfigSeparator}README.md${Consts.ConfigSeparator}LICENSE${Consts.ConfigSeparator}tsconfig.json${Consts.ConfigSeparator}yarn.lock${Consts.ConfigSeparator}pnpm-lock.yaml${Consts.ConfigSeparator}package-lock.json${Consts.ConfigSeparator}webpack.config.js${Consts.ConfigSeparator}vite.config.js${Consts.ConfigSeparator}vite.config.ts${Consts.ConfigSeparator}next.config.js${Consts.ConfigSeparator}pyproject.toml${Consts.ConfigSeparator}setup.py${Consts.ConfigSeparator}CMakeLists.txt${Consts.ConfigSeparator}Makefile${Consts.ConfigSeparator}build.gradle${Consts.ConfigSeparator}composer.json${Consts.ConfigSeparator}Gemfile${Consts.ConfigSeparator}.nvmrc${Consts.ConfigSeparator}.node-version${Consts.ConfigSeparator}Deno.json${Consts.ConfigSeparator}deno.jsonc`,
   GradientBrightness = 62,
   GradientDarkness = 21,
 }
@@ -72,9 +72,9 @@ class Configs {
       gradientBrightness: Defaults.GradientBrightness as number,
       gradientDarkness: Defaults.GradientDarkness as number,
       hashSource: HashSource.ProjectName,
-      projectIndicators: Defaults.ProjectIndicators.split(';'),
-      lightThemeColors: Defaults.LightThemeColors.split(';').map((color) => new RGBA(color)),
-      darkThemeColors: Defaults.DarkThemeColors.split(';').map((color) => new RGBA(color)),
+      projectIndicators: this.split(Defaults.ProjectIndicators),
+      lightThemeColors: this.split(Defaults.LightThemeColors).map((color) => new RGBA(color)),
+      darkThemeColors: this.split(Defaults.DarkThemeColors).map((color) => new RGBA(color)),
     };
   }
 
@@ -135,8 +135,12 @@ class Configs {
       `${Prop.LightThemeColors}:${this.join(this.my.lightThemeColors)}`,
       `${Prop.DarkThemeColors}:${this.join(this.my.darkThemeColors)}`,
     ];
-    const zipped = deflateRawSync(plain.join(Consts.SerializerSeparator));
-    return aes.encrypt(zipped);
+    const str = plain.join(Consts.SerializerSeparator);
+    const zipped = deflateRawSync(str);
+    vscode.window.showInformationMessage(`before zip:${str.length}, after zip:${zipped.length}`);
+    const encrypted = chacha20.encrypt(zipped);
+    vscode.window.showInformationMessage(`after encrypt: ${encrypted.length}`);
+    return encrypted;
   }
 
   private parse(decrypted: string): Partial<Config> {
@@ -189,7 +193,7 @@ class Configs {
    * @returns 配置对象
    */
   private deserialize(akasha: string): Config {
-    const decrypted = inflateRawSync(aes.decrypt(akasha));
+    const decrypted = inflateRawSync(chacha20.decrypt(akasha));
     const raw = this.parse(decrypted.toString());
     const defaults = this.newDefault;
 
