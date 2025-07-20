@@ -1,4 +1,4 @@
-export const enum ControlName {
+export const enum Controls {
   ShowSuggest,
   WorkbenchCssPath,
   Gradient,

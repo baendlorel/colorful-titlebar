@@ -10,13 +10,13 @@ import sanitizer from '@/common/sanitizer';
 
 import { AfterStyle } from '@/features/gradient/consts';
 import hacker from '@/features/gradient/hacker';
-import { ControlName } from './consts';
+import { Controls } from './consts';
 import { HandelResult, PostedValue } from './types';
 
 const Panel = i18n.ControlPanel;
 
 export const handlerMap = {
-  [ControlName.ShowSuggest]: async (result: HandelResult, value: PostedValue) => {
+  [Controls.ShowSuggest]: async (result: HandelResult, value: PostedValue) => {
     if (typeof value !== 'boolean') {
       result.succ = false;
       result.msg = Panel.typeError(value, 'a boolean');
@@ -24,7 +24,7 @@ export const handlerMap = {
     }
     await configs.setShowSuggest(value);
   },
-  [ControlName.WorkbenchCssPath]: async (result: HandelResult, value: PostedValue) => {
+  [Controls.WorkbenchCssPath]: async (result: HandelResult, value: PostedValue) => {
     if (typeof value !== 'string') {
       result.succ = false;
       result.msg = Panel.typeError(value, 'a string');
@@ -38,7 +38,7 @@ export const handlerMap = {
     }
     await configs.setWorkbenchCssPath(cssPath);
   },
-  [ControlName.Gradient]: async (result: HandelResult, value: PostedValue) => {
+  [Controls.Gradient]: async (result: HandelResult, value: PostedValue) => {
     let gradientStyle: AfterStyle;
     switch (Number(value)) {
       case GradientStyle.BrightCenter:
@@ -70,7 +70,7 @@ export const handlerMap = {
     await hacker.inject(cssPath, gradientStyle);
     result.msg = Panel.gradient.success;
   },
-  [ControlName.GradientBrightness]: async (result: HandelResult, value: PostedValue) => {
+  [Controls.GradientBrightness]: async (result: HandelResult, value: PostedValue) => {
     const raw = parseInt(String(value), 10);
     const percent = sanitizer.percent(raw);
     if (percent === null) {
@@ -81,7 +81,7 @@ export const handlerMap = {
     await configs.setGradientBrightness(percent);
     result.msg = Panel.gradientBrightness.success;
   },
-  [ControlName.GradientDarkness]: async (result: HandelResult, value: PostedValue) => {
+  [Controls.GradientDarkness]: async (result: HandelResult, value: PostedValue) => {
     const raw = parseInt(String(value), 10);
     const percent = sanitizer.percent(raw);
     if (percent === null) {
@@ -92,7 +92,7 @@ export const handlerMap = {
     await configs.setGradientDarkness(percent);
     result.msg = Panel.gradientDarkness.success;
   },
-  [ControlName.HashSource]: async (result: HandelResult, value: PostedValue) => {
+  [Controls.HashSource]: async (result: HandelResult, value: PostedValue) => {
     const d = parseInt(String(value), 10) as HashSource;
     const arr = [HashSource.FullPath, HashSource.ProjectName, HashSource.ProjectNameDate];
     if (!arr.includes(d)) {
@@ -103,27 +103,27 @@ export const handlerMap = {
     await configs.setHashSource(d);
     result.msg = Panel.hashSource.success;
   },
-  [ControlName.Refresh]: async (result: HandelResult, _value: PostedValue) => {
+  [Controls.Refresh]: async (result: HandelResult, _value: PostedValue) => {
     const token = getHashSource(configs.cwd);
     const color = getColor(configs.cwd);
     await style.applyColor(color);
     result.msg = Panel.refresh.success(token, color.toRGBString());
     result.other.color = color.toRGBString();
   },
-  [ControlName.RandomColor]: async (_result: HandelResult, _value: PostedValue) => {
+  [Controls.RandomColor]: async (_result: HandelResult, _value: PostedValue) => {
     throw new Error('RandomColor只是个标记，应该具体有颜色套组、纯粹、指定');
   },
-  [ControlName['RandomColor.colorSet']]: async (result: HandelResult, _value: PostedValue) => {
+  [Controls['RandomColor.colorSet']]: async (result: HandelResult, _value: PostedValue) => {
     const color = getColorByK(Math.random());
     await style.applyColor(color);
     result.other.color = color.toRGBString();
   },
-  [ControlName['RandomColor.pure']]: async (result: HandelResult, _value: PostedValue) => {
+  [Controls['RandomColor.pure']]: async (result: HandelResult, _value: PostedValue) => {
     const color = RGBA.randomRGB();
     await style.applyColor(color);
     result.other.color = color;
   },
-  [ControlName['RandomColor.specify']]: async (result: HandelResult, value: PostedValue) => {
+  [Controls['RandomColor.specify']]: async (result: HandelResult, value: PostedValue) => {
     if (typeof value !== 'string') {
       result.succ = false;
       result.msg = Panel.typeError(value, 'a string');
@@ -131,7 +131,7 @@ export const handlerMap = {
     }
     await style.applyColor(value);
   },
-  [ControlName.ProjectIndicators]: async (result: HandelResult, value: PostedValue) => {
+  [Controls.ProjectIndicators]: async (result: HandelResult, value: PostedValue) => {
     if (typeof value !== 'string') {
       result.succ = false;
       result.msg = Panel.typeError(value, 'a string');
@@ -143,7 +143,7 @@ export const handlerMap = {
       .filter(Boolean);
     await configs.setProjectIndicators(indicators);
   },
-  [ControlName.ThemeColors]: async (
+  [Controls.ThemeColors]: async (
     result: HandelResult,
     value: Record<string, RGBA[] | undefined>
   ) => {
@@ -156,7 +156,7 @@ export const handlerMap = {
     // 必须至少有一个是正常的
     const errors: string[] = [];
 
-    const rawLight = value[ControlName['ThemeColors.light']];
+    const rawLight = value[Controls['ThemeColors.light']];
     if (rawLight) {
       const light = sanitizer.colors(rawLight);
       if (light) {
@@ -170,7 +170,7 @@ export const handlerMap = {
       }
     }
 
-    const rawDark = value[ControlName['ThemeColors.dark']];
+    const rawDark = value[Controls['ThemeColors.dark']];
     if (rawDark) {
       const dark = sanitizer.colors(rawDark);
       if (dark) {
@@ -194,10 +194,10 @@ export const handlerMap = {
       throw null;
     }
   },
-  [ControlName['ThemeColors.light']]: async (_result: HandelResult, _value: PostedValue) => {
+  [Controls['ThemeColors.light']]: async (_result: HandelResult, _value: PostedValue) => {
     throw new Error('ThemeColors.light只是个标记');
   },
-  [ControlName['ThemeColors.dark']]: async (_result: HandelResult, _value: PostedValue) => {
+  [Controls['ThemeColors.dark']]: async (_result: HandelResult, _value: PostedValue) => {
     throw new Error('ThemeColors.dark只是个标记');
   },
 };

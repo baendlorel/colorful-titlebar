@@ -1,9 +1,9 @@
 import { Consts } from '@/common/consts';
-import { ControlName } from './consts';
+import { Controls } from './consts';
 
 export interface HandelResult {
   from: Consts.Name;
-  name: ControlName;
+  name: Controls;
   succ: boolean;
   msg: string;
   other: Record<string, any>;

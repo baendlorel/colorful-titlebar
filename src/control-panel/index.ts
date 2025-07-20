@@ -9,7 +9,7 @@ import version from '@/core/version';
 
 import { handlerMap } from './handler-map';
 import { HandelResult } from './types';
-import { ControlName, Prod } from './consts';
+import { Controls, Prod } from './consts';
 
 const Panel = i18n.ControlPanel;
 
@@ -84,25 +84,25 @@ export default async function (this: vscode.ExtensionContext) {
       },
       names: {
         // 这些都是指令=控制名的情况
-        showSuggest: '${ControlName.ShowSuggest}',
-        workbenchCssPath: '${ControlName.WorkbenchCssPath}',
-        gradient: '${ControlName.Gradient}',
-        hashSource: '${ControlName.HashSource}',
-        gradientBrightness: '${ControlName.GradientBrightness}',
-        gradientDarkness: '${ControlName.GradientDarkness}',
-        refresh: '${ControlName.Refresh}',
-        randomColor: '${ControlName.RandomColor}',
-        'randomColor.colorSet': "${ControlName['RandomColor.colorSet']}",
-        'randomColor.pure': "${ControlName['RandomColor.pure']}",
-        'randomColor.specify': "${ControlName['RandomColor.specify']}",
-        isRandomColor: (s) => s === "${ControlName['RandomColor.colorSet']}" || s === "${
-    ControlName['RandomColor.pure']
-  }" || s === "${ControlName['RandomColor.specify']}",
-        projectIndicators: '${ControlName.ProjectIndicators}',
+        showSuggest: '${Controls.ShowSuggest}',
+        workbenchCssPath: '${Controls.WorkbenchCssPath}',
+        gradient: '${Controls.Gradient}',
+        hashSource: '${Controls.HashSource}',
+        gradientBrightness: '${Controls.GradientBrightness}',
+        gradientDarkness: '${Controls.GradientDarkness}',
+        refresh: '${Controls.Refresh}',
+        randomColor: '${Controls.RandomColor}',
+        'randomColor.colorSet': "${Controls['RandomColor.colorSet']}",
+        'randomColor.pure': "${Controls['RandomColor.pure']}",
+        'randomColor.specify': "${Controls['RandomColor.specify']}",
+        isRandomColor: (s) => s === "${Controls['RandomColor.colorSet']}" || s === "${
+    Controls['RandomColor.pure']
+  }" || s === "${Controls['RandomColor.specify']}",
+        projectIndicators: '${Controls.ProjectIndicators}',
         // 这两个是配置决定的名字
-        lightThemeColors: "${ControlName['ThemeColors.light']}",
-        darkThemeColors: "${ControlName['ThemeColors.dark']}",
-        themeColors: '${ControlName.ThemeColors}',
+        lightThemeColors: "${Controls['ThemeColors.light']}",
+        darkThemeColors: "${Controls['ThemeColors.dark']}",
+        themeColors: '${Controls.ThemeColors}',
       }
     }
   </script>
@@ -174,12 +174,12 @@ export default async function (this: vscode.ExtensionContext) {
         </div>
         <div class="control-form">
           <label class="toggle-switch">
-            <input type="checkbox" class="control-input" name="${ControlName.ShowSuggest}">
+            <input type="checkbox" class="control-input" name="${Controls.ShowSuggest}">
             <span class="slider"></span>
           </label>
         </div>
-        <div class="control-error" name="${ControlName.ShowSuggest}"></div>
-        <div class="control-succ" name="${ControlName.ShowSuggest}"></div>
+        <div class="control-error" name="${Controls.ShowSuggest}"></div>
+        <div class="control-succ" name="${Controls.ShowSuggest}"></div>
       </div>
 
       <div class="control-item">
@@ -187,12 +187,10 @@ export default async function (this: vscode.ExtensionContext) {
           ${Panel.workbenchCssPath.label}<small>${Panel.workbenchCssPath.description}</small>
         </div>
         <div class="control-form">
-          <textarea class="control-input textarea" name="${
-            ControlName.WorkbenchCssPath
-          }"></textarea>
+          <textarea class="control-input textarea" name="${Controls.WorkbenchCssPath}"></textarea>
         </div>
-        <div class="control-error" name="${ControlName.WorkbenchCssPath}"></div>
-        <div class="control-succ" name="${ControlName.WorkbenchCssPath}"></div>
+        <div class="control-error" name="${Controls.WorkbenchCssPath}"></div>
+        <div class="control-succ" name="${Controls.WorkbenchCssPath}"></div>
       </div>
 
       <div class="control-item">
@@ -200,7 +198,7 @@ export default async function (this: vscode.ExtensionContext) {
           ${Panel.gradient.label}<small>${Panel.gradient.description}</small>
         </div>
         <div class="control-form">
-          <select class="control-input select" name="${ControlName.Gradient}">
+          <select class="control-input select" name="${Controls.Gradient}">
             <option value="" selected>${Panel.gradient.empty}</option>
             <option value="${GradientStyle.BrightCenter}">
               ${Panel.gradient[GradientStyle.BrightCenter]}
@@ -213,8 +211,8 @@ export default async function (this: vscode.ExtensionContext) {
   }</option>
           </select>
         </div>
-        <div class="control-error" name="${ControlName.Gradient}"></div>
-        <div class="control-succ" name="${ControlName.Gradient}"></div>
+        <div class="control-error" name="${Controls.Gradient}"></div>
+        <div class="control-succ" name="${Controls.Gradient}"></div>
       </div>
 
       <div class="control-item-double">
@@ -224,11 +222,11 @@ export default async function (this: vscode.ExtensionContext) {
           </div>
           <div class="control-form input-percent">
             <input type="number" min="0" max="100" step="5" class="control-input" name="${
-              ControlName.GradientBrightness
+              Controls.GradientBrightness
             }" />
           </div>
-          <div class="control-error" name="${ControlName.GradientBrightness}"></div>
-          <div class="control-succ" name="${ControlName.GradientBrightness}"></div>
+          <div class="control-error" name="${Controls.GradientBrightness}"></div>
+          <div class="control-succ" name="${Controls.GradientBrightness}"></div>
         </div>
 
         <div class="control-item" style="grid-template-columns: 1fr auto;">
@@ -237,11 +235,11 @@ export default async function (this: vscode.ExtensionContext) {
           </div>
           <div class="control-form input-percent">
             <input type="number" min="0" max="100" step="5" class="control-input" name="${
-              ControlName.GradientDarkness
+              Controls.GradientDarkness
             }" />
           </div>
-          <div class="control-error" name="${ControlName.GradientDarkness}"></div>
-          <div class="control-succ" name="${ControlName.GradientDarkness}"></div>
+          <div class="control-error" name="${Controls.GradientDarkness}"></div>
+          <div class="control-succ" name="${Controls.GradientDarkness}"></div>
         </div>
       </div>
 
@@ -250,7 +248,7 @@ export default async function (this: vscode.ExtensionContext) {
           ${Panel.hashSource.label}<small>${Panel.hashSource.description}</small>
         </div>
         <div class="control-form">
-          <select class="control-input select" name="${ControlName.HashSource}">
+          <select class="control-input select" name="${Controls.HashSource}">
             <option value="${HashSource.ProjectName}">
               ${Panel.hashSource[HashSource.ProjectName]}
             </option>
@@ -260,8 +258,8 @@ export default async function (this: vscode.ExtensionContext) {
             </option>
           </select>
         </div>
-        <div class="control-error" name="${ControlName.HashSource}"></div>
-        <div class="control-succ" name="${ControlName.HashSource}"></div>
+        <div class="control-error" name="${Controls.HashSource}"></div>
+        <div class="control-succ" name="${Controls.HashSource}"></div>
       </div>
 
       <div class="control-item">
@@ -275,29 +273,27 @@ export default async function (this: vscode.ExtensionContext) {
             </button>
             <div class="dropdown-menu">
               <button type="button" class="control-input dropdown-item" name="${
-                ControlName['RandomColor.colorSet']
+                Controls['RandomColor.colorSet']
               }">
                 ${Panel.randomColor.colorSet}
               </button>
               <button type="button" class="control-input dropdown-item" name="${
-                ControlName['RandomColor.pure']
+                Controls['RandomColor.pure']
               }">
                 ${Panel.randomColor.pure}
               </button>
               <!--control-input 不需要，因为这个按钮是靠选颜色来变更的-->
               <button type="button" class="dropdown-item color-picker" title="${
                 Panel.randomColor.specify
-              }" name="${ControlName['RandomColor.specify']}">
+              }" name="${Controls['RandomColor.specify']}">
                 <span>&nbsp;&nbsp;${Panel.randomColor.specify}</span>
-                <input type="color" class="control-input" name="${
-                  ControlName['RandomColor.specify']
-                }">
+                <input type="color" class="control-input" name="${Controls['RandomColor.specify']}">
               </button>
             </div>
           </div>
         </div>
-        <div class="control-error" name="${ControlName.RandomColor}"></div>
-        <div class="control-succ" name="${ControlName.RandomColor}"></div>
+        <div class="control-error" name="${Controls.RandomColor}"></div>
+        <div class="control-succ" name="${Controls.RandomColor}"></div>
       </div>
 
       <div class="control-item">
@@ -305,12 +301,12 @@ export default async function (this: vscode.ExtensionContext) {
           ${Panel.refresh.label}<small>${Panel.refresh.description}</small>
         </div>
         <div class="control-form">
-          <button type="button" class="control-input control-button" name="${ControlName.Refresh}">
+          <button type="button" class="control-input control-button" name="${Controls.Refresh}">
             <span>${Panel.refresh.button}</span>
           </button>
         </div>
-        <div class="control-error" name="${ControlName.Refresh}"></div>
-        <div class="control-succ" name="${ControlName.Refresh}"></div>
+        <div class="control-error" name="${Controls.Refresh}"></div>
+        <div class="control-succ" name="${Controls.Refresh}"></div>
       </div>
 
       <div class="control-item">
@@ -318,12 +314,10 @@ export default async function (this: vscode.ExtensionContext) {
           ${Panel.projectIndicators.label}<small>${Panel.projectIndicators.description}</small>
         </div>
         <div class="control-form textarea-wrapper" max-height="120">
-          <textarea class="control-input textarea" name="${
-            ControlName.ProjectIndicators
-          }"></textarea>
+          <textarea class="control-input textarea" name="${Controls.ProjectIndicators}"></textarea>
         </div>
-        <div class="control-error" name="${ControlName.ProjectIndicators}"></div>
-        <div class="control-succ" name="${ControlName.ProjectIndicators}"></div>
+        <div class="control-error" name="${Controls.ProjectIndicators}"></div>
+        <div class="control-succ" name="${Controls.ProjectIndicators}"></div>
       </div>
 
       <div class="control-item" style="grid-template-columns: 1fr 1.8fr;">
@@ -331,7 +325,7 @@ export default async function (this: vscode.ExtensionContext) {
           ${Panel.themeColors.label}<small>${Panel.themeColors.description}</small>
         </div>
         <div class="control-form" style="display: flex; flex-direction: column; gap: 8px;">
-          <div class="palette" name="${ControlName['ThemeColors.light']}">
+          <div class="palette" name="${Controls['ThemeColors.light']}">
             <div class="palette-label">
               ${Panel.themeColors.lightColors}
               <span class="palette-hint">${Panel.themeColors.dragHint}</span>
@@ -342,7 +336,7 @@ export default async function (this: vscode.ExtensionContext) {
               }">+</button>
             </div>
           </div>
-          <div class="palette" name="${ControlName['ThemeColors.dark']}">
+          <div class="palette" name="${Controls['ThemeColors.dark']}">
             <div class="palette-label">
               ${Panel.themeColors.darkColors}
               <span class="palette-hint">${Panel.themeColors.dragHint}</span>
@@ -354,8 +348,8 @@ export default async function (this: vscode.ExtensionContext) {
             </div>
           </div>
         </div>
-        <div class="control-error" name="${ControlName.ThemeColors}"></div>
-        <div class="control-succ" name="${ControlName.ThemeColors}"></div>
+        <div class="control-error" name="${Controls.ThemeColors}"></div>
+        <div class="control-succ" name="${Controls.ThemeColors}"></div>
       </div>
     </form>
   </div>
