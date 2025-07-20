@@ -9,4 +9,4 @@ export interface HandelResult {
   other: Record<string, any>;
 }
 
-export type PostedValue = string | number | boolean;
+export type PostedValue = string | number | boolean | Record<string, any>;

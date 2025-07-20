@@ -7,29 +7,49 @@ import configs from '@/common/configs';
 import i18n from '@/common/i18n';
 import RGBA from '@/common/rgba';
 import sanitizer from '@/common/sanitizer';
+import gradient from '@/features/gradient';
 
-import { AfterStyle } from '@/features/gradient/consts';
-import hacker from '@/features/gradient/hacker';
 import { Controls } from './consts';
 import { HandelResult, PostedValue } from './types';
 
 const Panel = i18n.ControlPanel;
 
-export const handlerMap = {
-  [Controls.ShowSuggest]: async (result: HandelResult, value: PostedValue) => {
-    if (typeof value !== 'boolean') {
+interface PostedValueMap {
+  string: string;
+  number: number;
+  boolean: boolean;
+  object: Record<string, any>;
+}
+
+const expect: <T extends keyof PostedValueMap>(
+  result: HandelResult,
+  value: PostedValue,
+  tp: T
+) => asserts value is PostedValueMap[T] = (
+  result: HandelResult,
+  value: PostedValue,
+  tp: keyof PostedValueMap
+) => {
+  if (tp === 'object') {
+    if (typeof value !== 'object' || value === null) {
       result.succ = false;
-      result.msg = Panel.typeError(value, 'a boolean');
+      result.msg = Panel.typeError(value, 'an object');
       throw null;
     }
+  } else if (typeof value !== tp) {
+    result.succ = false;
+    result.msg = Panel.typeError(value, `a ${tp}`);
+    throw null;
+  }
+};
+
+export const handlerMap = {
+  [Controls.ShowSuggest]: async (result: HandelResult, value: PostedValue) => {
+    expect(result, value, 'boolean');
     await configs.setShowSuggest(value);
   },
   [Controls.WorkbenchCssPath]: async (result: HandelResult, value: PostedValue) => {
-    if (typeof value !== 'string') {
-      result.succ = false;
-      result.msg = Panel.typeError(value, 'a string');
-      throw null;
-    }
+    expect(result, value, 'string');
     const cssPath = value.trim();
     if (!existsSync(cssPath)) {
       result.succ = false;
@@ -39,40 +59,23 @@ export const handlerMap = {
     await configs.setWorkbenchCssPath(cssPath);
   },
   [Controls.Gradient]: async (result: HandelResult, value: PostedValue) => {
-    let gradientStyle: AfterStyle;
-    switch (Number(value)) {
-      case GradientStyle.BrightCenter:
-        gradientStyle = AfterStyle.BrightCenter;
-        break;
+    expect(result, value, 'number');
+    switch (value) {
       case GradientStyle.BrightLeft:
-        gradientStyle = AfterStyle.BrightLeft;
-        break;
+      case GradientStyle.BrightCenter:
       case GradientStyle.ArcLeft:
-        gradientStyle = AfterStyle.ArcLeft;
+        await gradient.apply(value);
         break;
+      case GradientStyle.None:
       default:
-        result.succ = false;
-        result.msg = Panel.typeError(
-          value,
-          [
-            'one of ',
-            GradientStyle.BrightCenter,
-            GradientStyle.BrightLeft,
-            GradientStyle.ArcLeft,
-          ].join()
-        );
-        throw null;
+        await gradient.none();
+        break;
     }
-    const cssPath = await hacker.getWorkbenchCssPath();
-    if (!cssPath) {
-      return;
-    }
-    await hacker.inject(cssPath, gradientStyle);
     result.msg = Panel.gradient.success;
   },
   [Controls.GradientBrightness]: async (result: HandelResult, value: PostedValue) => {
-    const raw = parseInt(String(value), 10);
-    const percent = sanitizer.percent(raw);
+    expect(result, value, 'number');
+    const percent = sanitizer.percent(value);
     if (percent === null) {
       result.succ = false;
       result.msg = Panel.typeError(value);
@@ -82,8 +85,8 @@ export const handlerMap = {
     result.msg = Panel.gradientBrightness.success;
   },
   [Controls.GradientDarkness]: async (result: HandelResult, value: PostedValue) => {
-    const raw = parseInt(String(value), 10);
-    const percent = sanitizer.percent(raw);
+    expect(result, value, 'number');
+    const percent = sanitizer.percent(value);
     if (percent === null) {
       result.succ = false;
       result.msg = Panel.typeError(value);
@@ -92,15 +95,15 @@ export const handlerMap = {
     await configs.setGradientDarkness(percent);
     result.msg = Panel.gradientDarkness.success;
   },
-  [Controls.HashSource]: async (result: HandelResult, value: PostedValue) => {
-    const d = parseInt(String(value), 10) as HashSource;
+  [Controls.HashSource]: async (result: HandelResult, value: HashSource) => {
+    expect(result, value, 'number');
     const arr = [HashSource.FullPath, HashSource.ProjectName, HashSource.ProjectNameDate];
-    if (!arr.includes(d)) {
+    if (!arr.includes(value)) {
       result.succ = false;
       result.msg = Panel.typeError(value, `one of ${arr.join(', ')}`);
       throw null;
     }
-    await configs.setHashSource(d);
+    await configs.setHashSource(value);
     result.msg = Panel.hashSource.success;
   },
   [Controls.Refresh]: async (result: HandelResult, _value: PostedValue) => {
@@ -124,19 +127,11 @@ export const handlerMap = {
     result.other.color = color;
   },
   [Controls['RandomColor.specify']]: async (result: HandelResult, value: PostedValue) => {
-    if (typeof value !== 'string') {
-      result.succ = false;
-      result.msg = Panel.typeError(value, 'a string');
-      throw null;
-    }
+    expect(result, value, 'string');
     await style.applyColor(value);
   },
   [Controls.ProjectIndicators]: async (result: HandelResult, value: PostedValue) => {
-    if (typeof value !== 'string') {
-      result.succ = false;
-      result.msg = Panel.typeError(value, 'a string');
-      throw null;
-    }
+    expect(result, value, 'string');
     const indicators = value
       .split(Consts.ConfigSeparator)
       .map((item) => item.trim())
@@ -147,11 +142,7 @@ export const handlerMap = {
     result: HandelResult,
     value: Record<string, RGBA[] | undefined>
   ) => {
-    if (typeof value !== 'object' || value === null) {
-      result.succ = false;
-      result.msg = Panel.typeError(value, 'an object');
-      throw null;
-    }
+    expect(result, value, 'object');
 
     // 必须至少有一个是正常的
     const errors: string[] = [];

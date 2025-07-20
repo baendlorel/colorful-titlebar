@@ -41,7 +41,7 @@ class Hacker {
    *
    * 会在command注册的地方就确认`cssPath`是否存在
    */
-  async inject(cssPath: string, gradientStyle: string): Promise<void> {
+  async inject(cssPath: string, gradientStyle: GradientStyle): Promise<void> {
     const backupPath = `${cssPath}.${Css.BackupSuffix}`;
     if (!existsSync(backupPath)) {
       const buffer = await readFile(cssPath);
@@ -50,13 +50,13 @@ class Hacker {
 
     let rawStyle = AfterStyle.BrightLeft;
     switch (gradientStyle) {
-      case this.Enable.style[GradientStyle.BrightCenter]:
-        rawStyle = AfterStyle.BrightCenter;
-        break;
-      case this.Enable.style[GradientStyle.BrightLeft]:
+      case GradientStyle.BrightLeft:
         rawStyle = AfterStyle.BrightLeft;
         break;
-      case this.Enable.style[GradientStyle.ArcLeft]:
+      case GradientStyle.BrightCenter:
+        rawStyle = AfterStyle.BrightCenter;
+        break;
+      case GradientStyle.ArcLeft:
         rawStyle = AfterStyle.ArcLeft;
         break;
     }
@@ -76,7 +76,6 @@ class Hacker {
       const line = lines[i].trim();
       if (line.startsWith(Css.Token)) {
         lines.splice(i, 1);
-        break;
       }
     }
 
@@ -98,7 +97,6 @@ class Hacker {
       const line = lines[i].trim();
       if (line.startsWith(Css.Token)) {
         lines.splice(i, 1);
-        break;
       }
     }
 
