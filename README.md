@@ -234,6 +234,40 @@ Issues and Pull Requests are welcome!
 
 ## 📝 Changelog
 
+### 1.4.0
+
+- **🔐 Configuration Encryption & Security**
+
+  - **Unified Configuration Storage**: All settings now consolidated into a single encrypted field `akasha`
+    - Encryption algorithm: **ChaCha20**
+    - Configuration data compressed from previous plaintext 1100+ characters to about 430 characters
+  - **Data Serialization**: Efficient value-only array serialization system replacing key-value pairs
+  - **Configuration Sanitization**: Enhanced data validation with comprehensive sanitizer functions
+
+- **🎨 UI/UX Improvements**
+
+  - **Template System Enhancement**: Migrated from `${}` to `{{}}` template syntax with comprehensive template compiler
+  - **Type Safety**: Improved TypeScript integration with better type assertions using `expect` functions
+  - **Theme Consistency**: Fixed color picker foreground color updates and palette synchronization issues
+
+- **🐛 Critical Bug Fixes**
+
+  - **HTML Enum Handling**: Fixed issue where auto-incremented enum values became strings in HTML context
+  - **Gradient Style Management**: Improved CSS injection with token-based line scanning instead of regex
+
+- **🛠️ Architecture Improvements**
+
+  - **Build System Enhancement**: Implemented `__IS_DEV__` macro for development/production builds using Rollup replace plugin
+  - **Gradient System Refactor**: Centralized gradient functionality through main index rather than direct hacker exports
+  - **Pure Functions**: Introduced `purge()` function as a pure function for CSS token line removal
+  - **Error Handling**: Comprehensive error handling for encryption/decryption operations
+
+- **🧹 Code Quality & Maintenance**
+
+  - **Template Compiler**: 120+ template variables with systematic naming conventions
+  - **Documentation**: Enhanced JSDoc comments and code documentation throughout
+  - **Test Environment**: Improved development testing with proper environment detection
+
 ### 1.3.0
 
 - **🎯 UI/UX Major Improvements**
