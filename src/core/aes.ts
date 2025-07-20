@@ -20,18 +20,18 @@ class AESCrypto {
    * ! **会有报错，请在使用的地方处理**
    *
    * 使用 AES 加密字符串
-   * @param text - 要加密的明文
+   * @param buffer - 要加密的buffer
    * @returns 以 base64 格式返回加密后的字符串
    */
-  encrypt(text: string): string {
+  encrypt(buffer: Buffer): string {
     const iv = randomBytes(16);
     const cipher = createCipheriv(this.algorithm, this.key, iv);
 
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
+    let encrypted = cipher.update(buffer);
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
 
     // 将 IV 和加密数据组合
-    const result = iv.toString('hex') + ':' + encrypted;
+    const result = iv.toString('hex') + ':' + encrypted.toString('hex');
     return Buffer.from(result).toString('base64');
   }
 
@@ -40,9 +40,9 @@ class AESCrypto {
    *
    * 使用 AES 解密字符串
    * @param encryptedText - 以 base64 格式的加密文本
-   * @returns 解密后的明文
+   * @returns 解密后的Buffer
    */
-  decrypt(encryptedText: string): string {
+  decrypt(encryptedText: string): Buffer {
     const combined = Buffer.from(encryptedText, 'base64').toString('utf8');
     const [ivHex, encrypted] = combined.split(':');
 
@@ -53,8 +53,8 @@ class AESCrypto {
     const iv = Buffer.from(ivHex, 'hex');
     const decipher = createDecipheriv(this.algorithm, this.key, iv);
 
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
+    let decrypted = decipher.update(encrypted, 'hex');
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
 
     return decrypted;
   }

@@ -5,6 +5,7 @@ import { Consts, HashSource, TitleBarConsts } from './consts';
 import RGBA from './rgba';
 import i18n from './i18n';
 import safe from './safe';
+import { deflateRawSync, inflateRawSync } from 'node:zlib';
 
 const enum Defaults {
   LightThemeColors = 'rgb(167, 139, 250);rgb(147, 197, 253);rgb(128, 203, 196);rgb(172, 243, 157);rgb(250, 204, 21);rgb(253, 151, 31);rgb(251, 113, 133)',
@@ -77,7 +78,8 @@ class Configs {
   }
 
   private deserialize(akasha: string): Config {
-    const raw = JSON.parse(aes.decrypt(akasha)) as Partial<Config>;
+    const decrypted = inflateRawSync(aes.decrypt(akasha));
+    const raw = JSON.parse(decrypted.toString()) as Partial<Config>;
     const defaults = this.getDefault();
     // 下面对配置字段进行校验
     raw.currentVersion =
@@ -112,7 +114,6 @@ class Configs {
   }
 
   private serialize(): string {
-    // todo 配置文字大约有2000字，不加密的话只有1100字,能缩减吗
     const plain = {
       currentVersion: this.my.currentVersion,
       showSuggest: this.my.showSuggest,
@@ -124,7 +125,8 @@ class Configs {
       gradientBrightness: this.my.gradientBrightness,
       gradientDarkness: this.my.gradientDarkness,
     };
-    return JSON.stringify(plain);
+    const zipped = deflateRawSync(JSON.stringify(plain));
+    return aes.encrypt(zipped);
   }
 
   /**
@@ -154,7 +156,7 @@ class Configs {
   private async save(): Promise<void> {
     try {
       const self = vscode.workspace.getConfiguration(Consts.Name);
-      const akasha = aes.encrypt(this.serialize());
+      const akasha = this.serialize();
       await self.update(Consts.Akasha, akasha, vscode.ConfigurationTarget.Global);
     } catch (error) {
       throw error;
