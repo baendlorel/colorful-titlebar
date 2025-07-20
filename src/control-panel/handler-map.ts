@@ -6,7 +6,7 @@ import { Consts, GradientStyle, HashSource } from '@/common/consts';
 import configs from '@/common/configs';
 import i18n from '@/common/i18n';
 import RGBA from '@/common/rgba';
-import safe from '@/common/safe';
+import sanitizer from '@/common/sanitizer';
 
 import { AfterStyle } from '@/features/gradient/consts';
 import hacker from '@/features/gradient/hacker';
@@ -72,7 +72,7 @@ export const handlerMap = {
   },
   [ControlName.GradientBrightness]: async (result: HandelResult, value: PostedValue) => {
     const raw = parseInt(String(value), 10);
-    const percent = safe.percent(raw);
+    const percent = sanitizer.percent(raw);
     if (percent === null) {
       result.succ = false;
       result.msg = Panel.typeError(value);
@@ -83,7 +83,7 @@ export const handlerMap = {
   },
   [ControlName.GradientDarkness]: async (result: HandelResult, value: PostedValue) => {
     const raw = parseInt(String(value), 10);
-    const percent = safe.percent(raw);
+    const percent = sanitizer.percent(raw);
     if (percent === null) {
       result.succ = false;
       result.msg = Panel.typeError(value);
@@ -158,7 +158,7 @@ export const handlerMap = {
 
     const rawLight = value[ControlName['ThemeColors.light']];
     if (rawLight) {
-      const light = safe.colors(rawLight);
+      const light = sanitizer.colors(rawLight);
       if (light) {
         if (light.length === 0) {
           errors.push(Panel.themeColors.emptyPalette(Panel.themeColors.lightColors));
@@ -172,7 +172,7 @@ export const handlerMap = {
 
     const rawDark = value[ControlName['ThemeColors.dark']];
     if (rawDark) {
-      const dark = safe.colors(rawDark);
+      const dark = sanitizer.colors(rawDark);
       if (dark) {
         if (dark.length === 0) {
           errors.push(Panel.themeColors.emptyPalette(Panel.themeColors.darkColors));

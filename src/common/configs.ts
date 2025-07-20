@@ -4,7 +4,7 @@ import aes from '@/core/aes';
 import { Consts, HashSource, TitleBarConsts } from './consts';
 import RGBA from './rgba';
 import i18n from './i18n';
-import safe from './safe';
+import sanitizer from './sanitizer';
 import { deflateRawSync, inflateRawSync } from 'node:zlib';
 
 const enum Defaults {
@@ -15,16 +15,35 @@ const enum Defaults {
   GradientDarkness = 21,
 }
 
+/**
+ * 配置字段的PropertyKey常量组
+ *
+ * ! **确定好以后这个顺序就不可以变了！**
+ * - 这个顺序决定了序列化的字段顺序
+ * - 如果配置发生了变化，下面的序列化代码可以删掉属性，但这里的配置不可以删掉，否则编号会出现错位
+ */
+const enum Prop {
+  CurrentVersion,
+  ShowSuggest,
+  WorkbenchCssPath,
+  GradientBrightness,
+  GradientDarkness,
+  HashSource,
+  ProjectIndicators,
+  LightThemeColors,
+  DarkThemeColors,
+}
+
 interface Config {
   currentVersion: string;
   showSuggest: boolean;
-  lightThemeColors: RGBA[];
-  darkThemeColors: RGBA[];
-  projectIndicators: string[];
-  hashSource: HashSource;
   workbenchCssPath: string;
   gradientBrightness: number;
   gradientDarkness: number;
+  hashSource: HashSource;
+  projectIndicators: string[];
+  lightThemeColors: RGBA[];
+  darkThemeColors: RGBA[];
 }
 
 interface ColorCustomization {
@@ -45,6 +64,20 @@ class Configs {
     return vscode.workspace.getConfiguration();
   }
 
+  private get newDefault(): Config {
+    return {
+      currentVersion: '1.0.0',
+      showSuggest: true,
+      workbenchCssPath: '',
+      gradientBrightness: Defaults.GradientBrightness as number,
+      gradientDarkness: Defaults.GradientDarkness as number,
+      hashSource: HashSource.ProjectName,
+      projectIndicators: Defaults.ProjectIndicators.split(';'),
+      lightThemeColors: Defaults.LightThemeColors.split(';').map((color) => new RGBA(color)),
+      darkThemeColors: Defaults.DarkThemeColors.split(';').map((color) => new RGBA(color)),
+    };
+  }
+
   readonly cwd: string = vscode.workspace.workspaceFolders?.[0].uri.fsPath ?? '';
 
   readonly lang = vscode.env.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
@@ -63,18 +96,91 @@ class Configs {
     }
   }
 
-  private getDefault(): Config {
-    return {
-      currentVersion: '1.0.0',
-      showSuggest: true,
-      lightThemeColors: Defaults.LightThemeColors.split(';').map((color) => new RGBA(color)),
-      darkThemeColors: Defaults.DarkThemeColors.split(';').map((color) => new RGBA(color)),
-      projectIndicators: Defaults.ProjectIndicators.split(';'),
-      hashSource: HashSource.ProjectName,
-      workbenchCssPath: '',
-      gradientBrightness: Defaults.GradientBrightness as number,
-      gradientDarkness: Defaults.GradientDarkness as number,
-    };
+  // #region 序列化工具
+  /**
+   * 将字符串数组或RGBA对象数组转换为字符串
+   * @param arr
+   * @returns
+   */
+  private join(arr: string[] | RGBA[]): string {
+    return arr.map((a) => (a instanceof RGBA ? a.toRGBString() : a)).join(Consts.ConfigSeparator);
+  }
+
+  /**
+   * 拆分为数组，将会去掉首尾空格，并去掉空项
+   * @param str
+   * @returns
+   */
+  private split(str: string): string[] {
+    return str
+      .split(Consts.ConfigSeparator)
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+
+  /**
+   * 将配置对象序列化为字符串
+   * - 压缩后再加密，减少存储空间
+   * @returns 加密后的配置字符串
+   */
+  private serialize(): string {
+    const plain = [
+      `${Prop.CurrentVersion}:${this.my.currentVersion}`,
+      `${Prop.ShowSuggest}:${this.my.showSuggest ? 1 : 0}`,
+      `${Prop.WorkbenchCssPath}:${this.my.workbenchCssPath}`,
+      `${Prop.GradientBrightness}:${this.my.gradientBrightness}`,
+      `${Prop.GradientDarkness}:${this.my.gradientDarkness}`,
+      `${Prop.HashSource}:${this.my.hashSource}`,
+      `${Prop.ProjectIndicators}:${this.join(this.my.projectIndicators)}`,
+      `${Prop.LightThemeColors}:${this.join(this.my.lightThemeColors)}`,
+      `${Prop.DarkThemeColors}:${this.join(this.my.darkThemeColors)}`,
+    ];
+    const zipped = deflateRawSync(plain.join(Consts.SerializerSeparator));
+    return aes.encrypt(zipped);
+  }
+
+  private parse(decrypted: string): Partial<Config> {
+    const arr = decrypted.split(Consts.SerializerSeparator);
+    const result: Partial<Config> = {};
+    for (let i = 0; i < arr.length; i++) {
+      const entry = arr[i];
+      const index = entry.indexOf(':');
+      const k = parseInt(entry.slice(0, index), 10) as Prop;
+      const v = entry.slice(index + 1);
+      switch (k) {
+        case Prop.CurrentVersion:
+          result.currentVersion = v;
+          break;
+        case Prop.ShowSuggest:
+          result.showSuggest = v === '1';
+          break;
+        case Prop.WorkbenchCssPath:
+          result.workbenchCssPath = v;
+          break;
+        case Prop.GradientBrightness:
+          result.gradientBrightness = sanitizer.percent(parseInt(v, 10)) ?? undefined;
+          break;
+        case Prop.GradientDarkness:
+          result.gradientDarkness = sanitizer.percent(parseInt(v, 10)) ?? undefined;
+          break;
+        case Prop.HashSource:
+          result.hashSource = sanitizer.hashSource(parseInt(v, 10) as HashSource) ?? undefined;
+          break;
+        case Prop.ProjectIndicators:
+          result.projectIndicators = this.split(v);
+          break;
+        case Prop.LightThemeColors:
+          result.lightThemeColors = sanitizer.colors(this.split(v)) ?? undefined;
+          break;
+        case Prop.DarkThemeColors:
+          result.darkThemeColors = sanitizer.colors(this.split(v)) ?? undefined;
+          break;
+        default:
+          // * 这里有可能是未来被废弃的配置项，无需处理
+          break;
+      }
+    }
+    return result;
   }
 
   /**
@@ -84,62 +190,25 @@ class Configs {
    */
   private deserialize(akasha: string): Config {
     const decrypted = inflateRawSync(aes.decrypt(akasha));
-    const raw = JSON.parse(decrypted.toString()) as Partial<Config>;
-    const defaults = this.getDefault();
+    const raw = this.parse(decrypted.toString());
+    const defaults = this.newDefault;
 
-    // 下面对配置字段进行校验
-    raw.currentVersion =
-      typeof raw.currentVersion === 'string' ? raw.currentVersion : defaults.currentVersion;
-
-    raw.showSuggest = typeof raw.showSuggest === 'boolean' ? raw.showSuggest : defaults.showSuggest;
-
-    raw.lightThemeColors = safe.colors(raw.lightThemeColors) ?? defaults.lightThemeColors;
-    raw.darkThemeColors = safe.colors(raw.darkThemeColors) ?? defaults.darkThemeColors;
-
-    raw.projectIndicators = Array.isArray(raw.projectIndicators)
-      ? raw.projectIndicators.map((indicator) => String(indicator).trim())
-      : defaults.projectIndicators;
-
-    raw.hashSource = [
-      HashSource.ProjectName,
-      HashSource.FullPath,
-      HashSource.ProjectNameDate,
-    ].includes(raw.hashSource as HashSource)
-      ? raw.hashSource
-      : defaults.hashSource;
-
-    raw.workbenchCssPath =
-      typeof raw.workbenchCssPath === 'string' ? raw.workbenchCssPath : defaults.workbenchCssPath;
-
-    raw.gradientBrightness = safe.percent(raw.gradientBrightness) ?? defaults.gradientBrightness;
-
-    raw.gradientDarkness = safe.percent(raw.gradientDarkness) ?? defaults.gradientDarkness;
+    // & 经过parse的处理，这里的值类型一定是对的，只有可能“没有”
+    // 这里不宜和parse函数合并，因为真的可能没有值
+    raw.currentVersion = raw.currentVersion ?? defaults.currentVersion;
+    raw.showSuggest = raw.showSuggest ?? defaults.showSuggest;
+    raw.workbenchCssPath = raw.workbenchCssPath ?? defaults.workbenchCssPath;
+    raw.gradientBrightness = raw.gradientBrightness ?? defaults.gradientBrightness;
+    raw.gradientDarkness = raw.gradientDarkness ?? defaults.gradientDarkness;
+    raw.hashSource = raw.hashSource ?? defaults.hashSource;
+    raw.projectIndicators = raw.projectIndicators ?? defaults.projectIndicators;
+    raw.lightThemeColors = raw.lightThemeColors ?? defaults.lightThemeColors;
+    raw.darkThemeColors = raw.darkThemeColors ?? defaults.darkThemeColors;
 
     // & 至此，已经严谨地确保了所有配置都是正确的数据和类型
     return raw as Config;
   }
-
-  /**
-   * 将配置对象序列化为字符串
-   * - 压缩后再加密，减少存储空间
-   * @returns 加密后的配置字符串
-   */
-  private serialize(): string {
-    // ! 确定好以后这个顺序就不可以变了！
-    const plain = [
-      this.my.currentVersion,
-      this.my.showSuggest ? 1 : 0,
-      this.my.workbenchCssPath,
-      this.my.gradientBrightness,
-      this.my.gradientDarkness,
-      this.my.hashSource as number,
-      this.my.projectIndicators.join(Consts.ConfigSeparator),
-      this.my.lightThemeColors.map((color) => color.toRGBString()).join(Consts.ConfigSeparator),
-      this.my.darkThemeColors.map((color) => color.toRGBString()).join(Consts.ConfigSeparator),
-    ];
-    const zipped = deflateRawSync(JSON.stringify(plain));
-    return aes.encrypt(zipped);
-  }
+  // #endregion
 
   /**
    * @returns 是否需要以默认配置覆盖
@@ -176,7 +245,7 @@ class Configs {
   }
 
   private overrideWithDefaults(): Promise<void> {
-    this.my = this.getDefault();
+    this.my = this.newDefault;
     return this.save();
   }
 
@@ -240,22 +309,6 @@ class Configs {
     return this.my.showSuggest;
   }
 
-  get projectIndicators() {
-    return this.my.projectIndicators;
-  }
-
-  get lightThemeColors() {
-    return this.my.lightThemeColors;
-  }
-
-  get darkThemeColors() {
-    return this.my.darkThemeColors;
-  }
-
-  get hashSource() {
-    return this.my.hashSource;
-  }
-
   get workbenchCssPath() {
     return this.my.workbenchCssPath;
   }
@@ -268,6 +321,22 @@ class Configs {
     return this.my.gradientDarkness;
   }
 
+  get hashSource() {
+    return this.my.hashSource;
+  }
+
+  get projectIndicators() {
+    return this.my.projectIndicators;
+  }
+
+  get lightThemeColors() {
+    return this.my.lightThemeColors;
+  }
+
+  get darkThemeColors() {
+    return this.my.darkThemeColors;
+  }
+
   setCurrentVersion(value: string): Promise<void> {
     this.my.currentVersion = value;
     return this.save();
@@ -275,11 +344,6 @@ class Configs {
 
   setShowSuggest(value: boolean): Promise<void> {
     this.my.showSuggest = value;
-    return this.save();
-  }
-
-  setHashSource(value: HashSource): Promise<void> {
-    this.my.hashSource = value;
     return this.save();
   }
 
@@ -295,6 +359,11 @@ class Configs {
 
   setGradientDarkness(value: number): Promise<void> {
     this.my.gradientDarkness = value;
+    return this.save();
+  }
+
+  setHashSource(value: HashSource): Promise<void> {
+    this.my.hashSource = value;
     return this.save();
   }
 
