@@ -10,6 +10,7 @@ import version from '@/core/version';
 import { handlerMap } from './handler-map';
 import { HandelResult } from './types';
 import { Controls } from './consts';
+import TemplateCompiler from './template-compiler';
 
 const Panel = i18n.ControlPanel;
 
@@ -41,7 +42,6 @@ export default async function (this: vscode.ExtensionContext) {
     const templatePath = vscode.Uri.file(join(extPath, 'html', 'control-panel.template.html'));
     template = readFileSync(templatePath.fsPath, 'utf8');
   }
-  vscode.window.showInformationMessage(template);
 
   const scriptUri = controlPanel.webview.asWebviewUri(scriptPath);
   const cssUri = controlPanel.webview.asWebviewUri(cssPath);
@@ -58,7 +58,7 @@ export default async function (this: vscode.ExtensionContext) {
     .map((c) => c.toRGBString())
     .join(Consts.ConfigSeparator);
 
-  const map = {
+  const variables = {
     VERSION: version.get(this),
 
     // 资源路径类 (RESOURCE_)
@@ -150,7 +150,14 @@ export default async function (this: vscode.ExtensionContext) {
     DATA_DARK_THEME_COLORS: darkThemeColors,
   };
 
-  controlPanel.webview.html = template;
+  // 编译模板
+  const compileResult = TemplateCompiler.compile(template, variables);
+
+  vscode.window.showInformationMessage(
+    JSON.stringify(TemplateCompiler.generateReport(template, variables))
+  );
+
+  controlPanel.webview.html = compileResult.html;
 
   controlPanel.webview.onDidReceiveMessage(async (message) => {
     if (typeof message !== 'object' || !message.name) {
@@ -181,8 +188,6 @@ export default async function (this: vscode.ExtensionContext) {
     } finally {
       if (controlPanel) {
         await controlPanel.webview.postMessage(result);
-      } else {
-        vscode.window.showErrorMessage('控制面板被dispose了？');
       }
     }
   });

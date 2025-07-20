@@ -68,8 +68,6 @@ class Hacker {
       .replaceAll('{brightness}', brightness)
       .replace(/\n[\s]+/g, '');
 
-    // vscode.window.showInformationMessage(style);
-
     let css = await readFile(cssPath, 'utf8');
 
     // 消除旧的注入

@@ -174,9 +174,7 @@ class Configs {
 
     const str = plain.join(Consts.SerializerSeparator);
     const zipped = deflateRawSync(str);
-    vscode.window.showInformationMessage(`before zip:${str.length}, after zip:${zipped.length}`);
     const encrypted = cryptor.encrypt(zipped);
-    vscode.window.showInformationMessage(`after encrypt: ${encrypted.length}`);
     return encrypted;
   }
 
