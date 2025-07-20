@@ -1,5 +1,6 @@
 import vscode from 'vscode';
 import { join } from 'node:path';
+import { readFileSync } from 'node:fs';
 
 import { Consts, GradientStyle, HashSource } from '@/common/consts';
 import i18n from '@/common/i18n';
@@ -13,6 +14,7 @@ import { ControlName, Prod } from './consts';
 const Panel = i18n.ControlPanel;
 
 let controlPanel: vscode.WebviewPanel | null = null;
+let template: string | null = null;
 
 export default async function (this: vscode.ExtensionContext) {
   if (controlPanel !== null) {
@@ -30,10 +32,16 @@ export default async function (this: vscode.ExtensionContext) {
   )).onDidDispose(() => (controlPanel = null));
 
   // 准备导入路径
-  const scriptPath = vscode.Uri.file(join(this.extensionPath, 'html', 'control-panel.js'));
-  const cssPath = vscode.Uri.file(join(this.extensionPath, 'html', 'style.css'));
-  const cssThemeSwitchPath = vscode.Uri.file(join(this.extensionPath, 'html', 'theme-switch.css'));
-  const cssPalettePath = vscode.Uri.file(join(this.extensionPath, 'html', 'palette.css'));
+  const extPath = this.extensionPath;
+  const scriptPath = vscode.Uri.file(join(extPath, 'html', 'control-panel.js'));
+  const cssPath = vscode.Uri.file(join(extPath, 'html', 'style.css'));
+  const cssThemeSwitchPath = vscode.Uri.file(join(extPath, 'html', 'theme-switch.css'));
+  const cssPalettePath = vscode.Uri.file(join(extPath, 'html', 'palette.css'));
+  if (template === null) {
+    const templatePath = vscode.Uri.file(join(extPath, 'html', 'control-panel.template.html'));
+    template = readFileSync(templatePath.fsPath, 'utf8');
+  }
+  vscode.window.showInformationMessage(template);
 
   const scriptUri = controlPanel.webview.asWebviewUri(scriptPath);
   const cssUri = controlPanel.webview.asWebviewUri(cssPath);
