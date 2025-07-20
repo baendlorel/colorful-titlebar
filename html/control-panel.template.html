@@ -4,43 +4,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${Panel.title}</title>
+  <title>{{I18N_PANEL_TITLE}}</title>
   <script purpose="常量套组">
     window.__kskb_consts = {
-      isProd: '${Prod.Env}' === 'prod',
-      lang: '${configs.lang}',
-      separator: '${Prod.Env}' === 'prod' ? '${Consts.ConfigSeparator}' : ';',
+      isProd: '{{ENUM_ENV}}' === 'prod',
+      lang: '{{CFG_LANG}}',
+      separator: '{{ENUM_ENV}}' === 'prod' ? '{{ENUM_CONFIG_SEPARATOR}}' : ';',
       configs: {
-        theme: '${configs.theme}' === 'light',
-        showSuggest: '${configs.showSuggest}' === 'true',
-        workbenchCssPath: '${configs.workbenchCssPath}',
-        hashSource: '${configs.hashSource}',
-        gradientBrightness: '${configs.gradientBrightness}',
-        gradientDarkness: '${configs.gradientDarkness}',
-        currentColor: '${currentColor}',
-        projectIndicators: '${projectIndicators}',
-        lightThemeColors: '${lightThemeColors}',
-        darkThemeColors: '${darkThemeColors}',
+        theme: '{{CFG_THEME}}' === 'light',
+        showSuggest: '{{CFG_SHOW_SUGGEST}}' === 'true',
+        workbenchCssPath: '{{CFG_WORKBENCH_CSS_PATH}}',
+        hashSource: '{{CFG_HASH_SOURCE}}',
+        gradientBrightness: '{{CFG_GRADIENT_BRIGHTNESS}}',
+        gradientDarkness: '{{CFG_GRADIENT_DARKNESS}}',
+        currentColor: '{{DATA_CURRENT_COLOR}}',
+        projectIndicators: '{{DATA_PROJECT_INDICATORS}}',
+        lightThemeColors: '{{DATA_LIGHT_THEME_COLORS}}',
+        darkThemeColors: '{{DATA_DARK_THEME_COLORS}}',
       },
       names: {
         // 这些都是指令=控制名的情况
-        showSuggest: '${Controls.ShowSuggest}',
-        workbenchCssPath: '${Controls.WorkbenchCssPath}',
-        gradient: '${Controls.Gradient}',
-        hashSource: '${Controls.HashSource}',
-        gradientBrightness: '${Controls.GradientBrightness}',
-        gradientDarkness: '${Controls.GradientDarkness}',
-        refresh: '${Controls.Refresh}',
-        randomColor: '${Controls.RandomColor}',
-        'randomColor.colorSet': "${Controls['RandomColor.colorSet']}",
-        'randomColor.pure': "${Controls['RandomColor.pure']}",
-        'randomColor.specify': "${Controls['RandomColor.specify']}",
-        isRandomColor: (s) => s === "${Controls['RandomColor.colorSet']}" || s === "${Controls['RandomColor.pure']}" || s === "${Controls['RandomColor.specify']}",
-        projectIndicators: '${Controls.ProjectIndicators}',
+        showSuggest: '{{CTRL_SHOW_SUGGEST}}',
+        workbenchCssPath: '{{CTRL_WORKBENCH_CSS_PATH}}',
+        gradient: '{{CTRL_GRADIENT}}',
+        hashSource: '{{CTRL_HASH_SOURCE}}',
+        gradientBrightness: '{{CTRL_GRADIENT_BRIGHTNESS}}',
+        gradientDarkness: '{{CTRL_GRADIENT_DARKNESS}}',
+        refresh: '{{CTRL_REFRESH}}',
+        randomColor: '{{CTRL_RANDOM_COLOR}}',
+        'randomColor.colorSet': "{{CTRL_RANDOM_COLOR_COLOR_SET}}",
+        'randomColor.pure': "{{CTRL_RANDOM_COLOR_PURE}}",
+        'randomColor.specify': "{{CTRL_RANDOM_COLOR_SPECIFY}}",
+        isRandomColor: (s) => s === "{{CTRL_RANDOM_COLOR_COLOR_SET}}" || s === "{{CTRL_RANDOM_COLOR_PURE}}" || s === "{{CTRL_RANDOM_COLOR_SPECIFY}}",
+        projectIndicators: '{{CTRL_PROJECT_INDICATORS}}',
         // 这两个是配置决定的名字
-        lightThemeColors: "${Controls['ThemeColors.light']}",
-        darkThemeColors: "${Controls['ThemeColors.dark']}",
-        themeColors: '${Controls.ThemeColors}',
+        lightThemeColors: "{{CTRL_THEME_COLORS_LIGHT}}",
+        darkThemeColors: "{{CTRL_THEME_COLORS_DARK}}",
+        themeColors: '{{CTRL_THEME_COLORS}}',
       }
     }
   </script>
@@ -48,19 +48,19 @@
   <script purpose="加载css">
     {
       const css = document.createElement('link');
-      css.href = window.__kskb_consts.isProd ? '${cssUri}' : './style.css';
+      css.href = window.__kskb_consts.isProd ? '{{RESOURCE_CSS_URI}}' : './style.css';
       css.rel = 'stylesheet';
       css.type = 'text/css';
       document.head.appendChild(css);
 
       const cssThemeSwitch = document.createElement('link');
-      cssThemeSwitch.href = window.__kskb_consts.isProd ? '${cssThemeSwitchUri}' : './theme-switch.css';
+      cssThemeSwitch.href = window.__kskb_consts.isProd ? '{{RESOURCE_CSS_THEME_SWITCH_URI}}' : './theme-switch.css';
       cssThemeSwitch.rel = 'stylesheet';
       cssThemeSwitch.type = 'text/css';
       document.head.appendChild(cssThemeSwitch);
 
       const cssPalette = document.createElement('link');
-      cssPalette.href = window.__kskb_consts.isProd ? '${cssPaletteUri}' : './palette.css';
+      cssPalette.href = window.__kskb_consts.isProd ? '{{RESOURCE_CSS_PALETTE_URI}}' : './palette.css';
       cssPalette.rel = 'stylesheet';
       cssPalette.type = 'text/css';
       document.head.appendChild(cssPalette);
@@ -70,16 +70,16 @@
 </head>
 
 <body>
-  <div class="body" style="display: none;opacity: 0;" theme="${configs.theme}">
+  <div class="body" style="display: none;opacity: 0;" theme="{{CFG_THEME}}">
     <form id="settings" class="control-panel">
       <div class="header">
         <div>
           <h1>
-            <span class="colorful-title">${Consts.DisplayName}</span>
-            <span class="version">v${version.get(this)}</span>
+            <span class="colorful-title">{{ENUM_DISPLAY_NAME}}</span>
+            <span class="version">v{{VERSION}}</span>
           </h1>
           <p>by<a href="https://github.com/baendlorel">Kasukabe Tsumugi</a></p>
-          <p>${Panel.description}</p>
+          <p>{{I18N_PANEL_DESCRIPTION}}</p>
         </div>
         <div>
           <label for="theme" class="kskb-theme-switch">
@@ -108,172 +108,170 @@
 
       <div class="control-item">
         <div class="control-label">
-          ${Panel.showSuggest.label}<small>${Panel.showSuggest.description}</small>
+          {{I18N_SHOW_SUGGEST_LABEL}}<small>{{I18N_SHOW_SUGGEST_DESC}}</small>
         </div>
         <div class="control-form">
           <label class="toggle-switch">
-            <input type="checkbox" class="control-input" name="${Controls.ShowSuggest}">
+            <input type="checkbox" class="control-input" name="{{CTRL_SHOW_SUGGEST}}">
             <span class="slider"></span>
           </label>
         </div>
-        <div class="control-error" name="${Controls.ShowSuggest}"></div>
-        <div class="control-succ" name="${Controls.ShowSuggest}"></div>
+        <div class="control-error" name="{{CTRL_SHOW_SUGGEST}}"></div>
+        <div class="control-succ" name="{{CTRL_SHOW_SUGGEST}}"></div>
       </div>
 
       <div class="control-item">
         <div class="control-label">
-          ${Panel.workbenchCssPath.label}<small>${Panel.workbenchCssPath.description}</small>
+          {{I18N_WORKBENCH_CSS_PATH_LABEL}}<small>{{I18N_WORKBENCH_CSS_PATH_DESC}}</small>
         </div>
         <div class="control-form">
-          <textarea class="control-input textarea" name="${Controls.WorkbenchCssPath}"></textarea>
+          <textarea class="control-input textarea" name="{{CTRL_WORKBENCH_CSS_PATH}}"></textarea>
         </div>
-        <div class="control-error" name="${Controls.WorkbenchCssPath}"></div>
-        <div class="control-succ" name="${Controls.WorkbenchCssPath}"></div>
+        <div class="control-error" name="{{CTRL_WORKBENCH_CSS_PATH}}"></div>
+        <div class="control-succ" name="{{CTRL_WORKBENCH_CSS_PATH}}"></div>
       </div>
 
       <div class="control-item">
         <div class="control-label">
-          ${Panel.gradient.label}<small>${Panel.gradient.description}</small>
+          {{I18N_GRADIENT_LABEL}}<small>{{I18N_GRADIENT_DESC}}</small>
         </div>
         <div class="control-form">
-          <select class="control-input select" name="${Controls.Gradient}">
-            <option value="" selected>${Panel.gradient.empty}</option>
-            <option value="${GradientStyle.BrightCenter}">
-              ${Panel.gradient[GradientStyle.BrightCenter]}
+          <select class="control-input select" name="{{CTRL_GRADIENT}}">
+            <option value="" selected>{{I18N_GRADIENT_EMPTY}}</option>
+            <option value="{{ENUM_GRADIENT_BRIGHT_CENTER}}">
+              {{I18N_GRADIENT_BRIGHT_CENTER}}
             </option>
-            <option value="${GradientStyle.BrightLeft}">
-              ${Panel.gradient[GradientStyle.BrightLeft]}
+            <option value="{{ENUM_GRADIENT_BRIGHT_LEFT}}">
+              {{I18N_GRADIENT_BRIGHT_LEFT}}
             </option>
-            <option value="${GradientStyle.ArcLeft}">${
-              Panel.gradient[GradientStyle.ArcLeft]
-              }</option>
+            <option value="{{ENUM_GRADIENT_ARC_LEFT}}">{{I18N_GRADIENT_ARC_LEFT}}</option>
           </select>
         </div>
-        <div class="control-error" name="${Controls.Gradient}"></div>
-        <div class="control-succ" name="${Controls.Gradient}"></div>
+        <div class="control-error" name="{{CTRL_GRADIENT}}"></div>
+        <div class="control-succ" name="{{CTRL_GRADIENT}}"></div>
       </div>
 
       <div class="control-item-double">
         <div class="control-item" style="grid-template-columns: 1fr auto;">
           <div class="control-label">
-            ${Panel.gradientBrightness.label}<small>${Panel.gradientBrightness.description}</small>
+            {{I18N_GRADIENT_BRIGHTNESS_LABEL}}<small>{{I18N_GRADIENT_BRIGHTNESS_DESC}}</small>
           </div>
           <div class="control-form input-percent">
-            <input type="number" min="0" max="100" step="5" class="control-input" name="${Controls.GradientBrightness}" />
+            <input type="number" min="0" max="100" step="5" class="control-input" name="{{CTRL_GRADIENT_BRIGHTNESS}}" />
           </div>
-          <div class="control-error" name="${Controls.GradientBrightness}"></div>
-          <div class="control-succ" name="${Controls.GradientBrightness}"></div>
+          <div class="control-error" name="{{CTRL_GRADIENT_BRIGHTNESS}}"></div>
+          <div class="control-succ" name="{{CTRL_GRADIENT_BRIGHTNESS}}"></div>
         </div>
 
         <div class="control-item" style="grid-template-columns: 1fr auto;">
           <div class="control-label">
-            ${Panel.gradientDarkness.label}<small>${Panel.gradientDarkness.description}</small>
+            {{I18N_GRADIENT_DARKNESS_LABEL}}<small>{{I18N_GRADIENT_DARKNESS_DESC}}</small>
           </div>
           <div class="control-form input-percent">
-            <input type="number" min="0" max="100" step="5" class="control-input" name="${Controls.GradientDarkness}" />
+            <input type="number" min="0" max="100" step="5" class="control-input" name="{{CTRL_GRADIENT_DARKNESS}}" />
           </div>
-          <div class="control-error" name="${Controls.GradientDarkness}"></div>
-          <div class="control-succ" name="${Controls.GradientDarkness}"></div>
+          <div class="control-error" name="{{CTRL_GRADIENT_DARKNESS}}"></div>
+          <div class="control-succ" name="{{CTRL_GRADIENT_DARKNESS}}"></div>
         </div>
       </div>
 
       <div class="control-item">
         <div class="control-label">
-          ${Panel.hashSource.label}<small>${Panel.hashSource.description}</small>
+          {{I18N_HASH_SOURCE_LABEL}}<small>{{I18N_HASH_SOURCE_DESC}}</small>
         </div>
         <div class="control-form">
-          <select class="control-input select" name="${Controls.HashSource}">
-            <option value="${HashSource.ProjectName}">
-              ${Panel.hashSource[HashSource.ProjectName]}
+          <select class="control-input select" name="{{CTRL_HASH_SOURCE}}">
+            <option value="{{ENUM_HASH_SOURCE_PROJECT_NAME}}">
+              {{I18N_HASH_SOURCE_PROJECT_NAME}}
             </option>
-            <option value="${HashSource.FullPath}">${Panel.hashSource[HashSource.FullPath]}</option>
-            <option value="${HashSource.ProjectNameDate}">
-              ${Panel.hashSource[HashSource.ProjectNameDate]}
+            <option value="{{ENUM_HASH_SOURCE_FULL_PATH}}">{{I18N_HASH_SOURCE_FULL_PATH}}</option>
+            <option value="{{ENUM_HASH_SOURCE_PROJECT_NAME_DATE}}">
+              {{I18N_HASH_SOURCE_PROJECT_NAME_DATE}}
             </option>
           </select>
         </div>
-        <div class="control-error" name="${Controls.HashSource}"></div>
-        <div class="control-succ" name="${Controls.HashSource}"></div>
+        <div class="control-error" name="{{CTRL_HASH_SOURCE}}"></div>
+        <div class="control-succ" name="{{CTRL_HASH_SOURCE}}"></div>
       </div>
 
       <div class="control-item">
         <div class="control-label">
-          ${Panel.randomColor.label}<small>${Panel.randomColor.description}</small>
+          {{I18N_RANDOM_COLOR_LABEL}}<small>{{I18N_RANDOM_COLOR_DESC}}</small>
         </div>
         <div class="control-form">
           <div class="dropdown">
             <button type="button" class="dropdown-button" tabindex="0">
-              ${Panel.randomColor.label}
+              {{I18N_RANDOM_COLOR_LABEL}}
             </button>
             <div class="dropdown-menu">
-              <button type="button" class="control-input dropdown-item" name="${Controls['RandomColor.colorSet']}">
-                ${Panel.randomColor.colorSet}
+              <button type="button" class="control-input dropdown-item" name="{{CTRL_RANDOM_COLOR_COLOR_SET}}">
+                {{I18N_RANDOM_COLOR_COLOR_SET}}
               </button>
-              <button type="button" class="control-input dropdown-item" name="${Controls['RandomColor.pure']}">
-                ${Panel.randomColor.pure}
+              <button type="button" class="control-input dropdown-item" name="{{CTRL_RANDOM_COLOR_PURE}}">
+                {{I18N_RANDOM_COLOR_PURE}}
               </button>
               <!--control-input 不需要，因为这个按钮是靠选颜色来变更的-->
-              <button type="button" class="dropdown-item color-picker" title="${Panel.randomColor.specify}" name="${Controls['RandomColor.specify']}">
-                <span>&nbsp;&nbsp;${Panel.randomColor.specify}</span>
-                <input type="color" class="control-input" name="${Controls['RandomColor.specify']}">
+              <button type="button" class="dropdown-item color-picker" title="{{I18N_RANDOM_COLOR_SPECIFY}}" name="{{CTRL_RANDOM_COLOR_SPECIFY}}">
+                <span>&nbsp;&nbsp;{{I18N_RANDOM_COLOR_SPECIFY}}</span>
+                <input type="color" class="control-input" name="{{CTRL_RANDOM_COLOR_SPECIFY}}">
               </button>
             </div>
           </div>
         </div>
-        <div class="control-error" name="${Controls.RandomColor}"></div>
-        <div class="control-succ" name="${Controls.RandomColor}"></div>
+        <div class="control-error" name="{{CTRL_RANDOM_COLOR}}"></div>
+        <div class="control-succ" name="{{CTRL_RANDOM_COLOR}}"></div>
       </div>
 
       <div class="control-item">
         <div class="control-label">
-          ${Panel.refresh.label}<small>${Panel.refresh.description}</small>
+          {{I18N_REFRESH_LABEL}}<small>{{I18N_REFRESH_DESC}}</small>
         </div>
         <div class="control-form">
-          <button type="button" class="control-input control-button" name="${Controls.Refresh}">
-            <span>${Panel.refresh.button}</span>
+          <button type="button" class="control-input control-button" name="{{CTRL_REFRESH}}">
+            <span>{{I18N_REFRESH_BUTTON}}</span>
           </button>
         </div>
-        <div class="control-error" name="${Controls.Refresh}"></div>
-        <div class="control-succ" name="${Controls.Refresh}"></div>
+        <div class="control-error" name="{{CTRL_REFRESH}}"></div>
+        <div class="control-succ" name="{{CTRL_REFRESH}}"></div>
       </div>
 
       <div class="control-item">
         <div class="control-label">
-          ${Panel.projectIndicators.label}<small>${Panel.projectIndicators.description}</small>
+          {{I18N_PROJECT_INDICATORS_LABEL}}<small>{{I18N_PROJECT_INDICATORS_DESC}}</small>
         </div>
         <div class="control-form textarea-wrapper" max-height="120">
-          <textarea class="control-input textarea" name="${Controls.ProjectIndicators}"></textarea>
+          <textarea class="control-input textarea" name="{{CTRL_PROJECT_INDICATORS}}"></textarea>
         </div>
-        <div class="control-error" name="${Controls.ProjectIndicators}"></div>
-        <div class="control-succ" name="${Controls.ProjectIndicators}"></div>
+        <div class="control-error" name="{{CTRL_PROJECT_INDICATORS}}"></div>
+        <div class="control-succ" name="{{CTRL_PROJECT_INDICATORS}}"></div>
       </div>
 
       <div class="control-item" style="grid-template-columns: 1fr 1.8fr;">
         <div class="control-label">
-          ${Panel.themeColors.label}<small>${Panel.themeColors.description}</small>
+          {{I18N_THEME_COLORS_LABEL}}<small>{{I18N_THEME_COLORS_DESC}}</small>
         </div>
         <div class="control-form" style="display: flex; flex-direction: column; gap: 8px;">
-          <div class="palette" name="${Controls['ThemeColors.light']}">
+          <div class="palette" name="{{CTRL_THEME_COLORS_LIGHT}}">
             <div class="palette-label">
-              ${Panel.themeColors.lightColors}
-              <span class="palette-hint">${Panel.themeColors.dragHint}</span>
+              {{I18N_THEME_COLORS_LIGHT_COLORS}}
+              <span class="palette-hint">{{I18N_THEME_COLORS_DRAG_HINT}}</span>
             </div>
             <div class="color-list">
-              <button type="button" class="palette-add-color" title="${Panel.themeColors.addColor}">+</button>
+              <button type="button" class="palette-add-color" title="{{I18N_THEME_COLORS_ADD_COLOR}}">+</button>
             </div>
           </div>
-          <div class="palette" name="${Controls['ThemeColors.dark']}">
+          <div class="palette" name="{{CTRL_THEME_COLORS_DARK}}">
             <div class="palette-label">
-              ${Panel.themeColors.darkColors}
-              <span class="palette-hint">${Panel.themeColors.dragHint}</span>
+              {{I18N_THEME_COLORS_DARK_COLORS}}
+              <span class="palette-hint">{{I18N_THEME_COLORS_DRAG_HINT}}</span>
             </div>
             <div class="color-list">
-              <button type="button" class="palette-add-color" title="${Panel.themeColors.addColor}">+</button>
+              <button type="button" class="palette-add-color" title="{{I18N_THEME_COLORS_ADD_COLOR}}">+</button>
             </div>
           </div>
         </div>
-        <div class="control-error" name="${Controls.ThemeColors}"></div>
-        <div class="control-succ" name="${Controls.ThemeColors}"></div>
+        <div class="control-error" name="{{CTRL_THEME_COLORS}}"></div>
+        <div class="control-succ" name="{{CTRL_THEME_COLORS}}"></div>
       </div>
     </form>
   </div>
@@ -288,7 +286,7 @@
   <script purpose="加载js">
     {
       const script = document.createElement('script');
-      script.src = window.__kskb_consts.isProd ? '${scriptUri}' : './control-panel.js';
+      script.src = window.__kskb_consts.isProd ? '{{RESOURCE_SCRIPT_URI}}' : './control-panel.js';
       document.body.appendChild(script);
     }
   </script>
