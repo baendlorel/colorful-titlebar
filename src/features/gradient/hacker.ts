@@ -12,8 +12,8 @@ class Hacker {
   private readonly Enable = i18n.Features.gradient;
 
   /**
-   * 获取主css文件的路径
-   * @returns 如果路径上没找到文件或用户放弃输入，返回`null`
+   * Get the path to the workbench CSS file
+   * @returns The CSS file path, or null if not found or user cancels input
    */
   async getWorkbenchCssPath(): Promise<string | null> {
     let cssPath = configs.workbenchCssPath;
@@ -37,17 +37,18 @@ class Hacker {
   }
 
   /**
-   * 删去含有`Css.Token`的行，返回一个新数组
-   * @param lines
+   * Remove lines containing the CSS token from the array
+   * @param lines Array of CSS lines
+   * @returns Filtered array without injected lines
    */
   private purge(lines: string[]): string[] {
     return lines.filter((line) => !line.trim().startsWith(Css.Token));
   }
 
   /**
-   * 已包含backup
-   *
-   * 会在command注册的地方就确认`cssPath`是否存在
+   * Inject gradient CSS styles into the workbench CSS file
+   * @param cssPath Path to the workbench CSS file
+   * @param gradientStyle The gradient style to apply
    */
   async inject(cssPath: string, gradientStyle: GradientStyle): Promise<void> {
     const backupPath = `${cssPath}.${Css.BackupSuffix}`;
@@ -79,14 +80,14 @@ class Hacker {
     const css = await readFile(cssPath, 'utf8');
     const lines = this.purge(css.split('\n'));
 
-    lines.push(`${css}\n${Css.Token}${style}\n`);
+    lines.push(`${Css.Token}${style}`);
     await writeFile(cssPath, lines.join('\n'), 'utf8');
     vscode.window.showInformationMessage(this.Enable.success);
   }
 
   /**
-   * 消除注入
-   * @param cssPath
+   * Remove injected gradient styles from the CSS file
+   * @param cssPath Path to the workbench CSS file
    */
   async clean(cssPath: string): Promise<void> {
     const css = await readFile(cssPath, 'utf8');
@@ -97,8 +98,9 @@ class Hacker {
   }
 
   /**
-   * 会在command注册的地方就确认`cssPath`是否存在
-   * @deprecated 暂时无处使用
+   * Restore the CSS file from backup
+   * @param cssPath Path to the workbench CSS file
+   * @deprecated Currently unused
    */
   async restore(cssPath: string): Promise<void> {
     const backupPath = `${cssPath}.${Css.BackupSuffix}`;
