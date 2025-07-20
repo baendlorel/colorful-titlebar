@@ -1,8 +1,9 @@
 import path from 'path';
 import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
 import alias from '@rollup/plugin-alias';
+import replace from '@rollup/plugin-replace';
+import commonjs from '@rollup/plugin-commonjs';
 import terser from '@rollup/plugin-terser';
 import babel from '@rollup/plugin-babel';
 
@@ -21,11 +22,20 @@ export default [
         format: 'cjs', // 指定为CommonJS格式
         sourcemap: true,
         name: 'NBaseInteger', // 全局名称
+        globals: {
+          vscode: 'vscode', // 确保 vscode 被视为外部依赖
+        },
       },
     ],
     plugins: [
       alias({
         entries: [{ find: /^@/, replacement: path.resolve(import.meta.dirname, 'src') }],
+      }),
+      replace({
+        preventAssignment: true, // 防止替换赋值语句
+        values: {
+          __IS_DEV__: process.env.__IS_DEV__,
+        },
       }),
       resolve(),
       commonjs(),

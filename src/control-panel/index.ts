@@ -10,7 +10,7 @@ import version from '@/core/version';
 import { handlerMap } from './handler-map';
 import { HandelResult } from './types';
 import { Controls } from './consts';
-import TemplateCompiler from './template-compiler';
+import compiler from './compiler';
 
 const Panel = i18n.ControlPanel;
 
@@ -153,13 +153,15 @@ export default async function (this: vscode.ExtensionContext) {
   };
 
   // 编译模板
-  const compileResult = TemplateCompiler.compile(template, variables);
+  const { html, unreplacedPlaceholders, unusedVariables } = compiler.compile(template, variables);
 
-  vscode.window.showInformationMessage(
-    JSON.stringify(TemplateCompiler.generateReport(template, variables))
-  );
+  if (__IS_DEV__) {
+    vscode.window.showInformationMessage(
+      JSON.stringify({ unreplacedPlaceholders, unusedVariables })
+    );
+  }
 
-  controlPanel.webview.html = compileResult.html;
+  controlPanel.webview.html = html;
 
   controlPanel.webview.onDidReceiveMessage(async (message) => {
     if (typeof message !== 'object' || !message.name) {

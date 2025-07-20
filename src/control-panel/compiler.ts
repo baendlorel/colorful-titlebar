@@ -10,7 +10,7 @@
 /**
  * 模板编译器类
  */
-export class TemplateCompiler {
+class TemplateCompiler {
   /**
    * 编译模板
    * @param template 模板字符串
@@ -18,7 +18,7 @@ export class TemplateCompiler {
    * @param options 编译选项
    * @returns 编译结果
    */
-  static compile(template: string, variables: Record<string, any>) {
+  compile(template: string, variables: Record<string, any>) {
     // 1. 进行模板替换
     let html = template;
     const usedVariables = new Set<string>();
@@ -37,13 +37,10 @@ export class TemplateCompiler {
     // 3. 找出 HTML 中未被替换的双大括号占位符
     const unreplacedPlaceholders = this.findUnreplacedPlaceholders(html);
 
-    const success = unreplacedPlaceholders.length === 0;
-
     return {
       html,
       unusedVariables,
       unreplacedPlaceholders,
-      success,
     };
   }
 
@@ -52,7 +49,7 @@ export class TemplateCompiler {
    * @param html HTML 字符串
    * @returns 未替换的占位符数组
    */
-  private static findUnreplacedPlaceholders(html: string): string[] {
+  private findUnreplacedPlaceholders(html: string): string[] {
     const regex = /\{\{([^}]+)\}\}/g;
     const matches: string[] = [];
     let match: RegExpExecArray | null;
@@ -70,7 +67,7 @@ export class TemplateCompiler {
    * @param template 模板字符串
    * @returns 占位符变量名数组（去重）
    */
-  static extractPlaceholders(template: string): string[] {
+  extractPlaceholders(template: string): string[] {
     const regex = /\{\{([^}]+)\}\}/g;
     const placeholders: string[] = [];
     let match: RegExpExecArray | null;
@@ -89,7 +86,7 @@ export class TemplateCompiler {
    * @param variables 变量映射表
    * @returns 使用报告
    */
-  static generateReport(
+  generateReport(
     template: string,
     variables: Record<string, any>
   ): {
@@ -126,4 +123,6 @@ export class TemplateCompiler {
   }
 }
 
-export default TemplateCompiler;
+const compiler = new TemplateCompiler();
+
+export default compiler;

@@ -68,15 +68,21 @@ class Hacker {
       .replaceAll('{brightness}', brightness)
       .replace(/\n[\s]+/g, '');
 
-    let css = await readFile(cssPath, 'utf8');
+    const css = await readFile(cssPath, 'utf8');
 
     // 消除旧的注入
-    css = css.replace(new RegExp(`${Css.Token}[^\n]*\n`), '');
+    const lines = css.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (line.startsWith(Css.Token)) {
+        lines.splice(i, 1);
+        break;
+      }
+    }
 
     // 添加新的注入
-    css = `${css}\n${Css.Token}${style}\n`;
-
-    await writeFile(cssPath, css, 'utf8');
+    lines.push(`${css}\n${Css.Token}${style}\n`);
+    await writeFile(cssPath, lines.join('\n'), 'utf8');
     vscode.window.showInformationMessage(this.Enable.success);
   }
 
