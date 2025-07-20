@@ -445,7 +445,7 @@ select {
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
-  transition: all 0.3s ease;
+  transition: all 0.16s ease;
   z-index: 20;
   overflow: hidden;
   margin-top: 4px;
