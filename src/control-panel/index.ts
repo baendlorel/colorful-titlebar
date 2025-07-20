@@ -177,7 +177,9 @@ export default async function (this: vscode.ExtensionContext) {
       other: {},
     };
 
-    // vscode.window.showInformationMessage(JSON.stringify(message));
+    if (__IS_DEV__) {
+      vscode.window.showInformationMessage(JSON.stringify(message));
+    }
 
     try {
       const handler = handlerMap[result.name];

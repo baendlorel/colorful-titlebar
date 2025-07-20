@@ -21,7 +21,7 @@ export default [
         file: 'out/extension.js',
         format: 'cjs', // 指定为CommonJS格式
         sourcemap: true,
-        name: 'NBaseInteger', // 全局名称
+        name: 'Colorful Titlebar', // 全局名称
         globals: {
           vscode: 'vscode', // 确保 vscode 被视为外部依赖
         },
@@ -34,7 +34,7 @@ export default [
       replace({
         preventAssignment: true, // 防止替换赋值语句
         values: {
-          __IS_DEV__: process.env.__IS_DEV__,
+          __IS_DEV__: process.env.__IS_DEV__ || 'false',
         },
       }),
       resolve(),

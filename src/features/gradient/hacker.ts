@@ -87,7 +87,28 @@ class Hacker {
   }
 
   /**
+   * 消除注入
+   * @param cssPath
+   */
+  async clean(cssPath: string): Promise<void> {
+    const css = await readFile(cssPath, 'utf8');
+    // 消除旧的注入
+    const lines = css.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (line.startsWith(Css.Token)) {
+        lines.splice(i, 1);
+        break;
+      }
+    }
+
+    await writeFile(cssPath, lines.join('\n'), 'utf8');
+    vscode.window.showInformationMessage(this.Enable.success);
+  }
+
+  /**
    * 会在command注册的地方就确认`cssPath`是否存在
+   * @deprecated 暂时无处使用
    */
   async restore(cssPath: string): Promise<void> {
     const backupPath = `${cssPath}.${Css.BackupSuffix}`;

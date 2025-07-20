@@ -6,6 +6,7 @@ export const enum Css {
 
 export const enum AfterStyle {
   BrightCenter = `${Css.Selector}{
+      --kskb-bright-center: 1;
       content: "";
       position: absolute;
       top: 50%;
@@ -18,6 +19,7 @@ export const enum AfterStyle {
       pointer-events: none;
     }`,
   BrightLeft = `${Css.Selector}{
+      --kskb-bright-left: 1;
       content: "";
       position: absolute;
       top: 50%;
@@ -30,6 +32,7 @@ export const enum AfterStyle {
       pointer-events: none;
     }`,
   ArcLeft = `${Css.Selector}{
+      --kskb-arc-left: 1;
       content: '';
       position: absolute;
       width: 100%;

@@ -4,6 +4,7 @@ import { GradientStyle } from '@/common/consts';
 import i18n from '@/common/i18n';
 import hacker from './hacker';
 
+// todo 这个文件貌似不需要了
 class Gradient {
   private readonly Enable = i18n.Features.gradient;
 
@@ -26,12 +27,12 @@ class Gradient {
     await hacker.inject(cssPath, gradientStyle);
   }
 
-  async disable() {
+  async none() {
     const cssPath = await hacker.getWorkbenchCssPath();
     if (!cssPath) {
       return;
     }
-    await hacker.restore(cssPath);
+    await hacker.clean(cssPath);
   }
 }
 
