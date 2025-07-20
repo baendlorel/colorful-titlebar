@@ -77,10 +77,16 @@ class Configs {
     };
   }
 
+  /**
+   * 包含了解密、解压缩和校验的逻辑
+   * @param akasha 先后经历了压缩、加密和base64编码的配置字符串
+   * @returns 配置对象
+   */
   private deserialize(akasha: string): Config {
     const decrypted = inflateRawSync(aes.decrypt(akasha));
     const raw = JSON.parse(decrypted.toString()) as Partial<Config>;
     const defaults = this.getDefault();
+
     // 下面对配置字段进行校验
     raw.currentVersion =
       typeof raw.currentVersion === 'string' ? raw.currentVersion : defaults.currentVersion;
@@ -113,18 +119,24 @@ class Configs {
     return raw as Config;
   }
 
+  /**
+   * 将配置对象序列化为字符串
+   * - 压缩后再加密，减少存储空间
+   * @returns 加密后的配置字符串
+   */
   private serialize(): string {
-    const plain = {
-      currentVersion: this.my.currentVersion,
-      showSuggest: this.my.showSuggest,
-      lightThemeColors: this.my.lightThemeColors.map((color) => color.toRGBString()),
-      darkThemeColors: this.my.darkThemeColors.map((color) => color.toRGBString()),
-      projectIndicators: this.my.projectIndicators,
-      hashSource: this.my.hashSource as number,
-      workbenchCssPath: this.my.workbenchCssPath,
-      gradientBrightness: this.my.gradientBrightness,
-      gradientDarkness: this.my.gradientDarkness,
-    };
+    // ! 确定好以后这个顺序就不可以变了！
+    const plain = [
+      this.my.currentVersion,
+      this.my.showSuggest ? 1 : 0,
+      this.my.workbenchCssPath,
+      this.my.gradientBrightness,
+      this.my.gradientDarkness,
+      this.my.hashSource as number,
+      this.my.projectIndicators.join(Consts.ConfigSeparator),
+      this.my.lightThemeColors.map((color) => color.toRGBString()).join(Consts.ConfigSeparator),
+      this.my.darkThemeColors.map((color) => color.toRGBString()).join(Consts.ConfigSeparator),
+    ];
     const zipped = deflateRawSync(JSON.stringify(plain));
     return aes.encrypt(zipped);
   }

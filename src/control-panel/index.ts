@@ -43,11 +43,13 @@ export default async function (this: vscode.ExtensionContext) {
 
   // 准备一些数据
   const currentColor = configs.titleBarColor ?? '#007ACC';
-  const projectIndicators = configs.projectIndicators.join(Prod.Separator);
+  const projectIndicators = configs.projectIndicators.join(Consts.ConfigSeparator);
   const lightThemeColors = configs.lightThemeColors
     .map((c) => c.toRGBString())
-    .join(Prod.Separator);
-  const darkThemeColors = configs.darkThemeColors.map((c) => c.toRGBString()).join(Prod.Separator);
+    .join(Consts.ConfigSeparator);
+  const darkThemeColors = configs.darkThemeColors
+    .map((c) => c.toRGBString())
+    .join(Consts.ConfigSeparator);
 
   controlPanel.webview.html = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -60,7 +62,7 @@ export default async function (this: vscode.ExtensionContext) {
     window.__kskb_consts = {
       isProd: '${Prod.Env}' === 'prod',
       lang: '${configs.lang}',
-      separator: '${Prod.Env}' === 'prod' ? '${Prod.Separator}' : ';',
+      separator: '${Prod.Env}' === 'prod' ? '${Consts.ConfigSeparator}' : ';',
       configs: {
         theme: '${configs.theme}' === 'light',
         showSuggest: '${configs.showSuggest}' === 'true',

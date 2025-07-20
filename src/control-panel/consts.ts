@@ -18,5 +18,4 @@ export const enum ControlName {
 
 export const enum Prod {
   Env = 'prod',
-  Separator = ';',
 }

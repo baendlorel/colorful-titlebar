@@ -3,7 +3,8 @@ export const enum Consts {
   DisplayName = 'Colorful Titlebar',
   Akasha = 'akasha',
   WorkbenchCssName = 'workbench.desktop.main.css',
-  InvisibleSeparator = '\u2063',
+  SerializerSeparator = '\u2063',
+  ConfigSeparator = '\u200B',
 }
 
 export const enum TitleBarConsts {

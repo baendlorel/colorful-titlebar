@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 
 import { getHashSource, getColor, getColorByK } from '@/core/colors';
 import style from '@/core/style';
-import { GradientStyle, HashSource } from '@/common/consts';
+import { Consts, GradientStyle, HashSource } from '@/common/consts';
 import configs from '@/common/configs';
 import i18n from '@/common/i18n';
 import RGBA from '@/common/rgba';
@@ -10,7 +10,7 @@ import safe from '@/common/safe';
 
 import { AfterStyle } from '@/features/gradient/consts';
 import hacker from '@/features/gradient/hacker';
-import { ControlName, Prod } from './consts';
+import { ControlName } from './consts';
 import { HandelResult, PostedValue } from './types';
 
 const Panel = i18n.ControlPanel;
@@ -138,7 +138,7 @@ export const handlerMap = {
       throw null;
     }
     const indicators = value
-      .split(Prod.Separator)
+      .split(Consts.ConfigSeparator)
       .map((item) => item.trim())
       .filter(Boolean);
     await configs.setProjectIndicators(indicators);

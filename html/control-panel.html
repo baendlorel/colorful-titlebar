@@ -9,7 +9,7 @@
     window.__kskb_consts = {
       isProd: '${Prod.Env}' === 'prod',
       lang: '${configs.lang}',
-      separator: '${Prod.Env}' === 'prod' ? '${Prod.Separator}' : ';',
+      separator: '${Prod.Env}' === 'prod' ? '${Consts.ConfigSeparator}' : ';',
       configs: {
         theme: '${configs.theme}' === 'light',
         showSuggest: '${configs.showSuggest}' === 'true',
