@@ -9,7 +9,7 @@ import version from '@/core/version';
 
 import { handlerMap } from './handler-map';
 import { HandelResult } from './types';
-import { Controls, Prod } from './consts';
+import { Controls } from './consts';
 
 const Panel = i18n.ControlPanel;
 
@@ -58,319 +58,99 @@ export default async function (this: vscode.ExtensionContext) {
     .map((c) => c.toRGBString())
     .join(Consts.ConfigSeparator);
 
-  controlPanel.webview.html = `<!DOCTYPE html>
-<html lang="zh-CN">
+  const map = {
+    VERSION: version.get(this),
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${Panel.title}</title>
-  <script purpose="常量套组">
-    window.__kskb_consts = {
-      isProd: '${Prod.Env}' === 'prod',
-      lang: '${configs.lang}',
-      separator: '${Prod.Env}' === 'prod' ? '${Consts.ConfigSeparator}' : ';',
-      configs: {
-        theme: '${configs.theme}' === 'light',
-        showSuggest: '${configs.showSuggest}' === 'true',
-        workbenchCssPath: '${configs.workbenchCssPath}',
-        hashSource: '${configs.hashSource}',
-        gradientBrightness: '${configs.gradientBrightness}',
-        gradientDarkness: '${configs.gradientDarkness}',
-        currentColor: '${currentColor}',
-        projectIndicators: '${projectIndicators}',
-        lightThemeColors: '${lightThemeColors}',
-        darkThemeColors: '${darkThemeColors}',
-      },
-      names: {
-        // 这些都是指令=控制名的情况
-        showSuggest: '${Controls.ShowSuggest}',
-        workbenchCssPath: '${Controls.WorkbenchCssPath}',
-        gradient: '${Controls.Gradient}',
-        hashSource: '${Controls.HashSource}',
-        gradientBrightness: '${Controls.GradientBrightness}',
-        gradientDarkness: '${Controls.GradientDarkness}',
-        refresh: '${Controls.Refresh}',
-        randomColor: '${Controls.RandomColor}',
-        'randomColor.colorSet': "${Controls['RandomColor.colorSet']}",
-        'randomColor.pure': "${Controls['RandomColor.pure']}",
-        'randomColor.specify': "${Controls['RandomColor.specify']}",
-        isRandomColor: (s) => s === "${Controls['RandomColor.colorSet']}" || s === "${
-    Controls['RandomColor.pure']
-  }" || s === "${Controls['RandomColor.specify']}",
-        projectIndicators: '${Controls.ProjectIndicators}',
-        // 这两个是配置决定的名字
-        lightThemeColors: "${Controls['ThemeColors.light']}",
-        darkThemeColors: "${Controls['ThemeColors.dark']}",
-        themeColors: '${Controls.ThemeColors}',
-      }
-    }
-  </script>
+    // 资源路径类 (RESOURCE_)
+    RESOURCE_CSS_URI: cssUri,
+    RESOURCE_CSS_THEME_SWITCH_URI: cssThemeSwitchUri,
+    RESOURCE_CSS_PALETTE_URI: cssPaletteUri,
+    RESOURCE_SCRIPT_URI: scriptUri,
 
-  <script purpose="加载css">
-    {
-      const css = document.createElement('link');
-      css.href = window.__kskb_consts.isProd ? '${cssUri}' : './style.css';
-      css.rel = 'stylesheet';
-      css.type = 'text/css';
-      document.head.appendChild(css);
+    // 枚举常量类 (ENUM_)
+    ENUM_ENV: 'prod',
+    ENUM_DISPLAY_NAME: Consts.DisplayName,
+    ENUM_CONFIG_SEPARATOR: Consts.ConfigSeparator,
+    ENUM_GRADIENT_BRIGHT_CENTER: GradientStyle.BrightCenter,
+    ENUM_GRADIENT_BRIGHT_LEFT: GradientStyle.BrightLeft,
+    ENUM_GRADIENT_ARC_LEFT: GradientStyle.ArcLeft,
+    ENUM_HASH_SOURCE_PROJECT_NAME: HashSource.ProjectName,
+    ENUM_HASH_SOURCE_FULL_PATH: HashSource.FullPath,
+    ENUM_HASH_SOURCE_PROJECT_NAME_DATE: HashSource.ProjectNameDate,
 
-      const cssThemeSwitch = document.createElement('link');
-      cssThemeSwitch.href = window.__kskb_consts.isProd ? '${cssThemeSwitchUri}' : './theme-switch.css';
-      cssThemeSwitch.rel = 'stylesheet';
-      cssThemeSwitch.type = 'text/css';
-      document.head.appendChild(cssThemeSwitch);
+    // 配置数据类 (CFG_)
+    CFG_THEME: configs.theme,
+    CFG_LANG: configs.lang,
+    CFG_SHOW_SUGGEST: configs.showSuggest,
+    CFG_WORKBENCH_CSS_PATH: configs.workbenchCssPath,
+    CFG_HASH_SOURCE: configs.hashSource,
+    CFG_GRADIENT_BRIGHTNESS: configs.gradientBrightness,
+    CFG_GRADIENT_DARKNESS: configs.gradientDarkness,
 
-      const cssPalette = document.createElement('link');
-      cssPalette.href = window.__kskb_consts.isProd ? '${cssPaletteUri}' : './palette.css';
-      cssPalette.rel = 'stylesheet';
-      cssPalette.type = 'text/css';
-      document.head.appendChild(cssPalette);
-    }
-  </script>
+    // 控制名称类 (CTRL_)
+    CTRL_SHOW_SUGGEST: Controls.ShowSuggest,
+    CTRL_WORKBENCH_CSS_PATH: Controls.WorkbenchCssPath,
+    CTRL_GRADIENT: Controls.Gradient,
+    CTRL_GRADIENT_BRIGHTNESS: Controls.GradientBrightness,
+    CTRL_GRADIENT_DARKNESS: Controls.GradientDarkness,
+    CTRL_HASH_SOURCE: Controls.HashSource,
+    CTRL_REFRESH: Controls.Refresh,
+    CTRL_RANDOM_COLOR: Controls.RandomColor,
+    CTRL_RANDOM_COLOR_COLOR_SET: Controls['RandomColor.colorSet'],
+    CTRL_RANDOM_COLOR_PURE: Controls['RandomColor.pure'],
+    CTRL_RANDOM_COLOR_SPECIFY: Controls['RandomColor.specify'],
+    CTRL_PROJECT_INDICATORS: Controls.ProjectIndicators,
+    CTRL_THEME_COLORS: Controls.ThemeColors,
+    CTRL_THEME_COLORS_LIGHT: Controls['ThemeColors.light'],
+    CTRL_THEME_COLORS_DARK: Controls['ThemeColors.dark'],
 
-</head>
+    // 国际化文本类 (I18N_)
+    I18N_PANEL_TITLE: Panel.title,
+    I18N_PANEL_DESCRIPTION: Panel.description,
+    I18N_SHOW_SUGGEST_LABEL: Panel.showSuggest.label,
+    I18N_SHOW_SUGGEST_DESC: Panel.showSuggest.description,
+    I18N_WORKBENCH_CSS_PATH_LABEL: Panel.workbenchCssPath.label,
+    I18N_WORKBENCH_CSS_PATH_DESC: Panel.workbenchCssPath.description,
+    I18N_GRADIENT_LABEL: Panel.gradient.label,
+    I18N_GRADIENT_DESC: Panel.gradient.description,
+    I18N_GRADIENT_EMPTY: Panel.gradient.empty,
+    I18N_GRADIENT_BRIGHT_CENTER: Panel.gradient[GradientStyle.BrightCenter],
+    I18N_GRADIENT_BRIGHT_LEFT: Panel.gradient[GradientStyle.BrightLeft],
+    I18N_GRADIENT_ARC_LEFT: Panel.gradient[GradientStyle.ArcLeft],
+    I18N_GRADIENT_BRIGHTNESS_LABEL: Panel.gradientBrightness.label,
+    I18N_GRADIENT_BRIGHTNESS_DESC: Panel.gradientBrightness.description,
+    I18N_GRADIENT_DARKNESS_LABEL: Panel.gradientDarkness.label,
+    I18N_GRADIENT_DARKNESS_DESC: Panel.gradientDarkness.description,
+    I18N_HASH_SOURCE_LABEL: Panel.hashSource.label,
+    I18N_HASH_SOURCE_DESC: Panel.hashSource.description,
+    I18N_HASH_SOURCE_PROJECT_NAME: Panel.hashSource[HashSource.ProjectName],
+    I18N_HASH_SOURCE_FULL_PATH: Panel.hashSource[HashSource.FullPath],
+    I18N_HASH_SOURCE_PROJECT_NAME_DATE: Panel.hashSource[HashSource.ProjectNameDate],
+    I18N_RANDOM_COLOR_LABEL: Panel.randomColor.label,
+    I18N_RANDOM_COLOR_DESC: Panel.randomColor.description,
+    I18N_RANDOM_COLOR_COLOR_SET: Panel.randomColor.colorSet,
+    I18N_RANDOM_COLOR_PURE: Panel.randomColor.pure,
+    I18N_RANDOM_COLOR_SPECIFY: Panel.randomColor.specify,
+    I18N_REFRESH_LABEL: Panel.refresh.label,
+    I18N_REFRESH_DESC: Panel.refresh.description,
+    I18N_REFRESH_BUTTON: Panel.refresh.button,
+    I18N_PROJECT_INDICATORS_LABEL: Panel.projectIndicators.label,
+    I18N_PROJECT_INDICATORS_DESC: Panel.projectIndicators.description,
+    I18N_THEME_COLORS_LABEL: Panel.themeColors.label,
+    I18N_THEME_COLORS_DESC: Panel.themeColors.description,
+    I18N_THEME_COLORS_LIGHT_COLORS: Panel.themeColors.lightColors,
+    I18N_THEME_COLORS_DARK_COLORS: Panel.themeColors.darkColors,
+    I18N_THEME_COLORS_ADD_COLOR: Panel.themeColors.addColor,
+    I18N_THEME_COLORS_DRAG_HINT: Panel.themeColors.dragHint,
 
-<body>
-  <div class="body" style="display: none;opacity: 0;" theme="${configs.theme}">
-    <form id="settings" class="control-panel">
-      <div class="header">
-        <div>
-          <h1>
-            <span class="colorful-title">${Consts.DisplayName}</span>
-            <span class="version">v${version.get(this)}</span>
-          </h1>
-          <p>by<a href="https://github.com/baendlorel">Kasukabe Tsumugi</a></p>
-          <p>${Panel.description}</p>
-        </div>
-        <div>
-          <label for="theme" class="kskb-theme-switch">
-            <input type="checkbox" id="theme" name="theme" class="kskb-dummy">
-            <div class="kskb-moon">
-              <div class="kskb-icon"></div>
-            </div>
-            <div class="kskb-sun">
-              <div class="kskb-icon"></div>
-            </div>
-            <div class="kskb-stars">
-              <div class="kskb-star"></div>
-              <div class="kskb-star"></div>
-              <div class="kskb-star"></div>
-              <div class="kskb-star"></div>
-              <div class="kskb-star"></div>
-            </div>
-            <div class="kskb-clouds">
-              <div class="kskb-cloud"></div>
-              <div class="kskb-cloud"></div>
-              <div class="kskb-cloud"></div>
-            </div>
-          </label>
-        </div>
-      </div>
+    // 计算数据类 (DATA_)
+    DATA_CURRENT_COLOR: currentColor,
+    DATA_PROJECT_INDICATORS: projectIndicators,
+    DATA_LIGHT_THEME_COLORS: lightThemeColors,
+    DATA_DARK_THEME_COLORS: darkThemeColors,
+  };
 
-      <div class="control-item">
-        <div class="control-label">
-          ${Panel.showSuggest.label}<small>${Panel.showSuggest.description}</small>
-        </div>
-        <div class="control-form">
-          <label class="toggle-switch">
-            <input type="checkbox" class="control-input" name="${Controls.ShowSuggest}">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="control-error" name="${Controls.ShowSuggest}"></div>
-        <div class="control-succ" name="${Controls.ShowSuggest}"></div>
-      </div>
-
-      <div class="control-item">
-        <div class="control-label">
-          ${Panel.workbenchCssPath.label}<small>${Panel.workbenchCssPath.description}</small>
-        </div>
-        <div class="control-form">
-          <textarea class="control-input textarea" name="${Controls.WorkbenchCssPath}"></textarea>
-        </div>
-        <div class="control-error" name="${Controls.WorkbenchCssPath}"></div>
-        <div class="control-succ" name="${Controls.WorkbenchCssPath}"></div>
-      </div>
-
-      <div class="control-item">
-        <div class="control-label">
-          ${Panel.gradient.label}<small>${Panel.gradient.description}</small>
-        </div>
-        <div class="control-form">
-          <select class="control-input select" name="${Controls.Gradient}">
-            <option value="" selected>${Panel.gradient.empty}</option>
-            <option value="${GradientStyle.BrightCenter}">
-              ${Panel.gradient[GradientStyle.BrightCenter]}
-            </option>
-            <option value="${GradientStyle.BrightLeft}">
-              ${Panel.gradient[GradientStyle.BrightLeft]}
-            </option>
-            <option value="${GradientStyle.ArcLeft}">${
-    Panel.gradient[GradientStyle.ArcLeft]
-  }</option>
-          </select>
-        </div>
-        <div class="control-error" name="${Controls.Gradient}"></div>
-        <div class="control-succ" name="${Controls.Gradient}"></div>
-      </div>
-
-      <div class="control-item-double">
-        <div class="control-item" style="grid-template-columns: 1fr auto;">
-          <div class="control-label">
-            ${Panel.gradientBrightness.label}<small>${Panel.gradientBrightness.description}</small>
-          </div>
-          <div class="control-form input-percent">
-            <input type="number" min="0" max="100" step="5" class="control-input" name="${
-              Controls.GradientBrightness
-            }" />
-          </div>
-          <div class="control-error" name="${Controls.GradientBrightness}"></div>
-          <div class="control-succ" name="${Controls.GradientBrightness}"></div>
-        </div>
-
-        <div class="control-item" style="grid-template-columns: 1fr auto;">
-          <div class="control-label">
-            ${Panel.gradientDarkness.label}<small>${Panel.gradientDarkness.description}</small>
-          </div>
-          <div class="control-form input-percent">
-            <input type="number" min="0" max="100" step="5" class="control-input" name="${
-              Controls.GradientDarkness
-            }" />
-          </div>
-          <div class="control-error" name="${Controls.GradientDarkness}"></div>
-          <div class="control-succ" name="${Controls.GradientDarkness}"></div>
-        </div>
-      </div>
-
-      <div class="control-item">
-        <div class="control-label">
-          ${Panel.hashSource.label}<small>${Panel.hashSource.description}</small>
-        </div>
-        <div class="control-form">
-          <select class="control-input select" name="${Controls.HashSource}">
-            <option value="${HashSource.ProjectName}">
-              ${Panel.hashSource[HashSource.ProjectName]}
-            </option>
-            <option value="${HashSource.FullPath}">${Panel.hashSource[HashSource.FullPath]}</option>
-            <option value="${HashSource.ProjectNameDate}">
-              ${Panel.hashSource[HashSource.ProjectNameDate]}
-            </option>
-          </select>
-        </div>
-        <div class="control-error" name="${Controls.HashSource}"></div>
-        <div class="control-succ" name="${Controls.HashSource}"></div>
-      </div>
-
-      <div class="control-item">
-        <div class="control-label">
-          ${Panel.randomColor.label}<small>${Panel.randomColor.description}</small>
-        </div>
-        <div class="control-form">
-          <div class="dropdown">
-            <button type="button" class="dropdown-button" tabindex="0">
-              ${Panel.randomColor.label}
-            </button>
-            <div class="dropdown-menu">
-              <button type="button" class="control-input dropdown-item" name="${
-                Controls['RandomColor.colorSet']
-              }">
-                ${Panel.randomColor.colorSet}
-              </button>
-              <button type="button" class="control-input dropdown-item" name="${
-                Controls['RandomColor.pure']
-              }">
-                ${Panel.randomColor.pure}
-              </button>
-              <!--control-input 不需要，因为这个按钮是靠选颜色来变更的-->
-              <button type="button" class="dropdown-item color-picker" title="${
-                Panel.randomColor.specify
-              }" name="${Controls['RandomColor.specify']}">
-                <span>&nbsp;&nbsp;${Panel.randomColor.specify}</span>
-                <input type="color" class="control-input" name="${Controls['RandomColor.specify']}">
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="control-error" name="${Controls.RandomColor}"></div>
-        <div class="control-succ" name="${Controls.RandomColor}"></div>
-      </div>
-
-      <div class="control-item">
-        <div class="control-label">
-          ${Panel.refresh.label}<small>${Panel.refresh.description}</small>
-        </div>
-        <div class="control-form">
-          <button type="button" class="control-input control-button" name="${Controls.Refresh}">
-            <span>${Panel.refresh.button}</span>
-          </button>
-        </div>
-        <div class="control-error" name="${Controls.Refresh}"></div>
-        <div class="control-succ" name="${Controls.Refresh}"></div>
-      </div>
-
-      <div class="control-item">
-        <div class="control-label">
-          ${Panel.projectIndicators.label}<small>${Panel.projectIndicators.description}</small>
-        </div>
-        <div class="control-form textarea-wrapper" max-height="120">
-          <textarea class="control-input textarea" name="${Controls.ProjectIndicators}"></textarea>
-        </div>
-        <div class="control-error" name="${Controls.ProjectIndicators}"></div>
-        <div class="control-succ" name="${Controls.ProjectIndicators}"></div>
-      </div>
-
-      <div class="control-item" style="grid-template-columns: 1fr 1.8fr;">
-        <div class="control-label">
-          ${Panel.themeColors.label}<small>${Panel.themeColors.description}</small>
-        </div>
-        <div class="control-form" style="display: flex; flex-direction: column; gap: 8px;">
-          <div class="palette" name="${Controls['ThemeColors.light']}">
-            <div class="palette-label">
-              ${Panel.themeColors.lightColors}
-              <span class="palette-hint">${Panel.themeColors.dragHint}</span>
-            </div>
-            <div class="color-list">
-              <button type="button" class="palette-add-color" title="${
-                Panel.themeColors.addColor
-              }">+</button>
-            </div>
-          </div>
-          <div class="palette" name="${Controls['ThemeColors.dark']}">
-            <div class="palette-label">
-              ${Panel.themeColors.darkColors}
-              <span class="palette-hint">${Panel.themeColors.dragHint}</span>
-            </div>
-            <div class="color-list">
-              <button type="button" class="palette-add-color" title="${
-                Panel.themeColors.addColor
-              }">+</button>
-            </div>
-          </div>
-        </div>
-        <div class="control-error" name="${Controls.ThemeColors}"></div>
-        <div class="control-succ" name="${Controls.ThemeColors}"></div>
-      </div>
-    </form>
-  </div>
-
-  <script purpose="加载测试UI文本">
-    if (!window.__kskb_consts.isProd) {
-      const testScript = document.createElement('script');
-      testScript.src = '../tests/template-replacer.js';
-      document.body.appendChild(testScript);
-    }
-  </script>
-  <script purpose="加载js">
-    {
-      const script = document.createElement('script');
-      script.src = window.__kskb_consts.isProd ? '${scriptUri}' : './control-panel.js';
-      document.body.appendChild(script);
-    }
-  </script>
-</body>
-
-</html>`;
+  controlPanel.webview.html = template;
 
   controlPanel.webview.onDidReceiveMessage(async (message) => {
     if (typeof message !== 'object' || !message.name) {
