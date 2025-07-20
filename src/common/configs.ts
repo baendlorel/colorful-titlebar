@@ -140,7 +140,7 @@ class Configs {
    * @returns
    */
   private join(arr: string[] | RGBA[]): string {
-    return arr.map((a) => (a instanceof RGBA ? a.toRGBString() : a)).join(Consts.ConfigSeparator);
+    return arr.map((a) => (a instanceof RGBA ? a.toRGBShort() : a)).join(Consts.ConfigSeparator);
   }
 
   /**

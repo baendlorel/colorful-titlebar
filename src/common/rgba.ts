@@ -30,17 +30,21 @@ const toHex = (n: number) => Math.floor(n).toString(16).padStart(2, '0');
  * 支持从字符串解析颜色，混合颜色，转换为 hex 字符串等功能。
  */
 export default class RGBA {
-  static uniformRandom() {
+  /**
+   * 生成一个随机的RGB颜色
+   */
+  static randomRGB() {
+    // & 特意和另一个位置的算法不同，理论上都是均匀的
     const set = Array.from({ length: 3 }, () => toHex(Math.random() * 256));
     return `#${set.join('')}`;
   }
 
-  private r = 0;
-  private g = 0;
-  private b = 0;
-  private a = 1;
+  private r: number;
+  private g: number;
+  private b: number;
+  private a: number;
 
-  valid: boolean;
+  readonly valid: boolean;
 
   constructor(s?: string | RGBA) {
     if (s instanceof RGBA) {
@@ -57,19 +61,6 @@ export default class RGBA {
     this.b = parsed.b;
     this.a = parsed.a;
     this.valid = parsed.valid;
-  }
-
-  get brightness() {
-    return Math.floor((this.r * 299 + this.g * 587 + this.b * 114) / 1000);
-  }
-
-  plain() {
-    return {
-      r: this.r,
-      g: this.g,
-      b: this.b,
-      a: this.a,
-    };
   }
 
   /**
@@ -111,6 +102,23 @@ export default class RGBA {
     const g = toHex(this.g);
     const b = toHex(this.b);
     return `#${r}${g}${b}`;
+  }
+
+  /**
+   * 将本颜色输出为极简的hex字符串
+   * - `RRGGBB`或`RGB`
+   * - 不含`#`
+   * - 不含alpha
+   */
+  toRGBShort() {
+    const r = toHex(this.r);
+    const g = toHex(this.g);
+    const b = toHex(this.b);
+    if (r[0] === r[1] && g[0] === g[1] && b[0] === b[1]) {
+      // 如果每个颜色通道的两个字符相同，则可以缩短为单个字符
+      return `${r[0]}${g[0]}${b[0]}`;
+    }
+    return `${r}${g}${b}`;
   }
 
   /**

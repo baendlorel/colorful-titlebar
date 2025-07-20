@@ -529,9 +529,13 @@
         // 如果点击了添加按钮，则添加新颜色
         if (e.target.classList.contains('palette-add-color')) {
           const addButton = e.target;
+
+          // & 特意和另一个位置的算法不同，理论上都是均匀的
+          // const set = Array.from({ length: 3 }, () => toHex(Math.random() * 256));
+          // return `#${set.join('')}`;
           const color =
             '#' +
-            Math.floor(Math.random() * 16777215)
+            Math.floor(Math.random() * 16777216)
               .toString(16)
               .padStart(6, '0');
           const paletteItem = createPaletteItem(name, color);

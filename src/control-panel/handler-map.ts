@@ -119,7 +119,7 @@ export const handlerMap = {
     result.other.color = color.toRGBString();
   },
   [ControlName['RandomColor.pure']]: async (result: HandelResult, _value: PostedValue) => {
-    const color = RGBA.uniformRandom();
+    const color = RGBA.randomRGB();
     await style.applyColor(color);
     result.other.color = color;
   },
