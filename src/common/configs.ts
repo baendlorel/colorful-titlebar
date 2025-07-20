@@ -1,5 +1,5 @@
 import vscode from 'vscode';
-import chacha20 from '@/core/chacha20';
+import cryptor from '@/core/cryptor';
 
 import { Consts, HashSource, TitleBarConsts } from './consts';
 import RGBA from './rgba';
@@ -8,9 +8,6 @@ import sanitizer from './sanitizer';
 import { deflateRawSync, inflateRawSync } from 'node:zlib';
 
 const enum Defaults {
-  LightThemeColors = `rgb(167, 139, 250)${Consts.ConfigSeparator}rgb(147, 197, 253)${Consts.ConfigSeparator}rgb(128, 203, 196)${Consts.ConfigSeparator}rgb(172, 243, 157)${Consts.ConfigSeparator}rgb(250, 204, 21)${Consts.ConfigSeparator}rgb(253, 151, 31)${Consts.ConfigSeparator}rgb(251, 113, 133)`,
-  DarkThemeColors = `rgb(68, 0, 116)${Consts.ConfigSeparator}rgb(0, 47, 85)${Consts.ConfigSeparator}rgb(0, 66, 66)${Consts.ConfigSeparator}rgb(0, 75, 28)${Consts.ConfigSeparator}rgb(124, 65, 1)${Consts.ConfigSeparator}rgb(133, 33, 33)`,
-  ProjectIndicators = `.git${Consts.ConfigSeparator}package.json${Consts.ConfigSeparator}pom.xml${Consts.ConfigSeparator}Cargo.toml${Consts.ConfigSeparator}go.mod${Consts.ConfigSeparator}README.md${Consts.ConfigSeparator}LICENSE${Consts.ConfigSeparator}tsconfig.json${Consts.ConfigSeparator}yarn.lock${Consts.ConfigSeparator}pnpm-lock.yaml${Consts.ConfigSeparator}package-lock.json${Consts.ConfigSeparator}webpack.config.js${Consts.ConfigSeparator}vite.config.js${Consts.ConfigSeparator}vite.config.ts${Consts.ConfigSeparator}next.config.js${Consts.ConfigSeparator}pyproject.toml${Consts.ConfigSeparator}setup.py${Consts.ConfigSeparator}CMakeLists.txt${Consts.ConfigSeparator}Makefile${Consts.ConfigSeparator}build.gradle${Consts.ConfigSeparator}composer.json${Consts.ConfigSeparator}Gemfile${Consts.ConfigSeparator}.nvmrc${Consts.ConfigSeparator}.node-version${Consts.ConfigSeparator}Deno.json${Consts.ConfigSeparator}deno.jsonc`,
   GradientBrightness = 62,
   GradientDarkness = 21,
 }
@@ -64,6 +61,9 @@ class Configs {
     return vscode.workspace.getConfiguration();
   }
 
+  /**
+   * @constant 默认配置
+   */
   private get newDefault(): Config {
     return {
       currentVersion: '1.0.0',
@@ -72,9 +72,46 @@ class Configs {
       gradientBrightness: Defaults.GradientBrightness as number,
       gradientDarkness: Defaults.GradientDarkness as number,
       hashSource: HashSource.ProjectName,
-      projectIndicators: this.split(Defaults.ProjectIndicators),
-      lightThemeColors: this.split(Defaults.LightThemeColors).map((color) => new RGBA(color)),
-      darkThemeColors: this.split(Defaults.DarkThemeColors).map((color) => new RGBA(color)),
+      projectIndicators: [
+        '.git',
+        'package.json',
+        'pom.xml',
+        'Cargo.toml',
+        'go.mod',
+        'README.md',
+        'LICENSE',
+        'tsconfig.json',
+        'yarn.lock',
+        'pnpm-lock.yaml',
+        'package-lock.json',
+        'webpack.config.js',
+        'vite.config.js',
+        'vite.config.ts',
+        'next.config.js',
+        'pyproject.toml',
+        'setup.py',
+        'CMakeLists.txt',
+        'Makefile',
+        'build.gradle',
+        'composer.json',
+        'Gemfile',
+        '.nvmrc',
+        '.node-version',
+        'Deno.json',
+        'deno.jsonc',
+      ],
+      lightThemeColors: [
+        '#a78bfa',
+        '#93c5fd',
+        '#80cbc4',
+        '#acf39d',
+        '#facc15',
+        '#fd971f',
+        '#fb7185',
+      ].map((color) => new RGBA(color)),
+      darkThemeColors: ['#440074', '#002f55', '#004242', '#004b1c', '#5c2f00', '#6a0e0e'].map(
+        (color) => new RGBA(color)
+      ),
     };
   }
 
@@ -124,21 +161,21 @@ class Configs {
    * @returns 加密后的配置字符串
    */
   private serialize(): string {
-    const plain = [
-      `${Prop.CurrentVersion}:${this.my.currentVersion}`,
-      `${Prop.ShowSuggest}:${this.my.showSuggest ? 1 : 0}`,
-      `${Prop.WorkbenchCssPath}:${this.my.workbenchCssPath}`,
-      `${Prop.GradientBrightness}:${this.my.gradientBrightness}`,
-      `${Prop.GradientDarkness}:${this.my.gradientDarkness}`,
-      `${Prop.HashSource}:${this.my.hashSource}`,
-      `${Prop.ProjectIndicators}:${this.join(this.my.projectIndicators)}`,
-      `${Prop.LightThemeColors}:${this.join(this.my.lightThemeColors)}`,
-      `${Prop.DarkThemeColors}:${this.join(this.my.darkThemeColors)}`,
-    ];
+    const plain: string[] = [];
+    plain[Prop.CurrentVersion] = this.my.currentVersion;
+    plain[Prop.ShowSuggest] = this.my.showSuggest ? '1' : '0';
+    plain[Prop.WorkbenchCssPath] = this.my.workbenchCssPath;
+    plain[Prop.GradientBrightness] = this.my.gradientBrightness.toString();
+    plain[Prop.GradientDarkness] = this.my.gradientDarkness.toString();
+    plain[Prop.HashSource] = this.my.hashSource.toString();
+    plain[Prop.ProjectIndicators] = this.join(this.my.projectIndicators);
+    plain[Prop.LightThemeColors] = this.join(this.my.lightThemeColors);
+    plain[Prop.DarkThemeColors] = this.join(this.my.darkThemeColors);
+
     const str = plain.join(Consts.SerializerSeparator);
     const zipped = deflateRawSync(str);
     vscode.window.showInformationMessage(`before zip:${str.length}, after zip:${zipped.length}`);
-    const encrypted = chacha20.encrypt(zipped);
+    const encrypted = cryptor.encrypt(zipped);
     vscode.window.showInformationMessage(`after encrypt: ${encrypted.length}`);
     return encrypted;
   }
@@ -146,44 +183,15 @@ class Configs {
   private parse(decrypted: string): Partial<Config> {
     const arr = decrypted.split(Consts.SerializerSeparator);
     const result: Partial<Config> = {};
-    for (let i = 0; i < arr.length; i++) {
-      const entry = arr[i];
-      const index = entry.indexOf(':');
-      const k = parseInt(entry.slice(0, index), 10) as Prop;
-      const v = entry.slice(index + 1);
-      switch (k) {
-        case Prop.CurrentVersion:
-          result.currentVersion = v;
-          break;
-        case Prop.ShowSuggest:
-          result.showSuggest = v === '1';
-          break;
-        case Prop.WorkbenchCssPath:
-          result.workbenchCssPath = v;
-          break;
-        case Prop.GradientBrightness:
-          result.gradientBrightness = sanitizer.percent(parseInt(v, 10)) ?? undefined;
-          break;
-        case Prop.GradientDarkness:
-          result.gradientDarkness = sanitizer.percent(parseInt(v, 10)) ?? undefined;
-          break;
-        case Prop.HashSource:
-          result.hashSource = sanitizer.hashSource(parseInt(v, 10) as HashSource) ?? undefined;
-          break;
-        case Prop.ProjectIndicators:
-          result.projectIndicators = this.split(v);
-          break;
-        case Prop.LightThemeColors:
-          result.lightThemeColors = sanitizer.colors(this.split(v)) ?? undefined;
-          break;
-        case Prop.DarkThemeColors:
-          result.darkThemeColors = sanitizer.colors(this.split(v)) ?? undefined;
-          break;
-        default:
-          // * 这里有可能是未来被废弃的配置项，无需处理
-          break;
-      }
-    }
+    result.currentVersion = arr[Prop.CurrentVersion];
+    result.showSuggest = arr[Prop.ShowSuggest] === '1';
+    result.workbenchCssPath = arr[Prop.WorkbenchCssPath];
+    result.gradientBrightness = sanitizer.percent(arr[Prop.GradientBrightness]) ?? undefined;
+    result.gradientDarkness = sanitizer.percent(arr[Prop.GradientDarkness]) ?? undefined;
+    result.hashSource = sanitizer.hashSource(arr[Prop.HashSource]) ?? undefined;
+    result.projectIndicators = this.split(arr[Prop.ProjectIndicators]);
+    result.lightThemeColors = sanitizer.colors(this.split(arr[Prop.LightThemeColors])) ?? undefined;
+    result.darkThemeColors = sanitizer.colors(this.split(arr[Prop.DarkThemeColors])) ?? undefined;
     return result;
   }
 
@@ -193,7 +201,7 @@ class Configs {
    * @returns 配置对象
    */
   private deserialize(akasha: string): Config {
-    const decrypted = inflateRawSync(chacha20.decrypt(akasha));
+    const decrypted = inflateRawSync(cryptor.decrypt(akasha));
     const raw = this.parse(decrypted.toString());
     const defaults = this.newDefault;
 

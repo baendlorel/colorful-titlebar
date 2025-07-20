@@ -21,7 +21,10 @@ class Sanitizer {
     }
   }
 
-  percent(value: number | undefined): number | null {
+  percent(value: number | string | undefined): number | null {
+    if (typeof value === 'string') {
+      value = parseInt(value, 10);
+    }
     if (typeof value === 'number' && value >= 0 && value <= 100 && Number.isSafeInteger(value)) {
       return value;
     } else {
@@ -29,7 +32,10 @@ class Sanitizer {
     }
   }
 
-  hashSource(value: HashSource): HashSource | null {
+  hashSource(value: HashSource | string | undefined): HashSource | null {
+    if (typeof value === 'string') {
+      value = parseInt(value, 10) as HashSource;
+    }
     return value === HashSource.ProjectName ||
       value === HashSource.FullPath ||
       value === HashSource.ProjectNameDate
