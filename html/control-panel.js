@@ -193,10 +193,10 @@
       /**
        * @type {HTMLInputElement}
        */
-      const input = event.target;
+      const formItem = event.target;
       const data = {
-        name: input.name,
-        value: input.value,
+        name: formItem.name,
+        value: formItem.value,
       };
 
       if (data.name === 'theme') {
@@ -204,31 +204,44 @@
       }
 
       // 如果数字类不符合要求，则返回并提示
-      if (input.type === 'number') {
-        const value = parseInt(input.value, 10);
-        let max = parseInt(input.max, 10);
-        let min = parseInt(input.min, 10);
+      if (formItem.type === 'number') {
+        const value = parseInt(formItem.value, 10);
+        let max = parseInt(formItem.max, 10);
+        let min = parseInt(formItem.min, 10);
         max = Number.isNaN(max) ? Infinity : max;
         min = Number.isNaN(min) ? Infinity : min;
 
         if (Number.isNaN(value) || value < min || value > max) {
-          find(input.name, 'error').innerText = i18n.NumberLimit(min, max, true);
-          input.value = min;
+          find(formItem.name, 'error').innerText = i18n.NumberLimit(min, max, true);
+          formItem.value = min;
           return;
         }
+        // $ 此处value为number
         data.value = value;
-      } else if (input.type === 'checkbox') {
-        data.value = input.checked;
-      } else if (input.classList.contains('palette-input')) {
+      } else if (formItem.type === 'checkbox') {
+        // $ 此处value为boolean
+        data.value = formItem.checked;
+      } else if (formItem.classList.contains('palette-input')) {
         // 已经在初始化调色盘的地方处理过了
+        // $ 此处value为Record<string,string[]>
         return;
       }
 
-      if (input.name === names.projectIndicators) {
-        // 特殊处理项目指示器，将换行符转换为分号
-        data.value = input.value.replace(/\n/g, SEP).replace(/\s/g, '');
+      if (formItem.getAttribute('enum')) {
+        // $ 此处value为number，因为用到的enum全部都是自增数字
+        data.value = parseInt(data.value, 10);
       }
 
+      if (formItem.name === names.projectIndicators) {
+        // 特殊处理项目指示器
+        // $ 此处value为string[]
+        data.value = formItem.value
+          .split('\n')
+          .map((v) => v.trim())
+          .filter(Boolean);
+      }
+
+      // $ 如果没有经历任何分支，那么此处value为string
       vspost(data);
     });
 
@@ -644,16 +657,28 @@
 
   // #endregion
 
-  // 开始初始化
+  // # 开始初始化
+  // 初始化明暗主题切换按钮
   initThemeSwitch();
+
+  // 初始化调色盘，用于颜色套组编辑
   initPalette();
+
+  // 初始化单独的颜色选择器
   initColorPickers();
+
+  // 初始化表单的值
   initSettingsValue();
+
+  // 对整个form进行的change侦听
   initGeneralInputChange();
+
+  // 初始化所有的textarea
   q('.body').style.display = '';
   // 这样可以让textarea自动计算高度生效，在display:none的情况下无法正确计算高度，渲染出来的高度是初始高度
   q('.body').addEventListener('transitionstart', initTextarea, { once: true });
 
+  // 让整个界面淡入
   setTimeout(() => (q('.body').style.opacity = '1'), 100);
   window.freeze = freeze;
   window.unfreeze = unfreeze;

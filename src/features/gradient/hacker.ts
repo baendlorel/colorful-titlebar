@@ -37,6 +37,14 @@ class Hacker {
   }
 
   /**
+   * 删去含有`Css.Token`的行，返回一个新数组
+   * @param lines
+   */
+  private purge(lines: string[]): string[] {
+    return lines.filter((line) => !line.trim().startsWith(Css.Token));
+  }
+
+  /**
    * 已包含backup
    *
    * 会在command注册的地方就确认`cssPath`是否存在
@@ -64,22 +72,13 @@ class Hacker {
     const darkness = (configs.gradientDarkness / 100).toString();
     const brightness = (configs.gradientBrightness / 100).toString();
     const style = rawStyle
-      .replaceAll('{darkness}', darkness)
-      .replaceAll('{brightness}', brightness)
+      .replaceAll('{{darkness}}', darkness)
+      .replaceAll('{{brightness}}', brightness)
       .replace(/\n[\s]+/g, '');
 
     const css = await readFile(cssPath, 'utf8');
+    const lines = this.purge(css.split('\n'));
 
-    // 消除旧的注入
-    const lines = css.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (line.startsWith(Css.Token)) {
-        lines.splice(i, 1);
-      }
-    }
-
-    // 添加新的注入
     lines.push(`${css}\n${Css.Token}${style}\n`);
     await writeFile(cssPath, lines.join('\n'), 'utf8');
     vscode.window.showInformationMessage(this.Enable.success);
@@ -92,14 +91,7 @@ class Hacker {
   async clean(cssPath: string): Promise<void> {
     const css = await readFile(cssPath, 'utf8');
     // 消除旧的注入
-    const lines = css.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (line.startsWith(Css.Token)) {
-        lines.splice(i, 1);
-      }
-    }
-
+    const lines = this.purge(css.split('\n'));
     await writeFile(cssPath, lines.join('\n'), 'utf8');
     vscode.window.showInformationMessage(this.Enable.success);
   }

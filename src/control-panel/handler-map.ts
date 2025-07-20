@@ -10,46 +10,18 @@ import sanitizer from '@/common/sanitizer';
 import gradient from '@/features/gradient';
 
 import { Controls } from './consts';
-import { HandelResult, PostedValue } from './types';
+import { HandelResult, PostedValue, PostedValueType } from './types';
+import { expect } from './expector';
 
 const Panel = i18n.ControlPanel;
 
-interface PostedValueMap {
-  string: string;
-  number: number;
-  boolean: boolean;
-  object: Record<string, any>;
-}
-
-const expect: <T extends keyof PostedValueMap>(
-  result: HandelResult,
-  value: PostedValue,
-  tp: T
-) => asserts value is PostedValueMap[T] = (
-  result: HandelResult,
-  value: PostedValue,
-  tp: keyof PostedValueMap
-) => {
-  if (tp === 'object') {
-    if (typeof value !== 'object' || value === null) {
-      result.succ = false;
-      result.msg = Panel.typeError(value, 'an object');
-      throw null;
-    }
-  } else if (typeof value !== tp) {
-    result.succ = false;
-    result.msg = Panel.typeError(value, `a ${tp}`);
-    throw null;
-  }
-};
-
 export const handlerMap = {
   [Controls.ShowSuggest]: async (result: HandelResult, value: PostedValue) => {
-    expect(result, value, 'boolean');
+    expect(result, value, PostedValueType.Boolean);
     await configs.setShowSuggest(value);
   },
   [Controls.WorkbenchCssPath]: async (result: HandelResult, value: PostedValue) => {
-    expect(result, value, 'string');
+    expect(result, value, PostedValueType.String);
     const cssPath = value.trim();
     if (!existsSync(cssPath)) {
       result.succ = false;
@@ -59,7 +31,7 @@ export const handlerMap = {
     await configs.setWorkbenchCssPath(cssPath);
   },
   [Controls.Gradient]: async (result: HandelResult, value: PostedValue) => {
-    expect(result, value, 'number');
+    expect(result, value, PostedValueType.Number);
     switch (value) {
       case GradientStyle.BrightLeft:
       case GradientStyle.BrightCenter:
@@ -74,7 +46,7 @@ export const handlerMap = {
     result.msg = Panel.gradient.success;
   },
   [Controls.GradientBrightness]: async (result: HandelResult, value: PostedValue) => {
-    expect(result, value, 'number');
+    expect(result, value, PostedValueType.Number);
     const percent = sanitizer.percent(value);
     if (percent === null) {
       result.succ = false;
@@ -85,7 +57,7 @@ export const handlerMap = {
     result.msg = Panel.gradientBrightness.success;
   },
   [Controls.GradientDarkness]: async (result: HandelResult, value: PostedValue) => {
-    expect(result, value, 'number');
+    expect(result, value, PostedValueType.Number);
     const percent = sanitizer.percent(value);
     if (percent === null) {
       result.succ = false;
@@ -96,7 +68,7 @@ export const handlerMap = {
     result.msg = Panel.gradientDarkness.success;
   },
   [Controls.HashSource]: async (result: HandelResult, value: HashSource) => {
-    expect(result, value, 'number');
+    expect(result, value, PostedValueType.Number);
     const arr = [HashSource.FullPath, HashSource.ProjectName, HashSource.ProjectNameDate];
     if (!arr.includes(value)) {
       result.succ = false;
@@ -127,22 +99,19 @@ export const handlerMap = {
     result.other.color = color;
   },
   [Controls['RandomColor.specify']]: async (result: HandelResult, value: PostedValue) => {
-    expect(result, value, 'string');
+    expect(result, value, PostedValueType.String);
     await style.applyColor(value);
   },
   [Controls.ProjectIndicators]: async (result: HandelResult, value: PostedValue) => {
-    expect(result, value, 'string');
-    const indicators = value
-      .split(Consts.ConfigSeparator)
-      .map((item) => item.trim())
-      .filter(Boolean);
-    await configs.setProjectIndicators(indicators);
+    expect(result, value, PostedValueType.StringArray);
+    const filtered = value.map((v) => v.trim()).filter(Boolean);
+    await configs.setProjectIndicators(filtered);
   },
   [Controls.ThemeColors]: async (
     result: HandelResult,
     value: Record<string, RGBA[] | undefined>
   ) => {
-    expect(result, value, 'object');
+    expect(result, value, PostedValueType.Object);
 
     // 必须至少有一个是正常的
     const errors: string[] = [];

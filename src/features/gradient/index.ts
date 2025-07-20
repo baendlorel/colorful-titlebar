@@ -1,7 +1,4 @@
-import vscode from 'vscode';
-
 import { GradientStyle } from '@/common/consts';
-import i18n from '@/common/i18n';
 import hacker from './hacker';
 
 class Gradient {
