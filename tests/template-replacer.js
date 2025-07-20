@@ -260,68 +260,19 @@
    * @param {string} text
    * @returns {string}
    */
-  const replace2 = (text) => {
-    return text
-      .replace(
-        '${Panel.gradient[GradientStyle.BrightCenter]}',
-        mockData.Panel.gradient[mockData.GradientStyle.BrightCenter]
-      )
-      .replace(
-        '${Panel.gradient[GradientStyle.BrightLeft]}',
-        mockData.Panel.gradient[mockData.GradientStyle.BrightLeft]
-      )
-      .replace(
-        '${Panel.gradient[GradientStyle.ArcLeft]}',
-        mockData.Panel.gradient[mockData.GradientStyle.ArcLeft]
-      )
-      .replace(
-        '${Panel.hashSource[HashSource.ProjectName]}',
-        mockData.Panel.hashSource[mockData.HashSource.ProjectName]
-      )
-      .replace(
-        '${Panel.hashSource[HashSource.FullPath]}',
-        mockData.Panel.hashSource[mockData.HashSource.FullPath]
-      )
-      .replace(
-        '${Panel.hashSource[HashSource.ProjectNameDate]}',
-        mockData.Panel.hashSource[mockData.HashSource.ProjectNameDate]
-      )
-      .replace('${version.get(this)}', '13.34.2')
-      .replace(/\$\{([\w\.]+\w+)\}/g, ($0, $1) => {
-        const props = $1.split('.');
-        let v = mockData.Panel;
-        for (const p of props) {
-          v = v[p];
-          if (v === undefined) {
-            break;
-          }
-        }
-        if (v !== undefined) {
-          return v;
-        }
-
-        v = mockData;
-        for (const p of props) {
-          v = v[p];
-          if (v === undefined) {
-            break;
-          }
-        }
-        return v;
-      });
-  };
-
-  /**
-   * @param {string} text
-   * @returns {string}
-   */
   function replace(text) {
     return text
-      .replace('v${version.get(this)}', 'v12.32.12')
-      .replaceAll('${Consts.DisplayName}', 'Colorful Titlebar')
-      .replaceAll('${Panel.', '')
-      .replaceAll('.label}', '')
-      .replaceAll('.description}', 'Desc');
+      .replace('v{{VERSION}}', 'v12.32.12')
+      .replaceAll('{{ENUM_DISPLAY_NAME}}', 'Colorful Titlebar')
+      .replaceAll('{{I18N_', '')
+      .replaceAll('{{ENUM_', '')
+      .replaceAll('{{CFG_', '')
+      .replaceAll('{{CTRL_', '')
+      .replaceAll('{{DATA_', '')
+      .replaceAll('{{', '')
+      .replaceAll('_LABEL}}', '')
+      .replaceAll('_DESC}}', '_')
+      .replaceAll('}}', '');
   }
 
   // 模板替换函数
@@ -334,17 +285,13 @@
       const attrs = el.getAttributeNames();
       for (let i = 0; i < attrs.length; i++) {
         const attr = el.getAttribute(attrs[i]);
-        if (attr.includes('$')) {
-          el.setAttribute(attrs[i], replace(attr));
-        }
+        el.setAttribute(attrs[i], replace(attr));
       }
 
       for (let i = 0; i < el.childNodes.length; i++) {
         const node = el.childNodes[i];
         if (node instanceof Text) {
-          if (node.textContent.includes('$')) {
-            node.textContent = replace(node.textContent);
-          }
+          node.textContent = replace(node.textContent);
         }
         if (node instanceof HTMLElement) {
           visit(el.childNodes[i]);
@@ -356,6 +303,6 @@
     visit(document.body);
   }
 
-  // 开始替换
-  replaceTemplates();
+  // & 必须等一会再换，否则colorlist初始化还没好就被换掉了，会导致找不到元素
+  requestAnimationFrame(replaceTemplates);
 })();

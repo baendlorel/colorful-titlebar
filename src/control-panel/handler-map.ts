@@ -161,12 +161,12 @@ export const handlerMap = {
       const light = sanitizer.colors(rawLight);
       if (light) {
         if (light.length === 0) {
-          errors.push(Panel.themeColors.emptyPalette(Panel.themeColors.lightColors));
+          errors.push(Panel.themeColors.emptyPalette(Panel.themeColors.light));
         } else {
           await configs.setLightThemeColors(light);
         }
       } else {
-        errors.push(Panel.themeColors.invalidPaletteColor(Panel.themeColors.lightColors));
+        errors.push(Panel.themeColors.invalidPaletteColor(Panel.themeColors.light));
       }
     }
 
@@ -175,12 +175,12 @@ export const handlerMap = {
       const dark = sanitizer.colors(rawDark);
       if (dark) {
         if (dark.length === 0) {
-          errors.push(Panel.themeColors.emptyPalette(Panel.themeColors.darkColors));
+          errors.push(Panel.themeColors.emptyPalette(Panel.themeColors.dark));
         } else {
           await configs.setDarkThemeColors(dark);
         }
       } else {
-        errors.push(Panel.themeColors.invalidPaletteColor(Panel.themeColors.darkColors));
+        errors.push(Panel.themeColors.invalidPaletteColor(Panel.themeColors.dark));
       }
     }
 

@@ -39,6 +39,7 @@ const i18n = (() => {
         [GradientStyle.BrightCenter]: '中间较亮',
         [GradientStyle.BrightLeft]: '左侧较亮',
         [GradientStyle.ArcLeft]: '左侧弧光',
+        [GradientStyle.None]: '取消渐变',
         success: '注入成功，重启后生效',
       },
       gradientBrightness: {
@@ -80,8 +81,8 @@ const i18n = (() => {
       themeColors: {
         label: '颜色套组',
         description: '编辑亮色和暗色主题的颜色套组，用于计算颜色生成。颜色的顺序会影响计算出的颜色',
-        lightColors: '亮色套组',
-        darkColors: '暗色套组',
+        light: '亮色套组',
+        dark: '暗色套组',
         addColor: '添加颜色',
         removeColor: '删除',
         dragHint: '拖拽重新排序',
@@ -192,6 +193,7 @@ const i18n = (() => {
         [GradientStyle.BrightCenter]: 'Bright Center',
         [GradientStyle.BrightLeft]: 'Bright Left',
         [GradientStyle.ArcLeft]: 'Arc Left',
+        [GradientStyle.None]: 'None',
         success: 'Injected successfully, restart to take effect',
       },
       gradientBrightness: {
@@ -234,8 +236,8 @@ const i18n = (() => {
         label: 'Color Palette',
         description:
           'Edit light and dark theme color sets for random color functionality. Order of the colors will affect the generated results',
-        lightColors: 'Light Colors',
-        darkColors: 'Dark Colors',
+        light: 'Light Colors',
+        dark: 'Dark Colors',
         addColor: 'Add Color',
         removeColor: 'Remove',
         dragHint: 'Drag to reorder',

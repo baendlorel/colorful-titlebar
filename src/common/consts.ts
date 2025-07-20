@@ -31,6 +31,7 @@ export const enum GradientStyle {
   BrightLeft,
   BrightCenter,
   ArcLeft,
+  None,
 }
 
 export const enum HashSource {
