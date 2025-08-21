@@ -4,6 +4,8 @@
 
 A VS Code extension that adds colorful background colors to the title bar based on your project name.
 
+For more awesome packages, check out [my homepage💛](https://baendlorel.github.io/?repoType=npm)
+
 ## ✨ Features
 
 - 🎨 **Project-based Colors**: Automatically generates unique colors based on your project
