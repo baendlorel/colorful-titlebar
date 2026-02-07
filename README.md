@@ -2,6 +2,10 @@
 
 [中文版本](README.zh-cn.md) | **English**
 
+## Don't Want to see.vscode/settings.json in Your Project?
+
+Try [JetBrains TitleBar](https://marketplace.visualstudio.com/items?itemName=KasukabeTsumugi.jetbrains-titlebar)
+
 A VS Code extension that adds colorful background colors to the title bar based on your project name.
 
 For more awesome packages, check out [my homepage💛](https://baendlorel.github.io/?repoType=npm)
@@ -239,7 +243,6 @@ Issues and Pull Requests are welcome!
 ### 1.4.0
 
 - **🔐 Configuration Encryption & Security**
-
   - **Unified Configuration Storage**: All settings now consolidated into a single encrypted field `akasha`
     - Encryption algorithm: **ChaCha20**
     - Configuration data compressed from previous plaintext 1100+ characters to about 430 characters
@@ -247,25 +250,21 @@ Issues and Pull Requests are welcome!
   - **Configuration Sanitization**: Enhanced data validation with comprehensive sanitizer functions
 
 - **🎨 UI/UX Improvements**
-
   - **Template System Enhancement**: Migrated from `${}` to `{{}}` template syntax with comprehensive template compiler
   - **Type Safety**: Improved TypeScript integration with better type assertions using `expect` functions
   - **Theme Consistency**: Fixed color picker foreground color updates and palette synchronization issues
 
 - **🐛 Critical Bug Fixes**
-
   - **HTML Enum Handling**: Fixed issue where auto-incremented enum values became strings in HTML context
   - **Gradient Style Management**: Improved CSS injection with token-based line scanning instead of regex
 
 - **🛠️ Architecture Improvements**
-
   - **Build System Enhancement**: Implemented `__IS_DEV__` macro for development/production builds using Rollup replace plugin
   - **Gradient System Refactor**: Centralized gradient functionality through main index rather than direct hacker exports
   - **Pure Functions**: Introduced `purge()` function as a pure function for CSS token line removal
   - **Error Handling**: Comprehensive error handling for encryption/decryption operations
 
 - **🧹 Code Quality & Maintenance**
-
   - **Template Compiler**: 120+ template variables with systematic naming conventions
   - **Documentation**: Enhanced JSDoc comments and code documentation throughout
   - **Test Environment**: Improved development testing with proper environment detection
@@ -273,7 +272,6 @@ Issues and Pull Requests are welcome!
 ### 1.3.0
 
 - **🎯 UI/UX Major Improvements**
-
   - **Color Palette Management**: Added comprehensive palette management functionality
     - Configure color palettes for light and dark themes directly in the control panel
     - Provided default light and dark color palettes
@@ -286,14 +284,12 @@ Issues and Pull Requests are welcome!
   - **Responsive Design**: Better layout adaptation for different screen sizes
 
 - **🛠️ Code Quality Enhancements**
-
   - **TypeScript Integration**: Added comprehensive JSDoc type annotations throughout the codebase
   - **HTMLElement Extensions**: Properly typed custom HTMLElement prototype extensions (mount method)
   - **Modular Architecture**: Reorganized code structure with better separation of concerns
   - **Error Handling**: Improved error handling with better user feedback
 
 - **🚀 Performance Optimizations**
-
   - **Memory Management**: Optimized DOM manipulation and event handling
   - **Efficient Rendering**: Reduced unnecessary re-renders in control panel
   - **Better Resource Usage**: Improved cleanup of event listeners and DOM references
@@ -306,19 +302,16 @@ Issues and Pull Requests are welcome!
 ### 1.2.2
 
 - **🔧 Bug Fixes**
-
   - Automatic textarea height adjustment
   - Fixed issue where version was incorrectly detected as new every time
   - Fixed upgrade notification displaying function content instead of message
 
 - **🎨 New Random Color Feature**
-
   - Random from palette: Pick random colors from configured color palette
   - Pure random colors: Generate completely random RGB colors
   - Manual color picker: Specify custom colors with visual picker
 
 - **🎯 UI/UX Enhancements**:
-
   - Redesigned color picker with palette emoji button style
   - Widened control panel for better layout### 1.2.1
 
