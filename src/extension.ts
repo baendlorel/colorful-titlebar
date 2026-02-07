@@ -4,6 +4,7 @@ import style from './core/style';
 import catcher from './common/catcher';
 import register from './registers';
 import version from './core/version';
+import startGitBranchWatcher from './features/git-branch-watcher';
 
 export const activate = catcher(async (context: vscode.ExtensionContext) => {
   // 注册命令
@@ -13,6 +14,8 @@ export const activate = catcher(async (context: vscode.ExtensionContext) => {
 
   // 如果颜色没有设置过，那么应用标题栏颜色
   await style.applyIfNotSet();
+
+  startGitBranchWatcher(context);
 
   await version.updated(context);
 });

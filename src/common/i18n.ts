@@ -133,6 +133,13 @@ const i18n = (() => {
       },
     },
 
+    GitBranch: {
+      changed: (branch?: string) =>
+        `检测到Git分支变更${branch ? '：' + branch : ''}，是否重新计算颜色？`,
+      recalculate: '重新计算',
+      ignore: '不用了',
+    },
+
     ConfigLevel: {
       [vscode.ConfigurationTarget.Workspace]: '工作区',
       [vscode.ConfigurationTarget.WorkspaceFolder]: '工作区文件夹',
@@ -284,6 +291,13 @@ const i18n = (() => {
           no: 'This one is fine',
         },
       },
+    },
+
+    GitBranch: {
+      changed: (branch?: string) =>
+        `Git branch changed${branch ? ': ' + branch : ''}. Recalculate color now?`,
+      recalculate: 'Recalculate',
+      ignore: 'Ignore',
     },
 
     ConfigLevel: {

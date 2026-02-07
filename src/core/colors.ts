@@ -53,15 +53,18 @@ const buildHashSourceWithBranch = (base: string, workspacePath: string) => {
   return branch ? `${base}@${branch}` : base;
 };
 
-const getGitBranchName = (workspacePath: string): string | null => {
+export const resolveGitDir = (workspacePath: string): string | null => {
   try {
     const gitEntryPath = join(workspacePath, '.git');
     if (!existsSync(gitEntryPath)) {
       return null;
     }
 
-    let gitDir = gitEntryPath;
     const gitEntryStat = statSync(gitEntryPath);
+    if (gitEntryStat.isDirectory()) {
+      return gitEntryPath;
+    }
+
     if (gitEntryStat.isFile()) {
       const content = readFileSync(gitEntryPath, 'utf8');
       const match = content.match(/gitdir:\s*(.+)\s*/i);
@@ -69,9 +72,17 @@ const getGitBranchName = (workspacePath: string): string | null => {
         return null;
       }
       const dir = match[1].trim();
-      gitDir = isAbsolute(dir) ? dir : resolve(workspacePath, dir);
+      return isAbsolute(dir) ? dir : resolve(workspacePath, dir);
     }
+  } catch {
+    return null;
+  }
 
+  return null;
+};
+
+export const readGitBranchFromGitDir = (gitDir: string): string | null => {
+  try {
     const headPath = join(gitDir, 'HEAD');
     if (!existsSync(headPath)) {
       return null;
@@ -88,5 +99,11 @@ const getGitBranchName = (workspacePath: string): string | null => {
   } catch {
     return null;
   }
+
   return null;
+};
+
+export const getGitBranchName = (workspacePath: string): string | null => {
+  const gitDir = resolveGitDir(workspacePath);
+  return gitDir ? readGitBranchFromGitDir(gitDir) : null;
 };
