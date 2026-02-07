@@ -63,8 +63,7 @@
     "check": "tsc -p tsconfig.build.json",
     "test": "tsx tests/index.test.ts",
     "lint": "eslint src --ext ts",
-    "pack": "pnpm build && vsce package -o ./bin",
-    "publish": "pnpm build && vsce publish"
+    "pub": "pnpm build && vsce package -o ./bin"
   },
   "devDependencies": {
     "@babel/cli": "^7.27.2",
