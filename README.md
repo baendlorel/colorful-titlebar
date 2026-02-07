@@ -10,6 +10,10 @@ A VS Code extension that adds colorful background colors to the title bar based 
 
 For more awesome packages, check out [my homepage💛](https://baendlorel.github.io/?repoType=npm)
 
+## 2026-02-07 Update - Version 1.5.0 Released!
+
+Support for **Workspace Name + Git Branch Name** to generate titlebar colors! Now you can have different titlebar colors for different branches of the same project, making it easier to distinguish between them at a glance.
+
 ## ✨ Features
 
 - 🎨 **Project-based Colors**: Automatically generates unique colors based on your project
