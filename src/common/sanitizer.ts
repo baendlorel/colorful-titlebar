@@ -53,7 +53,9 @@ class Sanitizer {
     }
     return value === HashSource.ProjectName ||
       value === HashSource.FullPath ||
-      value === HashSource.ProjectNameDate
+      value === HashSource.ProjectNameDate ||
+      value === HashSource.ProjectNameBranch ||
+      value === HashSource.FullPathBranch
       ? value
       : null;
   }

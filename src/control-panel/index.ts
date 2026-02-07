@@ -21,16 +21,11 @@ export default async function (this: vscode.ExtensionContext) {
   if (controlPanel !== null) {
     return; // 防止创建多个设置页面
   }
-  (controlPanel = vscode.window.createWebviewPanel(
-    'controlPanel',
-    Panel.title,
-    vscode.ViewColumn.One,
-    {
-      enableScripts: true,
-      localResourceRoots: [vscode.Uri.joinPath(this.extensionUri, 'html')],
-      retainContextWhenHidden: true,
-    }
-  )).onDidDispose(() => (controlPanel = null));
+  (controlPanel = vscode.window.createWebviewPanel('controlPanel', Panel.title, vscode.ViewColumn.One, {
+    enableScripts: true,
+    localResourceRoots: [vscode.Uri.joinPath(this.extensionUri, 'html')],
+    retainContextWhenHidden: true,
+  })).onDidDispose(() => (controlPanel = null));
 
   // 准备导入路径
   const extPath = this.extensionPath;
@@ -51,12 +46,8 @@ export default async function (this: vscode.ExtensionContext) {
   // 准备一些数据
   const currentColor = configs.titleBarColor ?? '#007ACC';
   const projectIndicators = configs.projectIndicators.join(Consts.ConfigSeparator);
-  const lightThemeColors = configs.lightThemeColors
-    .map((c) => c.toRGBString())
-    .join(Consts.ConfigSeparator);
-  const darkThemeColors = configs.darkThemeColors
-    .map((c) => c.toRGBString())
-    .join(Consts.ConfigSeparator);
+  const lightThemeColors = configs.lightThemeColors.map((c) => c.toRGBString()).join(Consts.ConfigSeparator);
+  const darkThemeColors = configs.darkThemeColors.map((c) => c.toRGBString()).join(Consts.ConfigSeparator);
 
   const variables = {
     VERSION: version.get(this),
@@ -78,6 +69,8 @@ export default async function (this: vscode.ExtensionContext) {
     ENUM_HASH_SOURCE_PROJECT_NAME: HashSource.ProjectName,
     ENUM_HASH_SOURCE_FULL_PATH: HashSource.FullPath,
     ENUM_HASH_SOURCE_PROJECT_NAME_DATE: HashSource.ProjectNameDate,
+    ENUM_HASH_SOURCE_PROJECT_NAME_BRANCH: HashSource.ProjectNameBranch,
+    ENUM_HASH_SOURCE_FULL_PATH_BRANCH: HashSource.FullPathBranch,
 
     // 配置数据类 (CFG_)
     CFG_THEME: configs.theme,
@@ -128,6 +121,8 @@ export default async function (this: vscode.ExtensionContext) {
     I18N_HASH_SOURCE_PROJECT_NAME: Panel.hashSource[HashSource.ProjectName],
     I18N_HASH_SOURCE_FULL_PATH: Panel.hashSource[HashSource.FullPath],
     I18N_HASH_SOURCE_PROJECT_NAME_DATE: Panel.hashSource[HashSource.ProjectNameDate],
+    I18N_HASH_SOURCE_PROJECT_NAME_BRANCH: Panel.hashSource[HashSource.ProjectNameBranch],
+    I18N_HASH_SOURCE_FULL_PATH_BRANCH: Panel.hashSource[HashSource.FullPathBranch],
     I18N_RANDOM_COLOR_LABEL: Panel.randomColor.label,
     I18N_RANDOM_COLOR_DESC: Panel.randomColor.description,
     I18N_RANDOM_COLOR_COLOR_SET: Panel.randomColor.colorSet,
@@ -156,9 +151,7 @@ export default async function (this: vscode.ExtensionContext) {
   const { html, unreplacedPlaceholders, unusedVariables } = compiler.compile(template, variables);
 
   if (__IS_DEV__) {
-    vscode.window.showInformationMessage(
-      JSON.stringify({ unreplacedPlaceholders, unusedVariables })
-    );
+    vscode.window.showInformationMessage(JSON.stringify({ unreplacedPlaceholders, unusedVariables }));
   }
 
   controlPanel.webview.html = html;

@@ -58,14 +58,15 @@ const i18n = (() => {
         [HashSource.ProjectName]: '项目名',
         [HashSource.FullPath]: '完整路径',
         [HashSource.ProjectNameDate]: '项目名 + Date.getDate()',
+        [HashSource.ProjectNameBranch]: '项目名 + Git分支',
+        [HashSource.FullPathBranch]: '完整路径 + Git分支',
         success: '保存成功，点击"重新计算颜色"可以生效',
       },
       refresh: {
         label: '重新计算颜色',
         description: `再次让本插件自动计算颜色`,
         button: '开始计算',
-        success: (token: string, color: string) =>
-          `重新计算颜色成功，哈希入参：${token}，颜色：${color}`,
+        success: (token: string, color: string) => `重新计算颜色成功，哈希入参：${token}，颜色：${color}`,
       },
       randomColor: {
         label: '操作',
@@ -139,8 +140,7 @@ const i18n = (() => {
     },
 
     // 设置标题栏颜色
-    TitleBarColorSet: (settingsCreated: boolean) =>
-      `标题栏颜色已更新${settingsCreated ? '，已创建settings.json' : ''}`,
+    TitleBarColorSet: (settingsCreated: boolean) => `标题栏颜色已更新${settingsCreated ? '，已创建settings.json' : ''}`,
 
     // 设置全局标题栏样式
     NotCustomTitleBarStyle: (level: string) =>
@@ -160,8 +160,7 @@ const i18n = (() => {
     NotProject: 'Current folder is not a project directory, titlebar color remains unchanged',
 
     Version: {
-      updated: (v: string) =>
-        `is updated to v${v}. The control panel is opened to see the new features`,
+      updated: (v: string) => `is updated to v${v}. The control panel is opened to see the new features`,
       selfNotFound: 'How could I not find myself?',
       button: 'Open Control Panel!',
     },
@@ -172,17 +171,14 @@ const i18n = (() => {
       loading: 'Updating...',
       success: 'Saved successfully',
       typeError: (value: unknown, shouldBe?: string) =>
-        `Invalid value or value type, got ${value}(${typeof value})${
-          shouldBe ? '. Should be ' + shouldBe : ''
-        }`,
+        `Invalid value or value type, got ${value}(${typeof value})${shouldBe ? '. Should be ' + shouldBe : ''}`,
       showSuggest: {
         label: 'Show Suggestions',
         description: `Turning it off will block all suggestions`,
       },
       workbenchCssPath: {
         label: `${Consts.WorkbenchCssName} Path`,
-        description:
-          'After injection, VS Code might show "corrupted", just select "Never show again"',
+        description: 'After injection, VS Code might show "corrupted", just select "Never show again"',
         notExist: 'Path does not exist',
       },
       gradient: {
@@ -212,6 +208,8 @@ const i18n = (() => {
         [HashSource.ProjectName]: 'Project Name',
         [HashSource.FullPath]: 'Full Path',
         [HashSource.ProjectNameDate]: 'Project Name + Date.getDate()',
+        [HashSource.ProjectNameBranch]: 'Project Name + Git Branch',
+        [HashSource.FullPathBranch]: 'Full Path + Git Branch',
         success: 'Saved successfully, click "Recalculate Color" to apply changes',
       },
       refresh: {
@@ -296,9 +294,7 @@ const i18n = (() => {
 
     // 设置标题栏颜色
     TitleBarColorSet: (settingsCreated: boolean) =>
-      `TitleBar color has been updated${
-        settingsCreated ? ', "settings.json" has been created' : ''
-      }`,
+      `TitleBar color has been updated${settingsCreated ? ', "settings.json" has been created' : ''}`,
 
     // 设置全局标题栏样式
     NotCustomTitleBarStyle: (level: string) =>

@@ -38,6 +38,8 @@ export const enum HashSource {
   ProjectName,
   FullPath,
   ProjectNameDate,
+  ProjectNameBranch,
+  FullPathBranch,
 }
 
 // #endregion

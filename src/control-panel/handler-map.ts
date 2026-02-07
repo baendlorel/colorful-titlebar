@@ -69,7 +69,13 @@ export const handlerMap = {
   },
   [Controls.HashSource]: async (result: HandelResult, value: HashSource) => {
     expect(result, value, PostedValueType.Number);
-    const arr = [HashSource.FullPath, HashSource.ProjectName, HashSource.ProjectNameDate];
+    const arr = [
+      HashSource.FullPath,
+      HashSource.ProjectName,
+      HashSource.ProjectNameDate,
+      HashSource.ProjectNameBranch,
+      HashSource.FullPathBranch,
+    ];
     if (!arr.includes(value)) {
       result.succ = false;
       result.msg = Panel.typeError(value, `one of ${arr.join(', ')}`);
@@ -107,10 +113,7 @@ export const handlerMap = {
     const filtered = value.map((v) => v.trim()).filter(Boolean);
     await configs.setProjectIndicators(filtered);
   },
-  [Controls.ThemeColors]: async (
-    result: HandelResult,
-    value: Record<string, RGBA[] | undefined>
-  ) => {
+  [Controls.ThemeColors]: async (result: HandelResult, value: Record<string, RGBA[] | undefined>) => {
     expect(result, value, PostedValueType.Object);
 
     // 必须至少有一个是正常的

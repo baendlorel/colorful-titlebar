@@ -1,4 +1,5 @@
-import { basename } from 'node:path';
+import { basename, isAbsolute, join, resolve } from 'node:path';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
 import { HashSource } from '@/common/consts';
@@ -27,6 +28,10 @@ export const getHashSource = (fullPath: string) => {
       return fullPath;
     case HashSource.ProjectNameDate:
       return new Date().getDate().toString() + basename(fullPath);
+    case HashSource.ProjectNameBranch:
+      return buildHashSourceWithBranch(basename(fullPath), fullPath);
+    case HashSource.FullPathBranch:
+      return buildHashSourceWithBranch(fullPath, fullPath);
     default:
       return basename(fullPath);
   }
@@ -41,4 +46,47 @@ export const getColorByK = (k: number) => {
   const c1 = new RGBA(colorSet[a]);
   const c2 = new RGBA(colorSet[b]);
   return c1.mix(c2, factor);
+};
+
+const buildHashSourceWithBranch = (base: string, workspacePath: string) => {
+  const branch = getGitBranchName(workspacePath);
+  return branch ? `${base}@${branch}` : base;
+};
+
+const getGitBranchName = (workspacePath: string): string | null => {
+  try {
+    const gitEntryPath = join(workspacePath, '.git');
+    if (!existsSync(gitEntryPath)) {
+      return null;
+    }
+
+    let gitDir = gitEntryPath;
+    const gitEntryStat = statSync(gitEntryPath);
+    if (gitEntryStat.isFile()) {
+      const content = readFileSync(gitEntryPath, 'utf8');
+      const match = content.match(/gitdir:\s*(.+)\s*/i);
+      if (!match) {
+        return null;
+      }
+      const dir = match[1].trim();
+      gitDir = isAbsolute(dir) ? dir : resolve(workspacePath, dir);
+    }
+
+    const headPath = join(gitDir, 'HEAD');
+    if (!existsSync(headPath)) {
+      return null;
+    }
+    const head = readFileSync(headPath, 'utf8').trim();
+    if (head.toLowerCase().startsWith('ref:')) {
+      const ref = head.replace(/^ref:\s*/i, '').trim();
+      return basename(ref);
+    }
+
+    if (head.length >= 7) {
+      return `detached@${head.slice(0, 8)}`;
+    }
+  } catch {
+    return null;
+  }
+  return null;
 };
